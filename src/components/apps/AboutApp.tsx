@@ -67,7 +67,7 @@ export function AboutApp({
             <div className={`absolute -inset-2 bg-blue-500/20 rounded-full blur-xl ${isMobile ? '' : 'animate-pulse'}`}></div>
             <div className="relative w-32 h-32 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10">
               <img
-                src="/shrawan.jpg"
+                src="./shrawan.jpg"
                 alt="Shrawan Karki"
                 className="w-full h-full object-cover"
                 onError={(e) => {

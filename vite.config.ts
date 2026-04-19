@@ -7,10 +7,9 @@ import { qrcode } from "vite-plugin-qrcode";
 
 // Default values for local development
 const port = Number(process.env.PORT) || 5173;
-const basePath = process.env.BASE_PATH || "/";
 
 export default defineConfig({
-  base: basePath,
+  base: "/OS-Portfolio/",
   plugins: [
     react(),
     tailwindcss(),
@@ -25,7 +24,7 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
   },
   server: {

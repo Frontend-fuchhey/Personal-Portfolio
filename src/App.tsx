@@ -64,12 +64,12 @@ const MemoizedAppContent = memo(({
     case 'photos':   return <PhotosApp />;
     case 'cert-class12': return (
       <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <img src="/certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
+        <img src="./certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
       </div>
     );
     case 'cert-class10': return (
       <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <img src="/certificates/class10.jpg" alt="Certificate Class 10" className="w-auto h-full object-contain shadow-2xl" />
+        <img src="./certificates/class10.jpg" alt="Certificate Class 10" className="w-auto h-full object-contain shadow-2xl" />
       </div>
     );
     default: return null;

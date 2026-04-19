@@ -25,7 +25,7 @@ export function DesktopWidget({ onOpenAbout }: DesktopWidgetProps) {
     >
       <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20 shadow-lg">
         <img 
-          src="/shrawan.jpg" 
+          src="./shrawan.jpg" 
           alt="Shrawan Karki" 
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
