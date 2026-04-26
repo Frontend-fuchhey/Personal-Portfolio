@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Github, Linkedin, Twitter, Briefcase, GraduationCap, FileText, Monitor } from "lucide-react";
+import { Github, Linkedin, Twitter, Briefcase, GraduationCap, FileText, Monitor, School } from "lucide-react";
 import { AppId } from "../../types/os";
 import { ResumeView } from "../ResumeView";
 import { useOsData } from "../../hooks/useOsData";
+import { USER_CONFIG } from "../../data/userConfig";
 
 export function AboutApp({
   windowId,
@@ -16,6 +17,7 @@ export function AboutApp({
   onResumeStateChange?: (open: boolean) => void
 }) {
   const [isResumeVisible, setIsResumeVisible] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const { aboutData } = useOsData();
   const isMobile = window.innerWidth < 768;
 
@@ -67,8 +69,8 @@ export function AboutApp({
             <div className={`absolute -inset-2 bg-blue-500/20 rounded-full blur-xl ${isMobile ? '' : 'animate-pulse'}`}></div>
             <div className="relative w-32 h-32 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10">
               <img
-                src="./shrawan.jpg"
-                alt="Shrawan Karki"
+                src={USER_CONFIG.profilePic}
+                alt={USER_CONFIG.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src =
@@ -80,10 +82,10 @@ export function AboutApp({
 
           <div className="mb-6 text-center">
             <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-              Shrawan Karki
+              {USER_CONFIG.name}
             </h1>
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-blue-600 dark:text-blue-400">
-              Frontend Developer & UI/UX Designer
+              {USER_CONFIG.title}
             </p>
           </div>
 
@@ -175,7 +177,16 @@ export function AboutApp({
                       rel="noopener noreferrer"
                       className="w-14 h-14 flex-shrink-0 flex items-center justify-center p-2 bg-white dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 shadow-inner cursor-pointer hover:shadow-md transition-all active:scale-95"
                     >
-                      <img src={edu.logo} alt={edu.institution} className="max-w-full max-h-full object-contain" />
+                      {imageErrors[edu.id] ? (
+                        <School className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                      ) : (
+                        <img 
+                          src={edu.logo} 
+                          alt={edu.institution} 
+                          className="max-w-full max-h-full object-contain" 
+                          onError={() => setImageErrors(prev => ({ ...prev, [edu.id]: true }))}
+                        />
+                      )}
                     </a>
 
                     <div className="flex-1 flex justify-between gap-4">

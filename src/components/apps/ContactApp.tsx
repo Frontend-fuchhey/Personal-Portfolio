@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, Linkedin, Github, MapPin, Send, ExternalLink } from 'lucide-react';
+import { USER_CONFIG } from '../../data/userConfig';
 
 export function ContactApp() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -41,7 +42,7 @@ export function ContactApp() {
         </div>
         <div className="relative shrink-0">
           <div className="w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden">
-            <img src="./shrawan.jpg" className="w-full h-full object-cover" alt="avatar" />
+            <img src={USER_CONFIG.profilePic} className="w-full h-full object-cover" alt={USER_CONFIG.name} />
           </div>
           <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full ring-2 ring-green-500/10" />
         </div>

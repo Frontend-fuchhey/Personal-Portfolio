@@ -2,6 +2,7 @@ import { memo, useState, useEffect } from 'react';
 import { Wifi, Battery, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppId } from '../../types/os';
+import { USER_CONFIG } from '../../data/userConfig';
 
 const Clock = memo(() => {
   const [time, setTime] = useState(new Date());
@@ -55,7 +56,7 @@ export function TopBar({ onOpenApp, showClock = true }: TopBarProps) {
           onClick={() => onOpenApp?.('about')}
           className="text-white text-[13px] font-bold tracking-tight cursor-pointer hover:opacity-75 transition-opacity px-2"
         >
-          Shrawan OS
+          {USER_CONFIG.name.split(' ')[0]} OS
         </span>
       </div>
 
