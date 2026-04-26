@@ -22,6 +22,7 @@ import { AppId, Wallpaper } from './types/os';
 import { OsDataProvider } from './hooks/useOsData';
 import { GlobalBackButton } from './components/ui/GlobalBackButton';
 import { DesktopBackground } from './components/ui/DesktopBackground';
+import { USER_CONFIG } from './data/userConfig';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -228,7 +229,7 @@ export default function App() {
                     fontFamily: 'Inter, system-ui, sans-serif',
                   }}
                 >
-                  SHRAWAN KARKI
+                  {USER_CONFIG.name.toUpperCase()}
                 </h1>
                 <p
                   className="text-white font-light uppercase text-center mt-2"
@@ -238,7 +239,7 @@ export default function App() {
                     fontFamily: 'Inter, system-ui, sans-serif',
                   }}
                 >
-                  Frontend Developer & UI Designer
+                  {USER_CONFIG.title}
                 </p>
               </div>
               
@@ -279,7 +280,7 @@ export default function App() {
                 fontFamily: 'Inter, system-ui, sans-serif',
               }}
             >
-              SHRAWAN KARKI
+              {USER_CONFIG.name.toUpperCase()}
             </h1>
 
             <motion.div 
@@ -298,7 +299,7 @@ export default function App() {
                 fontFamily: 'Inter, system-ui, sans-serif',
               }}
             >
-              Frontend Developer &amp; UI Designer
+              {USER_CONFIG.title}
             </p>
           </motion.div>
         )}

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
+import { USER_CONFIG } from '../../data/userConfig';
 
 interface DesktopWidgetProps {
   onOpenAbout: () => void;
@@ -25,18 +26,18 @@ export function DesktopWidget({ onOpenAbout }: DesktopWidgetProps) {
     >
       <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20 shadow-lg">
         <img 
-          src="./shrawan.jpg" 
-          alt="Shrawan Karki" 
+          src={USER_CONFIG.profilePic} 
+          alt={USER_CONFIG.name} 
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
           onError={(e) => {
-            e.currentTarget.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Shrawan&backgroundColor=b6e3f4";
+            e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${USER_CONFIG.name}&backgroundColor=b6e3f4`;
           }}
         />
       </div>
 
       <div className="flex flex-col pr-4">
         <h3 className="text-white font-bold text-lg leading-tight mb-1">
-          Shrawan Karki
+          {USER_CONFIG.name}
         </h3>
         <div className="flex items-center gap-2 text-white/50 group-hover:text-blue-400 transition-colors">
           <span className="text-[10px] font-black uppercase tracking-widest">

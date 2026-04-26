@@ -1,3 +1,5 @@
+import itahariLogo from '../assets/itahari-logo.png';
+import arnikoLogo from '../assets/arniko-logo.png';
 import garmentIcon from '../assets/garmentflow.png';
 import gallery2 from '../assets/maingarment.png';
 import mbPortfolio from '../assets/mb.png';
@@ -28,7 +30,7 @@ export const INITIAL_ABOUT_DATA = {
       detail: "BSc (Hons) Computing",
       year: "2081 - Present",
       status: "ongoing",
-      logo: "/iic-logo.png",
+      logo: itahariLogo,
       link: "https://iic.edu.np/"
     },
     {
@@ -38,7 +40,7 @@ export const INITIAL_ABOUT_DATA = {
       detail: "Computer Science",
       year: "2079 - 2081",
       status: "completed",
-      logo: "/arniko-logo.png",
+      logo: arnikoLogo,
       certId: "cert-class12",
       link: "https://arnikofoundation.edu.np/"
     },
@@ -48,7 +50,7 @@ export const INITIAL_ABOUT_DATA = {
       institution: "Arniko Secondary School, Biratnagar",
       year: "Completed 2079",
       status: "completed",
-      logo: "/arniko-logo.png",
+      logo: arnikoLogo,
       certId: "cert-class10",
       link: "https://arnikofoundation.edu.np/"
     }
