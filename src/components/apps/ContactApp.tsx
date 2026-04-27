@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Mail, Linkedin, Github, MapPin, Send, ExternalLink } from 'lucide-react';
+import { Mail, Linkedin, Github, MapPin, Send } from 'lucide-react';
 import { USER_CONFIG } from '../../data/userConfig';
 
 export function ContactApp() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isFormReady = formData.name.trim() !== '' && formData.email.trim() !== '' && formData.message.trim() !== '';
 
   const submissionHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,96 +26,136 @@ export function ContactApp() {
   };
 
   const contactNodes = [
-    { id: 'email', label: 'pratyushkarki6@gmail.com', icon: Mail, color: '#EA4335', link: 'mailto:pratyushkarki6@gmail.com' },
-    { id: 'linkedin', label: 'Shrawan Karki profile', icon: Linkedin, color: '#0077B5', link: 'https://www.linkedin.com/in/shrawan-karki/' },
-    { id: 'github', label: 'shrawan-karki profile', icon: Github, color: '#181717', link: 'https://github.com/frontend-fuchhey' },
-    { id: 'location', label: 'Morang, Nepal', icon: MapPin, color: '#4285F4', link: '#' },
+    { id: 'email', title: 'EMAIL', label: 'pratyushkarki6@gmail.com', icon: Mail, color: '#EA4335', link: 'mailto:pratyushkarki6@gmail.com' },
+    { id: 'github', title: 'GITHUB', label: 'GitHub', icon: Github, color: '#181717', link: 'https://github.com/frontend-fuchhey' },
+    { id: 'linkedin', title: 'LINKEDIN', label: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: 'https://www.linkedin.com/in/shrawan-karki/' },
+    { id: 'location', title: 'LOCATION', label: 'Morang, Nepal', icon: MapPin, color: '#EA4335', link: '#' },
   ];
 
   return (
-    <div className="h-fit w-full flex flex-col bg-white/90 backdrop-blur-xl font-sans relative overflow-hidden rounded-[1rem] shadow-2xl border border-black/5 pb-[25px]">
+    <div className="w-full max-w-[500px] min-h-[600px] max-h-[90vh] mx-auto grid grid-cols-1 md:grid-cols-[35%_65%] font-sans relative overflow-x-hidden overflow-y-auto rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
       
-      {/* 1. Header Section - Tightened */}
-      <div className="p-[20px] pb-2 flex justify-between items-start">
-        <div className="max-w-[70%]">
-          <h1 className="text-2xl font-black text-black tracking-tight leading-tight">CONNECT WITH ME</h1>
-          <p className="text-xs text-gray-500 mt-1 font-medium italic">Always open to discuss projects...</p>
-        </div>
-        <div className="relative shrink-0">
-          <div className="w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden">
-            <img src={USER_CONFIG.profilePic} className="w-full h-full object-cover" alt={USER_CONFIG.name} />
+      {/* Left Panel - Contact Info */}
+      <div className="py-6 px-4 min-w-[140px] flex flex-col order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10">
+        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-8">CONTACT INFO</h2>
+        
+        <div className="bg-white/50 rounded-xl p-6 flex justify-center mb-8 shadow-sm">
+          <div className="relative shrink-0">
+            <div className="w-[54px] h-[54px] rounded-full border-[3px] border-white shadow-sm overflow-hidden">
+              <img src={USER_CONFIG.profilePic} className="w-full h-full object-cover" alt={USER_CONFIG.name} />
+            </div>
+            <div className="absolute bottom-0 right-0 w-[14px] h-[14px] bg-[#34C759] border-2 border-white rounded-full" />
           </div>
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full ring-2 ring-green-500/10" />
         </div>
-      </div>
 
-      <div className="px-[20px] flex flex-col flex-1">
-        {/* 2. Contact Info Grid */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2 pb-2">
+        <div className="space-y-8">
           {contactNodes.map((item) => {
             const Icon = item.icon;
+            
+            if (item.id === 'github' || item.id === 'linkedin') {
+              return (
+                <div key={item.id} className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{item.title}</span>
+                  <a 
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center flex-nowrap gap-2 cursor-pointer group hover:opacity-70 transition-all overflow-visible"
+                  >
+                    <Icon className="w-6 h-6 shrink-0" style={{ color: item.color }} />
+                    <span className="text-[13px] font-semibold text-black group-hover:text-blue-600 transition-colors">{item.label}</span>
+                  </a>
+                </div>
+              );
+            }
+
             return (
-              <div 
-                key={item.id}
-                onClick={() => {
-                  if(item.id !== 'email' && item.id !== 'location') window.open(item.link, '_blank');
-                  else if(item.id === 'email') window.location.href = item.link;
-                  navigator.clipboard.writeText(item.label);
-                }}
-                className="flex items-center gap-3 py-2 border-b border-black/5 cursor-pointer group transition-all"
-              >
-                <Icon className="w-5 h-5 shrink-0" style={{ color: item.color }} />
-                <span className="text-[11px] font-bold text-black truncate flex-1 tracking-tight">{item.label}</span>
-                <ExternalLink className="w-2.5 h-2.5 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div key={item.id} className="flex flex-col">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{item.title}</span>
+                <div 
+                  onClick={() => {
+                    if(item.id === 'email') window.location.href = item.link;
+                    navigator.clipboard.writeText(item.label);
+                  }}
+                  className="flex items-center flex-nowrap gap-2 cursor-pointer hover:opacity-70 transition-all overflow-visible"
+                >
+                  <Icon className="w-6 h-6 shrink-0" style={{ color: item.color }} />
+                  <span className={`font-semibold text-black ${
+                    item.id === 'email' ? 'text-[10px] sm:text-[11px] whitespace-nowrap overflow-visible leading-none tracking-tighter' : 'text-[13px] break-words'
+                  }`}>{item.label}</span>
+                </div>
               </div>
-            );
+            )
           })}
         </div>
-
-        {/* 3. Message Form Section */}
-        <div className="flex flex-col pt-2">
-          <h2 className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em] mb-3">MESSAGE ME</h2>
-          <form onSubmit={submissionHandler} className="space-y-4">
-            <input 
-              type="text"
-              required
-              value={formData.name}
-              onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-              placeholder="Your Full Name"
-              className="w-full bg-transparent border-b border-black py-2 text-[12px] placeholder:text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-            <input 
-              type="email"
-              required
-              value={formData.email}
-              onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-              placeholder="email@address.com"
-              className="w-full bg-transparent border-b border-black py-2 text-[12px] placeholder:text-gray-300 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-            <textarea 
-              required
-              value={formData.message}
-              onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-              placeholder="Message inquire..."
-              className="w-full bg-transparent border-b border-black py-2 text-[12px] placeholder:text-gray-300 focus:outline-none focus:border-blue-500 transition-colors h-[70px] resize-none"
-            />
-            
-            <div className="pt-4 flex justify-center pb-2">
-              <button 
-                type="submit"
-                disabled={isSubmitting}
-                className="flex items-center h-10 px-12 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs tracking-widest rounded-full shadow-xl shadow-blue-600/20 active:scale-95 transition-all gap-3 uppercase disabled:opacity-50"
-              >
-                {isSubmitting ? 'Sending...' : (
-                  <>
-                    SEND <Send className="w-4 h-4 fill-current" />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
+
+      {/* Right Panel - Message Form */}
+      <div className="bg-white p-6 flex flex-col flex-1 order-1 md:order-2">
+        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-8">MESSAGE</h2>
+        
+        <form onSubmit={submissionHandler} className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 gap-y-3">
+            <fieldset className="border border-gray-400 rounded-md px-5 focus-within:border-blue-500 transition-colors">
+              <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">NAME</legend>
+              <input 
+                type="text" 
+                required
+                value={formData.name}
+                onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                className="w-full py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black" 
+                placeholder="Your name here" 
+                style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
+              />
+            </fieldset>
+
+            <fieldset className="border border-gray-400 rounded-md px-5 focus-within:border-blue-500 transition-colors">
+              <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">EMAIL</legend>
+              <input 
+                type="email" 
+                required
+                value={formData.email}
+                onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                className="w-full py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black" 
+                placeholder="your.email@example.com" 
+                style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
+              />
+            </fieldset>
+
+            <fieldset className="border border-gray-400 rounded-md px-5 pb-2 focus-within:border-blue-500 transition-colors">
+              <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">MESSAGE</legend>
+              <textarea 
+                required
+                value={formData.message}
+                onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+                className="w-full h-32 py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black leading-[1.6] resize-none" 
+                placeholder="Tell me about your project..." 
+                style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
+              />
+            </fieldset>
+          </div>
+
+          <div className="mt-auto pt-4">
+            <button 
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full py-3.5 text-white font-bold text-[14px] rounded-md transition-all duration-500 flex items-center justify-center gap-3 tracking-widest disabled:opacity-50 ${
+                isFormReady 
+                  ? 'bg-blue-600 hover:bg-blue-700 animate-pulse brightness-110' 
+                  : 'bg-[#71A5D4] hover:bg-[#5C95C6]'
+              }`}
+              style={isFormReady ? { boxShadow: '0 0 15px rgba(37, 99, 235, 0.6)' } : {}}
+            >
+              {isSubmitting ? 'SENDING...' : (
+                <>
+                  SEND <Send className="w-4 h-4 fill-current" />
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
     </div>
   );
 }
