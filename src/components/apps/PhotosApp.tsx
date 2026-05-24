@@ -1,9 +1,10 @@
 import { useState, memo } from 'react';
 import { Camera, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import shrawanPic from '../../assets/shrawan.jpg';
 
 const photoData = [
-  { id: 1, url: '../../public/shrawan.jpg', title: 'Moment 1' },
+  { id: 1, url: shrawanPic, title: 'Moment 1' },
 ];
 
 export const PhotosApp = memo(() => {

@@ -1,11 +1,19 @@
 import { useState } from 'react';
-import { Mail, Linkedin, Github, MapPin, Send } from 'lucide-react';
+import { Mail, Linkedin, Github, MapPin, Send, Copy, Check } from 'lucide-react';
 import { USER_CONFIG } from '../../data/userConfig';
+import profilePic from '../../assets/shrawan.jpg';
 
 export function ContactApp() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const isFormReady = formData.name.trim() !== '' && formData.email.trim() !== '' && formData.message.trim() !== '';
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const submissionHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +41,7 @@ export function ContactApp() {
   ];
 
   return (
-    <div className="w-full max-w-[500px] min-h-[600px] max-h-[90vh] mx-auto grid grid-cols-1 md:grid-cols-[35%_65%] font-sans relative overflow-x-hidden overflow-y-auto rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
+    <div className="w-full max-w-[700px] min-h-[600px] max-h-[90vh] mx-auto grid grid-cols-1 md:grid-cols-[220px_1fr] font-sans relative overflow-x-hidden overflow-y-auto rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
       
       {/* Left Panel - Contact Info */}
       <div className="py-6 px-4 min-w-[140px] flex flex-col order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10">
@@ -41,8 +49,19 @@ export function ContactApp() {
         
         <div className="bg-white/50 rounded-xl p-6 flex justify-center mb-8 shadow-sm">
           <div className="relative shrink-0">
-            <div className="w-[54px] h-[54px] rounded-full border-[3px] border-white shadow-sm overflow-hidden">
-              <img src={USER_CONFIG.profilePic} className="w-full h-full object-cover" alt={USER_CONFIG.name} />
+            <div className="w-36 h-36 rounded-full border-[3px] border-white shadow-sm overflow-hidden antialiased">
+              <img 
+                src={profilePic} 
+                className="w-full h-full object-cover object-center image-render-crisp" 
+                style={{ 
+                  // @ts-ignore
+                  WebkitImageRendering: 'optimize-contrast', 
+                  imageRendering: 'crisp-edges',
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden'
+                }}
+                alt={USER_CONFIG.name} 
+              />
             </div>
             <div className="absolute bottom-0 right-0 w-[14px] h-[14px] bg-[#34C759] border-2 border-white rounded-full" />
           </div>
@@ -69,20 +88,46 @@ export function ContactApp() {
               );
             }
 
+            if (item.id === 'email') {
+              return (
+                <div key={item.id} className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{item.title}</span>
+                  <div className="flex items-center flex-nowrap gap-2 overflow-visible">
+                    <div 
+                      onClick={() => window.location.href = item.link}
+                      className="flex items-center flex-nowrap gap-2 cursor-pointer hover:opacity-70 transition-all overflow-visible"
+                    >
+                      <Icon className="w-6 h-6 shrink-0" style={{ color: item.color }} />
+                      <span className="text-[12px] font-normal text-gray-700 whitespace-nowrap overflow-visible leading-none tracking-tighter">
+                        {item.label}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(item.label);
+                      }}
+                      className="p-1 hover:bg-black/5 rounded-md transition-colors"
+                      title="Copy email"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <div key={item.id} className="flex flex-col">
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{item.title}</span>
                 <div 
                   onClick={() => {
-                    if(item.id === 'email') window.location.href = item.link;
                     navigator.clipboard.writeText(item.label);
                   }}
                   className="flex items-center flex-nowrap gap-2 cursor-pointer hover:opacity-70 transition-all overflow-visible"
                 >
                   <Icon className="w-6 h-6 shrink-0" style={{ color: item.color }} />
-                  <span className={`font-semibold text-black ${
-                    item.id === 'email' ? 'text-[10px] sm:text-[11px] whitespace-nowrap overflow-visible leading-none tracking-tighter' : 'text-[13px] break-words'
-                  }`}>{item.label}</span>
+                  <span className="text-[13px] font-semibold text-black break-words">{item.label}</span>
                 </div>
               </div>
             )
@@ -141,7 +186,7 @@ export function ContactApp() {
               disabled={isSubmitting}
               className={`w-full py-3.5 text-white font-bold text-[14px] rounded-md transition-all duration-500 flex items-center justify-center gap-3 tracking-widest disabled:opacity-50 ${
                 isFormReady 
-                  ? 'bg-blue-600 hover:bg-blue-700 animate-pulse brightness-110' 
+                  ? 'bg-blue-600 hover:bg-blue-700 animate-pulse brightness-110 drop-shadow-lg' 
                   : 'bg-[#71A5D4] hover:bg-[#5C95C6]'
               }`}
               style={isFormReady ? { boxShadow: '0 0 15px rgba(37, 99, 235, 0.6)' } : {}}

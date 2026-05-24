@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { USER_CONFIG } from '../../data/userConfig';
+import profilePic from '../../assets/shrawan.jpg';
 
 interface DesktopWidgetProps {
   onOpenAbout: () => void;
@@ -24,11 +25,18 @@ export function DesktopWidget({ onOpenAbout }: DesktopWidgetProps) {
       whileHover={{ y: -5, background: 'rgba(255, 255, 255, 0.12)', scale: 1.02 }}
       onClick={onOpenAbout}
     >
-      <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20 shadow-lg">
+      <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20 shadow-lg antialiased">
         <img 
-          src={USER_CONFIG.profilePic} 
+          src={profilePic} 
           alt={USER_CONFIG.name} 
-          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 object-center image-render-crisp"
+          style={{ 
+            // @ts-ignore
+            WebkitImageRendering: 'optimize-contrast', 
+            imageRendering: 'crisp-edges',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden'
+          }}
           onError={(e) => {
             e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${USER_CONFIG.name}&backgroundColor=b6e3f4`;
           }}
