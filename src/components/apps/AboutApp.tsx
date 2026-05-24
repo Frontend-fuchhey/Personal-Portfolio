@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import profilePic from "../../assets/shrawan.jpg";
 import {
   Github,
   Linkedin,
@@ -72,7 +73,7 @@ export function AboutApp({
       }}
     >
       <div
-        className={`flex-1 ${isMobile ? "p-5" : "p-8 md:p-12 overflow-y-auto custom-scrollbar"}`}
+        className={`flex-1 ${isMobile ? "px-5 py-6" : "px-8 py-6 md:px-12 md:py-8 overflow-y-auto custom-scrollbar"}`}
       >
         <div
           className={`${isMobile ? "w-full h-auto" : "max-w-[520px] w-full"} flex flex-col items-center`}
@@ -81,11 +82,18 @@ export function AboutApp({
             <div
               className={`absolute -inset-2 bg-blue-500/20 rounded-full blur-xl ${isMobile ? "" : "animate-pulse"}`}
             ></div>
-            <div className="relative w-32 h-32 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10">
+            <div className="relative w-64 h-64 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10 antialiased">
               <img
-                src={USER_CONFIG.profilePic}
+                src={profilePic}
                 alt={USER_CONFIG.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center rounded-full image-render-crisp"
+                style={{ 
+                  // @ts-ignore
+                  WebkitImageRendering: 'optimize-contrast', 
+                  imageRendering: 'crisp-edges',
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden'
+                }}
                 onError={(e) => {
                   e.currentTarget.src =
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=Pratyush&backgroundColor=b6e3f4";
@@ -94,7 +102,7 @@ export function AboutApp({
             </div>
           </div>
 
-          <div className="mb-6 text-center">
+          <div className="mb-6 text-center mt-6">
             <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
               {USER_CONFIG.name}
             </h1>

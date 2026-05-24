@@ -9,7 +9,7 @@ import { qrcode } from "vite-plugin-qrcode";
 const port = Number(process.env.PORT) || 5173;
 
 export default defineConfig({
-  base: "/OS-Portfolio/",
+  base: "/",
   plugins: [
     react(),
     tailwindcss(),
