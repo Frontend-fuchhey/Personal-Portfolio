@@ -73,7 +73,7 @@ export function AboutApp({
       }}
     >
       <div
-        className={`flex-1 ${isMobile ? "px-5 py-6" : "px-8 py-6 md:px-12 md:py-8 overflow-y-auto custom-scrollbar"}`}
+        className={`flex-1 custom-scroll-cursor ${isMobile ? "px-5 py-6" : "px-8 py-6 md:px-12 md:py-8 overflow-y-auto custom-scrollbar"}`}
       >
         <div
           className={`${isMobile ? "w-full h-auto" : "max-w-[520px] w-full"} flex flex-col items-center`}
