@@ -21,7 +21,7 @@ export function DesktopWidget({ onOpenAbout }: DesktopWidgetProps) {
       }}
       initial={{ opacity: 0, x: -30 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 4.2, duration: 1.2, ease: "easeOut" }}
+      transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
       whileHover={{ y: -5, background: 'rgba(255, 255, 255, 0.12)', scale: 1.02 }}
       onClick={onOpenAbout}
     >

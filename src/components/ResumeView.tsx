@@ -8,12 +8,12 @@ export function ResumeView({ onBack }: { onBack?: () => void }) {
     email: "pratyushkarki6@gmail.com",
     location: "Morang, Nepal",
     github: "github.com/frontend-fuchhey",
-    linkedin: "linkedin.com/in/shrawan-karki-59b0ba392/",
-    portfolio: "shrawan.os"
+    linkedin: "Shrawan Karki",
+    portfolio: "shrawankarki.com.np"
   };
 
   const skills = [
-    { category: "Frontend", items: ["React", "TypeScript", "Tailwind CSS", "Next.js", "Framer Motion", "Three.js"] },
+    { category: "Frontend", items: ["React", "javascript", "html", "css", "Tailwind CSS", "Next.js", "Framer Motion", "Three.js"] },
     { category: "Tools", items: ["Figma", "Git"] }
   ];
 
@@ -53,10 +53,24 @@ export function ResumeView({ onBack }: { onBack?: () => void }) {
     }
   ];
 
+  const projects = [
+    {
+      project_name: "Garment Flow",
+      description_project: "The app is designed to streamline the entire garment export process, from raw material procurement to final product delivery. It serves as a centralized platform for managing purchase orders, inventory, production workflows, and export logistics, ensuring seamless coordination among buyers, manufacturers, and suppliers.",
+      github_link: "https://github.com/frontend-fuchhey/Garment_Project"
+    },
+    {
+      project_name: "Shrawan OS Portfolio",
+      description_project: "Custom Linux theme based portfolio personal website",
+      link: "https://shrawankarki.com.np"
+
+    }
+  ]
+
   const languages = ["English (Professional)", "Nepali (Native)", "Hindi (Fluent)"];
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-  
+
   return (
     <div className={`absolute inset-0 w-full h-full bg-[#f9fafb] dark:bg-[#111827] font-sans flex flex-col overflow-hidden ${isMobile ? 'mobile-content-shift' : ''}`}
       style={{ color: '#111827' }}>
@@ -75,7 +89,7 @@ export function ResumeView({ onBack }: { onBack?: () => void }) {
           )}
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hidden sm:block">Digital Resume</h2>
         </div>
-        <a 
+        <a
           href="./Shrawan_Karki_CV.pdf"
           download="Shrawan_Karki_CV.pdf"
           target="_blank"

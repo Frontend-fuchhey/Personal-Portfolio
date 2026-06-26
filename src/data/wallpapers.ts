@@ -1,6 +1,7 @@
 import { Wallpaper } from '../types/os';
 
 export const WALLPAPERS: Wallpaper[] = [
+  { id: 'v7_wave',  name: 'V7 Wave',      value: '/fluid_wave_bg.png',                                                          type: 'url' },
   { id: 'aurora',   name: 'Aurora',       value: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%)', type: 'gradient' },
   { id: 'sunset',   name: 'Sunset',       value: 'linear-gradient(135deg, #f093fb 0%, #f5576c 30%, #4facfe 80%, #00f2fe 100%)', type: 'gradient' },
   { id: 'forest',   name: 'Forest',       value: 'linear-gradient(135deg, #0a3d0a 0%, #134e13 30%, #1e7e1e 70%, #2b9e2b 100%)', type: 'gradient' },

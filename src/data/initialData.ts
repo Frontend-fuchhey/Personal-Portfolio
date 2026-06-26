@@ -61,6 +61,7 @@ export const INITIAL_PROJECTS = [
   {
     id: 'garment_flow',
     name: 'Garment flow',
+    category: 'React', // <--- Added Category
     description: 'A comprehensive Store Management System and ERP.',
     tech: ['React.js', 'TypeScript', 'Tailwind CSS'],
     stars: 342,
@@ -77,6 +78,7 @@ export const INITIAL_PROJECTS = [
   {
     id: 'portfolio',
     name: 'Shrawan OS',
+    category: 'React', // <--- Added Category (or 'React' depending on your choice)
     description: 'This portfolio! macOS-inspired interactive experience',
     tech: ['React', 'TypeScript', 'Framer Motion', 'Tailwind CSS'],
     stars: 89,
@@ -90,4 +92,3 @@ export const INITIAL_PROJECTS = [
     coverImage: lpPortfolio
   },
 ];
-
