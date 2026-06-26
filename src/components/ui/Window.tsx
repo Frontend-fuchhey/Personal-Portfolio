@@ -56,12 +56,13 @@ export function Window({
       ? { top: 32, left: 0, right: 0, bottom: 84, width: '100vw', height: 'calc(100vh - 116px)' }
       : win.appId === 'contact' 
         ? {
-            top: `calc(50% + ${win.y}px)`,
-            left: `calc(50% + ${win.x}px)`,
+            position: 'fixed' as const,
+            top: '50%',
+            left: '50%',
             x: '-50%',
-            y: '-55%',
+            y: '-50%',
             width: win.width,
-            height: 'fit-content',
+            minHeight: 600,
             maxWidth: '95vw',
             maxHeight: 'calc(100vh - 120px)',
             borderRadius: '1rem',
@@ -122,7 +123,14 @@ export function Window({
       dragMomentum={false}
       dragTransition={{ bounceStiffness: 1000, bounceDamping: 100 }}
       onDragEnd={handleDragEnd}
-      onMouseDown={() => onFocus(win.id)}
+      onMouseDown={(e) => {
+        // Only focus the window; do NOT intercept events from inside the content
+        onFocus(win.id);
+      }}
+      onClick={(e) => {
+        // Stop window-level clicks from escaping to desktop layer
+        e.stopPropagation();
+      }}
     >
       {!isMobile && (
         <div
@@ -174,7 +182,12 @@ export function Window({
       )}
 
 
-      <div className={`window-content flex-1 ${isMobile ? 'overflow-y-auto h-full pt-[60px] pb-[50px] px-0' : 'overflow-hidden'}`} style={{ background: isMobile ? '#FFFFFF' : 'transparent' }}>
+      <div
+        className={`window-content flex-1 ${isMobile ? 'overflow-y-auto h-full pt-[60px] pb-[50px] px-0' : 'overflow-hidden'}`}
+        style={{ background: isMobile ? '#FFFFFF' : 'transparent' }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
         {children}
       </div>
     </motion.div>

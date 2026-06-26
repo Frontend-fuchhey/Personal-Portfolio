@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOsData } from '../../hooks/useOsData';
+import { INITIAL_PROJECTS } from '../../data/initialData';
 
 interface ProjectFeature {
   icon: any;
@@ -20,6 +21,7 @@ interface Project {
   description: string;
   longDesc?: string | any;
   tech: string[];
+  category?: string;
   stars?: number;
   forks?: number;
   url?: string;
@@ -40,6 +42,9 @@ export function ProjectsApp() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const [activeFilter, setActiveFilter] = useState<'all' | 'react' | 'web design'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const handleProjectClick = (e: React.MouseEvent, project: Project) => {
     e.preventDefault();
     e.stopPropagation();
@@ -52,36 +57,108 @@ export function ProjectsApp() {
     setSelected(null);
   };
 
+  const filteredProjects = INITIAL_PROJECTS.filter((project) => {
+    // Always read from INITIAL_PROJECTS (source of truth) — never stale context state
+    if (activeFilter.toLowerCase() === 'all') return true;
+    return project.category?.toLowerCase().trim() === activeFilter.toLowerCase().trim();
+  });
+
+  // Apply search on top of the category-filtered list
+  const projectsData = (filteredProjects as Project[]).filter(project => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return project.name.toLowerCase().includes(q) ||
+      project.description.toLowerCase().includes(q) ||
+      project.tech.some(t => t.toLowerCase().includes(q));
+  });
+
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   return (
-    <div className={`h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden relative ${isMobile ? 'mobile-content-shift' : ''}`}>
+    <div className={`w-full h-full md:w-[860px] md:h-[580px] flex flex-col bg-white dark:bg-gray-900 overflow-hidden relative ${isMobile ? 'mobile-content-shift' : ''}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/40 dark:bg-gray-800/40">
-          <FolderOpen className="w-4 h-4 text-orange-500" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Projects</span>
-          <span className="text-xs text-gray-400 ml-auto">{projects.length} items</span>
+        <div className="w-full border-b border-slate-200/60 bg-white/70 backdrop-blur-md flex flex-wrap items-center gap-y-2 px-4 py-2 select-none shrink-0 z-10">
+          {/* Row 1: Title + Filter Tabs */}
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            {/* Left Section — Project Directory Brand Label */}
+            <div className="flex items-center gap-2 text-slate-700 font-sans font-bold text-xs tracking-wide uppercase shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <span>PROJECTS ({projectsData.length})</span>
+            </div>
+
+            {/* Center Section — Filter Tab Navigation */}
+            <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400 font-sans">
+              {(['all', 'react', 'web design'] as const).map((cat, idx, arr) => (
+                <span key={cat} className="flex items-center gap-3">
+                  <button
+                    onClick={() => setActiveFilter(cat)}
+                    className={activeFilter === cat
+                      ? 'text-slate-800 font-bold border-b border-slate-800 pb-0.5 cursor-default'
+                      : 'hover:text-slate-600 cursor-pointer transition-colors duration-150'
+                    }
+                  >
+                    {cat === 'all' ? 'All' : cat === 'react' ? 'React' : 'Web Design'}
+                  </button>
+                  {idx < arr.length - 1 && (
+                    <span className="text-slate-200 pointer-events-none px-0.5">|</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2 on mobile / inline on desktop: Search Input */}
+          <div className="relative w-full mt-1 md:mt-0 md:w-auto md:max-w-[160px] md:ml-auto">
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-100 border border-slate-200/30 rounded-md pl-7 pr-2.5 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-300 transition-all duration-200"
+            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="flex flex-wrap gap-8 p-8">
-            {projects.map(project => {
-              const isEmoji = project.iconType === 'emoji' || (typeof project.icon === 'string' && !project.icon.includes('/') && !project.icon.includes('.'));
-              const iconDisplay = project.iconType === 'emoji' ? project.iconValue : (project.iconValue || project.icon);
+            {projectsData.length === 0 ? (
+              <div className="w-full py-12 flex flex-col items-center justify-center text-slate-400 gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" className="w-10 h-10 text-slate-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18a2.25 2.25 0 012.25 2.25v4.25a2.25 2.25 0 01-2.25 2.25H2.25A2.25 2.25 0 010 20v-4.25A2.25 2.25 0 012.25 13.5z" />
+                </svg>
+                <p className="text-xs">No projects found matching the criteria</p>
+              </div>
+            ) : (
+              projectsData.map(project => {
+                const isEmoji = project.iconType === 'emoji' || (typeof project.icon === 'string' && !project.icon.includes('/') && !project.icon.includes('.'));
+                const iconDisplay = project.iconType === 'emoji' ? project.iconValue : (project.iconValue || project.icon);
 
-              return (
-                <button
-                  key={project.id}
-                  onClick={(e) => handleProjectClick(e, project)}
-                  className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
-                >
-                  <div className={`w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + project.color : ''}`}>
-                    {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={project.name} className="w-16 h-16 object-cover rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10" />}
-                  </div>
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 leading-tight break-words">{project.name}</span>
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={project.id}
+                    onClick={(e) => handleProjectClick(e, project)}
+                    className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
+                  >
+                    <div className={`w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + project.color : ''}`}>
+                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={project.name} className="w-16 h-16 object-cover rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10" />}
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 leading-tight break-words">{project.name}</span>
+                  </button>
+                )
+              })
+            )}
           </div>
 
           <div className="mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-700/50 text-center">

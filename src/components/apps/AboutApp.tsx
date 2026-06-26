@@ -37,7 +37,7 @@ export function AboutApp({
     }
   }, [isResumeVisible, onResumeStateChange]);
 
-  useEffect(() => {}, [isMobile]);
+  useEffect(() => { }, [isMobile]);
 
   useEffect(() => {
     if (!windowId || !onUpdateSize) return;
@@ -87,9 +87,9 @@ export function AboutApp({
                 src={profilePic}
                 alt={USER_CONFIG.name}
                 className="w-full h-full object-cover object-center rounded-full image-render-crisp"
-                style={{ 
+                style={{
                   // @ts-ignore
-                  WebkitImageRendering: 'optimize-contrast', 
+                  WebkitImageRendering: 'optimize-contrast',
                   imageRendering: 'crisp-edges',
                   transform: 'translateZ(0)',
                   backfaceVisibility: 'hidden'
@@ -149,6 +149,86 @@ export function AboutApp({
               clean, performant, and accessible user interfaces that tell a
               story.
             </p>
+            {/* Tech Stack Divider & Section */}
+            <div className="w-full max-w-lg flex flex-col gap-5 mt-6 pt-6 border-t border-gray-100 dark:border-white/10 text-sm">
+              {(() => {
+                const techCategories = [
+                  {
+                    label: "Frontend",
+                    items: [
+                      {
+                        name: 'React',
+                        icon: <svg className="w-4 h-4 text-[#61DAFB]" viewBox="-11.5 -10.23174 23 20.46348" fill="none" stroke="currentColor" strokeWidth="1"><ellipse rx="11" ry="4.2" /><ellipse rx="11" ry="4.2" transform="rotate(60)" /><ellipse rx="11" ry="4.2" transform="rotate(120)" /><circle r="2" fill="currentColor" /></svg>
+                      },
+                      ,
+                      {
+                        name: 'JavaScript',
+                        icon: <svg className="w-4 h-4 text-[#F7DF1E] fill-current" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.1 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h41.3v143.7zm99.6-42.5c4.8 21.6 18.6 34.6 38.8 34.6 18.6 0 31.5-9.3 31.5-24.3 0-16.8-12.3-22.8-33.1-31.9l-11.4-4.8c-32.5-14.1-54.1-31.3-54.1-68.5 0-38.2 30.4-66.4 72.7-66.4 39.4 0 63.2 17.7 71.3 43.6l-32.8 19.3c-5.7-11.7-14.4-17.7-37.3-17.7-17.1 0-28.3 8.7-28.3 22 0 14.4 9 20.1 27.7 28.3l12.3 5.4c39.1 17.1 59.8 34 59.8 73 0 41.6-31.3 70-79.9 70-52.3 0-77-24.3-86.8-54.4l34.1-19.6z" /></svg>
+                      }
+                    ]
+                  },
+                  {
+                    label: "Designing & Styling",
+                    items: [
+                      {
+                        name: 'Tailwind CSS',
+                        icon: <svg className="w-4 h-4 text-[#38BDF8] fill-current" viewBox="0 0 24 24"><path d="M12 6.5c-2.8 0-4.9 1.4-6.3 4.2 2.1-2.1 4.2-2.8 6.3-2.1 1.2.4 2 1.3 3 2.3 1.5 1.5 3.3 3.3 6.6 3.3 2.8 0 4.9-1.4 6.3-4.2-2.1 2.1-4.2 2.8-6.3 2.1-1.2-.4-2-1.3-3-2.3-1.5-1.5-3.3-3.3-6.6-3.3zM5.4 13c-2.8 0-4.9 1.4-6.3 4.2 2.1-2.1 4.2-2.8 6.3-2.1 1.2.4 2 1.3 3 2.3 1.5 1.5 3.3 3.3 6.6 3.3 2.8 0 4.9-1.4 6.3-4.2-2.1 2.1-4.2 2.8-6.3 2.1-1.2-.4-2-1.3-3-2.3-1.5-1.5-3.3-3.3-6.6-3.3z" /></svg>
+                      },
+                      {
+                        name: 'UI/UX Designing',
+                        icon: <svg className="w-4 h-4 text-[#A259FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>
+                      },
+                      {
+                        name: 'Figma',
+                        icon: <svg className="w-4 h-4" viewBox="0 0 38 57" fill="none"><path d="M19 0a9.5 9.5 0 0 0-9.5 9.5 9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 19 0z" fill="#F24E1E" /><path d="M9.5 19a9.5 9.5 0 0 0 0 19h9.5V19H9.5z" fill="#A259FF" /><path d="M19 19h9.5a9.5 9.5 0 0 0 0-19H19v19z" fill="#FF7262" /><path d="M19 38h9.5a9.5 9.5 0 0 0 0-19H19v19z" fill="#1ABC9C" /><path d="M9.5 38a9.5 9.5 0 0 0 9.5 9.5V38H9.5z" fill="#18A0FB" /></svg>
+                      },
+                      {
+                        name: 'Photoshop',
+                        icon: <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><rect width="24" height="24" rx="4" fill="#001E36" /><path d="M7.5 7h2.6c1.5 0 2.4.7 2.4 2 0 1.4-1 2.1-2.5 2.1H8.8V15H7.5V7zm1.3 3.1h1c.8 0 1.3-.3 1.3-1 0-.6-.4-.9-1.2-.9h-1v1.9zm5.5 2.5c0-.9.6-1.5 1.8-1.6 1.1 0 1.7.3 1.7.3v-1s-.5-.2-1.4-.2c-1.8 0-2.8 1-2.8 2.5 0 2.1 2.8 1.7 2.8 3 0 .4-.4.6-1 .6-.9 0-1.6-.4-1.6-.4l-.3.9s.7.4 1.9.4c1.8 0 2.9-.9 2.9-2.5 0-2.3-2.8-1.8-2.8-3z" fill="#31A8FF" /></svg>
+                      }
+                    ]
+                  },
+                  {
+                    label: "Tools & Env",
+                    items: [
+                      {
+                        name: 'Git / GitHub',
+                        icon: <svg className="w-4 h-4 text-[#24292E] dark:text-gray-200 fill-current" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
+                      },
+                      {
+                        name: 'Vite',
+                        icon: <svg className="w-4 h-4 text-[#646CFF] fill-current" viewBox="0 0 24 24"><path d="M19.95 2.5L12 16v6l7.95-13.5h-5.4zM4.05 2.5L12 16V9.5H6.6z" /></svg>
+                      },
+                      {
+                        name: 'Netlify',
+                        icon: <svg className="w-4 h-4 text-[#00C7B7] fill-current" viewBox="0 0 24 24"><path d="M12 2L2 12h5v10h10V12h5L12 2z" /></svg>
+                      },
+                      {
+                        name: 'npm',
+                        icon: <svg className="w-4 h-4 text-[#CB3837] fill-current" viewBox="0 0 24 24"><path d="M0 0v24h24V0H0zm18.5 18.5h-3.5v-11h-3v11h-6.5v-13h13v13z" /></svg>
+                      }
+                    ]
+                  }
+                ];
+
+                return techCategories.map((cat) => (
+                  <div key={cat.label} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 py-2.5 border-b border-gray-50 dark:border-white/[0.02] last:border-0">
+                    <span className="w-44 shrink-0 font-bold text-xs uppercase tracking-wider text-gray-400">
+                      {cat.label}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {cat.items.map((tech) => (
+                        <span key={tech.name} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-gray-50 dark:bg-white/5 border border-gray-200/60 dark:border-white/10 text-xs font-medium text-gray-700 dark:text-gray-300 shadow-sm">
+                          {tech.icon}
+                          <span>{tech.name}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+
             <button
               onClick={() => setIsResumeVisible(true)}
               className="mt-8 flex items-center gap-2.5 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl shadow-blue-500/20 transition-all active:scale-95 font-bold text-sm mx-auto"

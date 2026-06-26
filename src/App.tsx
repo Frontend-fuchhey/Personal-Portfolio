@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWindows } from './hooks/useWindows';
 import { Window } from './components/ui/Window';
@@ -106,10 +106,16 @@ export default function App() {
     return false;
   });
   
-  const [isSystemReady, setIsSystemReady] = useState(() => {
-    if (typeof window !== 'undefined') return window.innerWidth < 768;
-    return false;
-  });
+  const [isBooted, setIsBooted] = useState(false);
+  const [isFading, setIsFading] = useState(false);
+
+  const handleLaunch = useCallback(() => {
+    if (isFading) return;
+    setIsFading(true);
+    setTimeout(() => {
+      setIsBooted(true);
+    }, 800);
+  }, [isFading]);
   
   const [isRecentsView, setIsRecentsView] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
@@ -184,6 +190,15 @@ export default function App() {
     }
   };
 
+  if (!isBooted) {
+    return (
+      <BootScreen 
+        isFading={isFading} 
+        onLaunch={handleLaunch} 
+      />
+    );
+  }
+
   return (
     <OsDataProvider>
       <DesktopBackground 
@@ -192,10 +207,6 @@ export default function App() {
       >
         {isMobile && <AndroidStatusBar />}
         
-        <AnimatePresence>
-          {!isSystemReady && <BootScreen onComplete={() => setIsSystemReady(true)} />}
-        </AnimatePresence>
-
         {!isMobile && <TopBar onOpenApp={openWindow} showClock={showClock} />}
 
         <div 
@@ -263,7 +274,7 @@ export default function App() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: "easeOut", delay: 3.8 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
             className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
             style={{ zIndex: 0 }}
           >
@@ -274,7 +285,7 @@ export default function App() {
               style={{
                 fontSize: 'clamp(2.6rem, 7.5vw, 6rem)',
                 fontWeight: 100,
-                opacity: 0.16,
+                opacity: 0.32,
                 letterSpacing: '0.18em',
                 lineHeight: 1.1,
                 fontFamily: 'Inter, system-ui, sans-serif',
@@ -285,8 +296,8 @@ export default function App() {
 
             <motion.div 
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "12%", opacity: 0.08 }}
-              transition={{ delay: 4.5, duration: 1 }}
+              animate={{ width: "12%", opacity: 0.18 }}
+              transition={{ delay: 1.0, duration: 1 }}
               className="h-[1px] bg-white my-8 min-w-[80px]"
             />
 
@@ -294,7 +305,7 @@ export default function App() {
               className="text-white font-light uppercase text-center"
               style={{
                 fontSize: 'clamp(0.5rem, 1.1vw, 0.7rem)',
-                opacity: 0.14,
+                opacity: 0.30,
                 letterSpacing: '0.45em',
                 fontFamily: 'Inter, system-ui, sans-serif',
               }}

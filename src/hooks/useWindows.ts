@@ -3,7 +3,7 @@ import { WindowState, AppId } from '../types/os';
 
 const DEFAULT_WINDOWS: Record<AppId, Omit<WindowState, 'isOpen' | 'isMinimized' | 'isMaximized' | 'zIndex'>> = {
   about: { id: 'about', appId: 'about', title: 'About Me', x: 0, y: 0, width: 620, height: 480 },
-  projects: { id: 'projects', appId: 'projects', title: 'File Explorer — Projects', x: 0, y: 0, width: 760, height: 520 },
+  projects: { id: 'projects', appId: 'projects', title: 'File Explorer — Projects', x: 0, y: 0, width: 860, height: 580 },
   terminal: { id: 'terminal', appId: 'terminal', title: 'Terminal', x: 0, y: 0, width: 680, height: 420 },
   contact: { id: 'contact', appId: 'contact', title: 'Contact', x: 0, y: 0, width: 520, height: 700 },
   settings: { id: 'settings', appId: 'settings', title: 'Settings', x: 0, y: 0, width: 560, height: 460 },
