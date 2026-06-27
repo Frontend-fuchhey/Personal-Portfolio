@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 
 interface BootScreenProps {
   isFading: boolean;
@@ -7,250 +6,269 @@ interface BootScreenProps {
 }
 
 export const BootScreen = ({ isFading, onLaunch }: BootScreenProps) => {
-  const [timeString, setTimeString] = useState('');
-  const [sessionTime, setSessionTime] = useState(0);
+  const [stage, setStage] = useState<'terminal' | 'login' | 'desktop'>('terminal');
+  const [typedName, setTypedName] = useState('');
+  const [typedWelcome, setTypedWelcome] = useState('');
+  const [typedIntro, setTypedIntro] = useState('');
+  const [isTypewriterDone, setIsTypewriterDone] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [liveTime, setLiveTime] = useState(() => new Date().toLocaleTimeString());
 
-  // Time updater
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeString(now.toLocaleTimeString('en-US', { hour12: false }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Session time updater (counts up in seconds)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionTime(prev => prev + 1);
+    const timer = setInterval(() => {
+      setLiveTime(new Date().toLocaleTimeString());
     }, 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
 
-  const formatSessionTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  const nameText = 'SHRAWAN KARKI';
+  const welcomeText = 'WELCOME TO MY PERSONAL PORTFOLIO';
+  const introText = 'I am a Frontend Developer & UI/UX Designer focused on building intuitive, pixel-perfect interfaces.';
 
-  // Keyboard event listener for Enter
+  // Initial Typewriter Sequencer & Mobile check
   useEffect(() => {
+    const checkMobile = () => window.innerWidth < 768;
+    if (checkMobile()) {
+      onLaunch();
+      return;
+    }
+
+    let currentText = '';
+    let i = 0;
+    let nameTimeout: NodeJS.Timeout;
+    let welcomeTimeout: NodeJS.Timeout;
+    let introTimeout: NodeJS.Timeout;
+
+    const typeName = () => {
+      if (i < nameText.length) {
+        currentText += nameText[i];
+        setTypedName(currentText);
+        i++;
+        nameTimeout = setTimeout(typeName, 60);
+      } else {
+        i = 0;
+        currentText = '';
+        welcomeTimeout = setTimeout(typeWelcome, 400);
+      }
+    };
+
+    const typeWelcome = () => {
+      if (i < welcomeText.length) {
+        currentText += welcomeText[i];
+        setTypedWelcome(currentText);
+        i++;
+        welcomeTimeout = setTimeout(typeWelcome, 40);
+      } else {
+        i = 0;
+        currentText = '';
+        introTimeout = setTimeout(typeIntro, 400);
+      }
+    };
+
+    const typeIntro = () => {
+      if (i < introText.length) {
+        currentText += introText[i];
+        setTypedIntro(currentText);
+        i++;
+        introTimeout = setTimeout(typeIntro, 25);
+      } else {
+        setIsTypewriterDone(true);
+      }
+    };
+
+    typeName();
+
+    return () => {
+      clearTimeout(nameTimeout);
+      clearTimeout(welcomeTimeout);
+      clearTimeout(introTimeout);
+    };
+  }, [onLaunch]);
+
+  // Loading progress bar sequencer (runs after typewriter is complete)
+  useEffect(() => {
+    if (!isTypewriterDone) return;
+
+    const totalDuration = 3500; // 3.5 seconds
+    const steps = 70;
+    const intervalTime = totalDuration / steps;
+    const increment = 100 / steps;
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const next = prev + increment;
+        if (next >= 100) {
+          clearInterval(interval);
+          setStage('login');
+          return 100;
+        }
+        return next;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(interval);
+  }, [isTypewriterDone]);
+
+  // Listen for Enter key during the login stage
+  useEffect(() => {
+    if (stage !== 'login') return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
+        setStage('desktop');
         onLaunch();
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onLaunch]);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [stage, onLaunch]);
+
+  const getLoadingBar = (percent: number) => {
+    const totalBlocks = 20;
+    const filledBlocks = Math.min(totalBlocks, Math.floor((percent / 100) * totalBlocks));
+    const emptyBlocks = totalBlocks - filledBlocks;
+    return `[${'█'.repeat(filledBlocks)}${'-'.repeat(emptyBlocks)}]`;
+  };
+
+  if (stage === 'login') {
+    return (
+      <div 
+        className={`fixed inset-0 z-50 flex flex-col justify-center items-center bg-[#0d0f12] select-none overflow-hidden transition-opacity duration-700 ${isFading ? 'opacity-0' : 'opacity-100'}`}
+      >
+        {/* Background Wallpaper with Blur Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center filter blur-xl scale-105 opacity-60"
+          style={{ backgroundImage: "url('/fluid_wave_bg.png')" }}
+        />
+        {/* Dark overlay for contrast */}
+        <div className="absolute inset-0 bg-black/45" />
+
+        {/* Card */}
+        <div className="login-fade-in relative z-10 w-80 sm:w-96 p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl flex flex-col items-center text-center text-white">
+          {/* Avatar: round gray user silhouette container */}
+          <div className="w-20 h-20 rounded-full bg-zinc-700/60 mb-4 flex items-center justify-center">
+            <svg 
+              className="w-10 h-10 text-zinc-300/80" 
+              fill="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+
+          {/* User Info */}
+          <h2 className="text-xl font-bold uppercase tracking-wider mb-1">
+            SHRAWAN KARKI
+          </h2>
+          <p className="text-xs text-zinc-300/90 mb-6 font-light">
+            Frontend Developer & UI/UX designer
+          </p>
+
+          {/* Password Input */}
+          <input 
+            type="text" 
+            value="••••••••" 
+            readOnly 
+            className="w-full text-center bg-white/10 border border-white/10 rounded-lg py-2 px-4 text-white focus:outline-none tracking-widest text-lg select-none mb-6"
+          />
+
+          {/* Call to Action: slow pulse */}
+          <div className="text-[11px] tracking-[0.2em] uppercase font-semibold text-white/60 animate-slow-pulse">
+            PRESS ENTER TO START
+          </div>
+        </div>
+
+        {/* Bottom Utilities */}
+        <div className="absolute bottom-8 flex items-center gap-4 sm:gap-6 text-xs text-white/40 font-light z-10">
+          <button className="hover:text-white/80 transition-colors cursor-pointer">Sleep</button>
+          <span className="text-white/10">|</span>
+          <button className="hover:text-white/80 transition-colors cursor-pointer">Restart</button>
+          <span className="text-white/10">|</span>
+          <button className="hover:text-white/80 transition-colors cursor-pointer">Guest Login</button>
+          <span className="text-white/10">|</span>
+          <button className="hover:text-white/80 transition-colors cursor-pointer">Shut Down</button>
+        </div>
+
+        <style>{`
+          @keyframes fadeInLogin {
+            from { opacity: 0; transform: scale(0.97) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+          }
+          .login-fade-in {
+            animation: fadeInLogin 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+          @keyframes slowPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.85; }
+          }
+          .animate-slow-pulse {
+            animation: slowPulse 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`w-screen h-screen overflow-hidden fixed inset-0 z-50 flex items-center justify-center p-4 select-none ${
-        isFading ? 'opacity-0' : 'opacity-100'
-      } transition-opacity duration-800`}
-      style={{
-        backgroundImage: "url('/fluid_wave_bg.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* DESKTOP / TABLET LAYOUT — hidden on mobile (< md)                  */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-
-      {/* Top System Status Bar — desktop only */}
-      <div className="hidden md:flex absolute top-0 left-0 right-0 p-4 flex-col sm:flex-row justify-between items-center w-full gap-2 bg-slate-900/20 backdrop-blur-sm border-b border-white/10">
-        <div className="text-white text-xs font-mono opacity-80 text-center sm:text-left">
-          SHRAWAN_OS[v7.0.0] :: Nepalese Developer
-        </div>
-        <div className="flex flex-wrap justify-center items-center gap-4 text-white text-xs font-mono opacity-80 text-center">
-          <span>TIME: {timeString}</span>
-          <span>SESSION: {formatSessionTime(sessionTime)}</span>
-          <span>BOOT_TARGET: [GUEST]</span>
-        </div>
+    <div className={`fixed inset-0 z-50 bg-[#0d0f12] font-mono text-green-400 p-8 flex flex-col justify-center items-center select-none overflow-hidden transition-opacity duration-700 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+      <div className="w-full absolute top-0 left-0 border-b border-zinc-800/60 px-6 py-2 flex justify-between items-center font-mono text-[11px] select-none text-green-400 z-50">
+        <span>SHRAWAN_OS[v 7] ::  Nepalese Developer ꔪ</span>
+        <span>TIME: {liveTime}  |  SESSION: 00:14  |  BOOT_TARGET: [GUEST]</span>
       </div>
+      <style>{`
+        @keyframes terminalBlink {
+          50% { opacity: 0; }
+        }
+        .terminal-cursor {
+          animation: terminalBlink 1s step-end infinite;
+        }
+        .fade-in-log {
+          animation: fadeInQuick 0.4s ease-out forwards;
+        }
+        @keyframes fadeInQuick {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-      {/* Central Glassmorphism Boot Card — desktop only */}
-      <motion.div
-        className="hidden md:block bg-white/60 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-10 pt-8 max-w-2xl w-full text-slate-900 font-sans relative mx-4"
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-      >
-        {/* Manifest Row */}
-        <div className="font-mono text-xs tracking-wider text-slate-700/90 flex items-center justify-center gap-2 mb-6 w-full">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center font-bold text-[10px] shadow-sm shrink-0">
-            SK
-          </div>
-          <span>SHRAWAN_OS_v7.0_Custom Operating system based portfolio </span>
+      <div className="max-w-2xl w-full flex flex-col gap-6 text-sm sm:text-base leading-relaxed">
+        {/* Row 1: Name */}
+        <div className="h-8 flex items-center">
+          <span className="text-xl font-bold tracking-widest">{typedName}</span>
+          {typedName && !typedWelcome && <span className="terminal-cursor ml-1">█</span>}
         </div>
 
-        {/* Typography & Text Content */}
-        <span className="text-4xl font-extrabold tracking-tight text-slate-900 mt-2 block text-center">
-          SHRAWAN KARKI
-        </span>
-        <span className="text-lg font-medium text-amber-700/90 text-center mt-1 block">
-          Frontend Developer &amp; UI/UX designer
-        </span>
-
-        {/* Divider 1 */}
-        <div className="border-t border-dashed border-slate-400/50 my-5" />
-
-        {/* Welcome Message */}
-        <p className="text-base text-slate-800 leading-relaxed">
-          Welcome to my space! I'm a UI/UX designer and frontend developer focused on building
-          intuitive, pixel-perfect websites. Dive into my portfolio to see how I combine creativity
-          with code to solve real-world problems.
-        </p>
-
-        {/* Dual-Interaction Boot Target Section */}
-        <div className="mt-6">
-          <span className="font-mono text-sm tracking-wider text-slate-600 block">
-            [BOOT SEQUENCE]:
-          </span>
-          <button
-            onClick={onLaunch}
-            className="w-full text-left cursor-pointer hover:bg-slate-900/5 active:bg-slate-900/10 transition-colors rounded-lg p-2 -mx-2 flex items-center justify-between mt-2"
-          >
-            <span className="text-slate-800 font-medium">
-              → Launch Graphical User Interface
-            </span>
-            <kbd className="bg-slate-800/10 px-2 py-0.5 rounded border border-slate-800/20 ml-2 font-mono text-sm text-slate-700">
-              [Enter]
-            </kbd>
-          </button>
+        {/* Row 2: Welcome message */}
+        <div className="h-8 flex items-center">
+          <span className="text-md opacity-90">{typedWelcome}</span>
+          {typedWelcome && !typedIntro && <span className="terminal-cursor ml-1">█</span>}
         </div>
 
-        {/* Divider 2 */}
-        <div className="border-t border-dashed border-slate-400/50 my-5" />
-
-        {/* Terminal Status Logs */}
-        <div className="flex flex-col gap-1 text-emerald-600 font-mono text-sm font-semibold tracking-wide">
-          <div>KERNEL: SHRAWAN_v7.0.0 // READY</div>
-          <div>SESSION: INTERACTIVE // [OK]</div>
+        {/* Row 3: Intro details */}
+        <div className="min-h-[60px] flex items-start">
+          <p className="opacity-80 text-sm sm:text-base">{typedIntro}</p>
+          {typedIntro && !isTypewriterDone && <span className="terminal-cursor ml-1">█</span>}
         </div>
-      </motion.div>
 
-      {/* Bottom Navigation Pills — desktop only */}
-      <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 items-center gap-3 bg-slate-900/60 px-5 py-2.5 rounded-full border border-white/15 backdrop-blur-md shadow-lg max-w-[95vw] overflow-x-auto whitespace-nowrap">
-        <button
-          onClick={onLaunch}
-          className="flex items-center gap-1.5 text-[10px] sm:text-xs text-white font-mono cursor-pointer hover:text-white/80 active:scale-95 transition-all"
-        >
-          <kbd className="bg-white/20 text-white px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] border border-white/20">Enter</kbd>
-          <span className="text-white">Launch</span>
-        </button>
-        <span className="h-3 w-[1px] bg-white/30"></span>
-        <button
-          className="flex items-center gap-1.5 text-[10px] sm:text-xs text-white font-mono cursor-pointer hover:text-white/80 active:scale-95 transition-all"
-        >
-          <kbd className="bg-white/20 text-white px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] border border-white/20">Edit</kbd>
-          <span className="text-white">Options</span>
-        </button>
-        <span className="h-3 w-[1px] bg-white/30"></span>
-        <button
-          className="flex items-center gap-1.5 text-[10px] sm:text-xs text-white font-mono cursor-pointer hover:text-white/80 active:scale-95 transition-all"
-        >
-          <kbd className="bg-white/20 text-white px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] border border-white/20">Cancel</kbd>
-          <span className="text-white">Exit</span>
-        </button>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* MOBILE WELCOME MICRO-CARD — only visible on mobile (< md)          */}
-      {/* ─────────────────────────────────────────────────────────────────── */}
-      <div className="flex md:hidden absolute inset-0 w-full h-full items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-          className="w-full max-w-sm"
-        >
-          {/* Glassmorphic card */}
-          <div
-            className="relative rounded-3xl overflow-hidden"
-            style={{
-              background: 'rgba(255,255,255,0.12)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.25)',
-              boxShadow: '0 8px 48px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.3)',
-            }}
-          >
-            {/* Subtle top accent gradient */}
-            <div
-              className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl"
-              style={{ background: 'linear-gradient(90deg, #f59e0b, #ef4444, #a855f7)' }}
-            />
-
-            <div className="px-7 pt-8 pb-7 flex flex-col items-center gap-5">
-              {/* Avatar badge */}
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white text-lg shadow-lg"
-                style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }}
-              >
-                SK
-              </div>
-
-              {/* Text content */}
-              <div className="text-center space-y-2">
-                <p
-                  className="font-mono text-[10px] tracking-[0.25em] uppercase"
-                  style={{ color: 'rgba(255,255,255,0.55)' }}
-                >
-                  SHRAWAN_OS v7.0.0
-                </p>
-                <h1
-                  className="text-white font-bold leading-snug"
-                  style={{ fontSize: '1.25rem', letterSpacing: '-0.01em' }}
-                >
-                  Welcome to My<br />Personal Portfolio
-                </h1>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.65)' }}
-                >
-                  Explore about me and my work.
-                </p>
-              </div>
-
-              {/* Terminal-style CTA button */}
-              <motion.button
-                onClick={onLaunch}
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ scale: 1.03 }}
-                className="w-full font-mono text-sm font-semibold tracking-widest py-3.5 rounded-xl relative overflow-hidden"
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  color: '#fff',
-                  letterSpacing: '0.12em',
-                }}
-              >
-                {/* Button shimmer overlay */}
-                <span
-                  className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity"
-                  style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(168,85,247,0.12))' }}
-                />
-                <span className="relative z-10">[ Enter Shrawan OS ]</span>
-              </motion.button>
-
-              {/* Micro status line */}
-              <p
-                className="font-mono text-[9px] tracking-widest uppercase"
-                style={{ color: 'rgba(255,255,255,0.35)' }}
-              >
-                KERNEL READY ·&nbsp;
-                <span style={{ color: 'rgba(52,211,153,0.8)' }}>●</span>
-                &nbsp;INTERACTIVE
-              </p>
+        {/* Phase 2: Dev Environment Logs & Loading Progress */}
+        {isTypewriterDone && (
+          <div className="mt-4 flex flex-col gap-2 border-t border-green-500/20 pt-4">
+            {progress > 10 && <div className="fade-in-log opacity-0">► Initializing kernel log matrices... [OK]</div>}
+            {progress > 30 && <div className="fade-in-log opacity-0">► Injecting core packages & system resources... [OK]</div>}
+            {progress > 55 && <div className="fade-in-log opacity-0">► Compiling responsive layout frames... [SUCCESS]</div>}
+            {progress > 75 && <div className="fade-in-log opacity-0">► Establishing secure terminal handshake... [OK]</div>}
+            {progress > 90 && <div className="fade-in-log opacity-0">► Initializing graphical user interface... [READY]</div>}
+            
+            <div className="mt-6 font-bold flex flex-col sm:flex-row sm:items-center gap-2">
+              <span>LOADING SYSTEM:</span>
+              <span>{getLoadingBar(progress)}</span>
+              <span>{Math.min(100, Math.floor(progress))}%</span>
             </div>
           </div>
-        </motion.div>
+        )}
       </div>
     </div>
   );
