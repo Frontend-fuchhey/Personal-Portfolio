@@ -4,6 +4,7 @@ import {
   Github,
   Linkedin,
   Twitter,
+  Instagram,
   Briefcase,
   GraduationCap,
   FileText,
@@ -127,6 +128,11 @@ export function AboutApp({
                 icon: <Twitter className="w-5 h-5" />,
                 href: "https://x.com/pratyushkarki6",
                 label: "Twitter",
+              },
+              {
+                icon: <Instagram className="w-5 h-5" />,
+                href: "https://www.instagram.com/ig_prasar7",
+                label: "Instagram",
               },
             ].map((social, i) => (
               <a
