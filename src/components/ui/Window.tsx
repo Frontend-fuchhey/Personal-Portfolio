@@ -62,7 +62,7 @@ export function Window({
             x: '-50%',
             y: '-50%',
             width: win.width,
-            minHeight: 600,
+            height: 460,
             maxWidth: '95vw',
             maxHeight: 'calc(100vh - 120px)',
             borderRadius: '1rem',

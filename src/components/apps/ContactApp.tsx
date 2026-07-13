@@ -50,13 +50,13 @@ export function ContactApp() {
   ];
 
   return (
-    <div className="w-full max-w-[700px] min-h-[600px] max-h-[90vh] mx-auto grid grid-cols-1 md:grid-cols-[220px_1fr] font-sans relative overflow-x-hidden overflow-y-auto rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
+    <div className="w-full max-w-[700px] h-full flex-1 mx-auto grid grid-cols-1 md:grid-cols-[220px_1fr] font-sans relative overflow-hidden rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
 
       {/* Left Panel - Contact Info */}
-      <div className="py-6 px-4 min-w-[140px] flex flex-col order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10">
-        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-8">CONTACT INFO</h2>
+      <div className="h-full py-6 pb-6 px-4 min-w-[140px] flex flex-col justify-between order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10">
+        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-4">CONTACT INFO</h2>
 
-        <div className="bg-white/50 rounded-xl p-6 flex justify-center mb-8 shadow-sm">
+        <div className="bg-white/50 rounded-xl p-4 flex justify-center mb-4 shadow-sm">
           <div className="relative shrink-0">
             <div className="w-36 h-36 rounded-full border-[3px] border-white shadow-sm overflow-hidden antialiased">
               <img
@@ -76,7 +76,7 @@ export function ContactApp() {
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-4">
           {contactNodes.map((item) => {
             const Icon = item.icon;
 
@@ -149,8 +149,8 @@ export function ContactApp() {
       </div>
 
       {/* Right Panel - Message Form */}
-      <div className="bg-white p-6 flex flex-col flex-1 order-1 md:order-2">
-        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-8">MESSAGE</h2>
+      <div className="bg-white p-6 pb-6 flex flex-col justify-between flex-1 order-1 md:order-2 h-full">
+        <h2 className="text-[15px] font-extrabold text-[#1e293b] tracking-wider mb-4">MESSAGE</h2>
 
         {isSuccess ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 my-auto min-h-[350px] animate-in fade-in zoom-in-95 duration-300">
@@ -170,47 +170,47 @@ export function ContactApp() {
           </div>
         ) : (
           <form onSubmit={submissionHandler} className="flex flex-col flex-1">
-            <div className="flex flex-col flex-1 gap-y-3">
-              <fieldset className="border border-gray-400 rounded-md px-5 focus-within:border-blue-500 transition-colors">
+            <div className="flex flex-col flex-1 space-y-2">
+              <fieldset className="border border-gray-400 rounded-md px-4 focus-within:border-blue-500 transition-colors">
                 <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">NAME</legend>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                  className="w-full py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black"
+                  className="w-full py-2 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black"
                   placeholder="Your name here"
                   style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
                 />
               </fieldset>
 
-              <fieldset className="border border-gray-400 rounded-md px-5 focus-within:border-blue-500 transition-colors">
+              <fieldset className="border border-gray-400 rounded-md px-4 focus-within:border-blue-500 transition-colors">
                 <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">EMAIL</legend>
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                  className="w-full py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black"
+                  className="w-full py-2 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black"
                   placeholder="your.email@example.com"
                   style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
                 />
               </fieldset>
 
-              <fieldset className="border border-gray-400 rounded-md px-5 pb-2 focus-within:border-blue-500 transition-colors">
+              <fieldset className="border border-gray-400 rounded-md px-4 pb-2 focus-within:border-blue-500 transition-colors">
                 <legend className="text-[10px] font-semibold px-1 text-black tracking-wide">MESSAGE</legend>
                 <textarea
                   required
                   value={formData.message}
                   onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-                  className="w-full h-32 py-4 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black leading-[1.6] resize-none"
+                  className="w-full h-20 py-2 focus:outline-none text-[14px] bg-transparent placeholder-gray-500/40 text-black leading-[1.6] resize-none"
                   placeholder="Tell me about your project..."
                   style={{ filter: 'none', transition: 'background-color 5000s ease-in-out 0s' }}
                 />
               </fieldset>
             </div>
 
-            <div className="mt-auto pt-4">
+            <div className="mt-auto pt-3">
               <button
                 type="submit"
                 disabled={isSubmitting}

@@ -1,7 +1,4 @@
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
-import { USER_CONFIG } from '../../data/userConfig';
-import profilePic from '../../assets/shrawan.jpg';
 
 interface DesktopWidgetProps {
   onOpenAbout: () => void;
@@ -10,52 +7,33 @@ interface DesktopWidgetProps {
 export function DesktopWidget({ onOpenAbout }: DesktopWidgetProps) {
   return (
     <motion.div
-      className="absolute left-10 bottom-24 hidden lg:flex items-center gap-6 p-5 rounded-3xl cursor-pointer group"
-      style={{
-        background: 'rgba(255, 255, 255, 0.08)',
-        backdropFilter: 'blur(30px)',
-        WebkitBackdropFilter: 'blur(30px)',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-        zIndex: 2,
-      }}
+      className="absolute left-10 bottom-24 hidden lg:inline-flex flex-row items-center gap-2.5 p-1.5 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg select-none hover:bg-white/15 transition-all w-fit cursor-pointer group z-10"
       initial={{ opacity: 0, x: -30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
-      whileHover={{ y: -5, background: 'rgba(255, 255, 255, 0.12)', scale: 1.02 }}
+      whileHover={{ y: -5 }}
       onClick={onOpenAbout}
     >
-      <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20 shadow-lg antialiased">
-        <img 
-          src={profilePic} 
-          alt={USER_CONFIG.name} 
-          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 object-center image-render-crisp"
-          style={{ 
-            // @ts-ignore
-            WebkitImageRendering: 'optimize-contrast', 
-            imageRendering: 'crisp-edges',
-            transform: 'translateZ(0)',
-            backfaceVisibility: 'hidden'
-          }}
-          onError={(e) => {
-            e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${USER_CONFIG.name}&backgroundColor=b6e3f4`;
-          }}
-        />
+      {/* Vector Initials Badge - Option 2 */}
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-base shadow-inner">
+        SK
       </div>
 
-      <div className="flex flex-col pr-4">
-        <h3 className="text-white font-bold text-lg leading-tight mb-1">
-          {USER_CONFIG.name}
-        </h3>
-        <div className="flex items-center gap-2 text-white/50 group-hover:text-blue-400 transition-colors">
-          <span className="text-[10px] font-black uppercase tracking-widest">
-            View Profile
-          </span>
-          <ExternalLink className="w-3 h-3" />
-        </div>
+      {/* Profile Links Text (keep existing content and structure) */}
+      <div className="flex flex-col pr-2">
+        {/* Kept existing 'Shrawan Karki' name */}
+        <span className="text-white font-semibold text-sm">Shrawan Karki</span> 
+        {/* Kept existing 'VIEW PROFILE' link structure and icon */}
+        <a 
+          href="/profile" 
+          onClick={(e) => { e.preventDefault(); onOpenAbout(); }}
+          className="flex items-center gap-1 text-white/70 text-[11px] hover:text-white transition-colors"
+        >
+          <span>VIEW PROFILE</span>
+          {/* Kept existing external link SVG icon */}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-70"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        </a>
       </div>
-
-      <div className="absolute inset-0 rounded-3xl bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors duration-500 pointer-events-none" />
     </motion.div>
   );
 }

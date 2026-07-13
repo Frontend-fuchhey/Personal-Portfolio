@@ -23,6 +23,7 @@ import { OsDataProvider } from './hooks/useOsData';
 import { GlobalBackButton } from './components/ui/GlobalBackButton';
 import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
+import profilePic from './assets/shrawan.jpg';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -168,6 +169,22 @@ export default function App() {
       minimizeWindow(win.id);
     }
   };
+
+  useEffect(() => {
+    const cacheImages = async () => {
+      const srcArray = ['/fluid_wave_bg.png', profilePic];
+      const promises = srcArray.map((src) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+      await Promise.all(promises);
+    };
+    cacheImages();
+  }, []);
 
   useEffect(() => {
     const updateDeviceStatus = () => setIsMobile(window.innerWidth < 768);
