@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import profilePic from "../../assets/shrawan.jpg";
 import {
   Github,
@@ -31,6 +31,15 @@ export function AboutApp({
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const { aboutData } = useOsData();
   const isMobile = window.innerWidth < 768;
+
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const profileImgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (profileImgRef.current?.complete) {
+      setIsProfileLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (onResumeStateChange) {
@@ -85,9 +94,11 @@ export function AboutApp({
             ></div>
             <div className="relative w-64 h-64 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10 antialiased">
               <img
+                ref={profileImgRef}
                 src={profilePic}
                 alt={USER_CONFIG.name}
-                className="w-full h-full object-cover object-center rounded-full image-render-crisp"
+                onLoad={() => setIsProfileLoaded(true)}
+                className={`w-full h-full object-cover object-center rounded-full image-render-crisp transition-opacity duration-500 ease-in-out ${isProfileLoaded ? "opacity-100" : "opacity-0"}`}
                 style={{
                   // @ts-ignore
                   WebkitImageRendering: 'optimize-contrast',

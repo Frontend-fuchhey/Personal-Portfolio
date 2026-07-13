@@ -53,20 +53,6 @@ export function ResumeView({ onBack }: { onBack?: () => void }) {
     }
   ];
 
-  const projects = [
-    {
-      project_name: "Garment Flow",
-      description_project: "The app is designed to streamline the entire garment export process, from raw material procurement to final product delivery. It serves as a centralized platform for managing purchase orders, inventory, production workflows, and export logistics, ensuring seamless coordination among buyers, manufacturers, and suppliers.",
-      github_link: "https://github.com/frontend-fuchhey/Garment_Project"
-    },
-    {
-      project_name: "Shrawan OS Portfolio",
-      description_project: "Custom Linux theme based portfolio personal website",
-      link: "https://shrawankarki.com.np"
-
-    }
-  ]
-
   const languages = ["English (Professional)", "Nepali (Native)", "Hindi (Fluent)"];
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
