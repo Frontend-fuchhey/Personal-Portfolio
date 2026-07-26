@@ -24,6 +24,7 @@ import { GlobalBackButton } from './components/ui/GlobalBackButton';
 import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
 import profilePic from './assets/shrawan.jpg';
+import { ResumeView } from './components/ResumeView';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -36,7 +37,8 @@ const MemoizedAppContent = memo(({
   onUpdateSize,
   showClock,
   setShowClock,
-  onResumeStateChange
+  onResumeStateChange,
+  onClose
 }: { 
   appId: AppId; 
   wallpaper: Wallpaper; 
@@ -47,12 +49,14 @@ const MemoizedAppContent = memo(({
   showClock: boolean;
   setShowClock: (s: boolean) => void;
   onResumeStateChange?: (open: boolean) => void;
+  onClose?: () => void;
 }) => {
   switch (appId) {
-    case 'about':    return <AboutApp windowId={windowId} onUpdateSize={onUpdateSize} onOpenApp={onOpenApp} onResumeStateChange={onResumeStateChange} />;
+    case 'about':    return <AboutApp windowId={windowId} onUpdateSize={onUpdateSize} onOpenApp={onOpenApp} onResumeStateChange={onResumeStateChange} onClose={onClose} />;
     case 'projects': return <ProjectsApp />;
     case 'terminal': return <TerminalApp onOpenApp={onOpenApp} />;
     case 'contact':  return <ContactApp />;
+    case 'resume':   return <ResumeView onClose={onClose} />;
     case 'settings': return (
       <SettingsApp 
         wallpaper={wallpaper} 
@@ -194,6 +198,48 @@ export default function App() {
     return () => window.removeEventListener('resize', updateDeviceStatus);
   }, []);
 
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '') || window.location.hash.replace(/^#+/, '');
+      const targetApp = rawPath.toLowerCase().trim();
+      const validApps = ['projects', 'resume', 'contact', 'terminal', 'about'];
+
+      if (validApps.includes(targetApp)) {
+        openWindow(targetApp as AppId);
+      }
+    };
+
+    // Run on initial mount
+    handleUrlChange();
+
+    // Listen for hashchange and popstate events
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, [openWindow]);
+
+  const handleCloseWindow = useCallback((id: string) => {
+    const win = windows.find(w => w.id === id);
+    closeWindow(id);
+
+    if (win) {
+      const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '') || window.location.hash.replace(/^#+/, '');
+      const currentRoute = rawPath.toLowerCase().trim();
+      
+      const isRouteMatch = 
+        currentRoute === win.appId || 
+        (win.appId === 'about' && currentRoute === 'resume') ||
+        (win.appId === 'resume' && currentRoute === 'about');
+
+      if (isRouteMatch) {
+        window.history.pushState({}, '', '/');
+      }
+    }
+  }, [windows, closeWindow]);
+
   const handleBackClick = () => {
     if (isRecentsView) {
       setIsRecentsView(false);
@@ -203,7 +249,7 @@ export default function App() {
       .filter(w => w.isOpen && !w.isMinimized)
       .sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0))[0];
     if (topWin) {
-      closeWindow(topWin.id);
+      handleCloseWindow(topWin.id);
     }
   };
 
@@ -343,7 +389,7 @@ export default function App() {
                 <div key={win.id} className="pointer-events-auto">
                   <Window
                     window={win}
-                    onClose={closeWindow}
+                    onClose={handleCloseWindow}
                     onMinimize={minimizeWindow}
                     onMaximize={maximizeWindow}
                     onFocus={(id) => { focusWindow(id); setIsRecentsView(false); }}
@@ -361,6 +407,7 @@ export default function App() {
                       showClock={showClock}
                       setShowClock={setShowClock}
                       onResumeStateChange={setIsResumeOpen}
+                      onClose={() => handleCloseWindow(win.id)}
                     />
                   </Window>
                 </div>

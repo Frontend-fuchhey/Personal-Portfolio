@@ -1,6 +1,6 @@
-import { Github, Linkedin, Mail, Globe, ArrowLeft, Download } from "lucide-react";
+import { Github, Linkedin, Mail, Globe, ArrowLeft, Download, X } from "lucide-react";
 
-export function ResumeView({ onBack }: { onBack?: () => void }) {
+export function ResumeView({ onBack, onClose }: { onBack?: () => void; onClose?: () => void }) {
 
   const name = "Shrawan Karki";
   const title = "Frontend Developer | UI/UX Designer";
@@ -64,6 +64,17 @@ export function ResumeView({ onBack }: { onBack?: () => void }) {
       {/* Sticky Control Bar */}
       <div className="sticky top-0 z-50 w-full h-14 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 px-6 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4">
+          {onClose && (
+            <div className="flex items-center mr-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); onClose(); }}
+                className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 transition-colors flex items-center justify-center group cursor-pointer border-0 p-0"
+                title="Close"
+              >
+                <X className="w-2 h-2 text-black/40 opacity-0 group-hover:opacity-100" />
+              </button>
+            </div>
+          )}
           {onBack && !isMobile && (
             <button
               onClick={onBack}
