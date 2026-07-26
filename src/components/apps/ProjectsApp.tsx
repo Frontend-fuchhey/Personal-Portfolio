@@ -219,7 +219,19 @@ export function ProjectsApp() {
                       {selected.subHeader}
                     </div>
                   )}
-                  <div className="text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed">{selected.longDesc || selected.description}</div>
+                  <div className="space-y-4 text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                    {(selected.longDesc || selected.description).split('||').map((paragraph: string, index: number) => {
+                      const isHeader = paragraph.startsWith('🚀') || paragraph.startsWith('💡') || paragraph.startsWith('📈');
+                      return (
+                        <p 
+                          key={index} 
+                          className={isHeader ? "font-bold text-slate-800 dark:text-white pt-2" : "text-slate-600 dark:text-slate-300"}
+                        >
+                          {paragraph}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {selected.features && selected.features.length > 0 && (

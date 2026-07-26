@@ -21,11 +21,13 @@ export function AboutApp({
   onUpdateSize,
   onOpenApp,
   onResumeStateChange,
+  onClose,
 }: {
   windowId?: string;
   onUpdateSize?: (id: string, w: number, h: number) => void;
   onOpenApp?: (appId: AppId) => void;
   onResumeStateChange?: (open: boolean) => void;
+  onClose?: () => void;
 }) {
   const [isResumeVisible, setIsResumeVisible] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -62,7 +64,7 @@ export function AboutApp({
   }, [isResumeVisible, windowId, onUpdateSize]);
 
   if (isResumeVisible) {
-    return <ResumeView onBack={() => setIsResumeVisible(false)} />;
+    return <ResumeView onBack={() => setIsResumeVisible(false)} onClose={onClose} />;
   }
 
   const systemSpecs = [
