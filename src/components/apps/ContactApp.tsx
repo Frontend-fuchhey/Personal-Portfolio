@@ -45,7 +45,7 @@ export function ContactApp() {
   const contactNodes = [
     { id: 'email', title: 'EMAIL', label: 'pratyushkarki6@gmail.com', icon: Mail, color: '#EA4335', link: 'mailto:pratyushkarki6@gmail.com' },
     { id: 'github', title: 'GITHUB', label: 'GitHub', icon: Github, color: '#181717', link: 'https://github.com/frontend-fuchhey' },
-    { id: 'linkedin', title: 'LINKEDIN', label: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: 'https://www.linkedin.com/in/shrawan-karki-59b0ba392/' },
+    { id: 'linkedin', title: 'LINKEDIN', label: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: 'https://www.linkedin.com/in/shrawan-karki-187706428/' },
     { id: 'location', title: 'LOCATION', label: 'Morang, Nepal', icon: MapPin, color: '#EA4335', link: '#' },
   ];
 

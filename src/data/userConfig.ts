@@ -6,7 +6,7 @@ export const USER_CONFIG = {
   profilePic: profilePic,
   socials: {
     github: 'https://github.com/frontend-fuchhey',
-    linkedin: 'https://www.linkedin.com/in/shrawan-karki-59b0ba392/',
+    linkedin: 'https://www.linkedin.com/in/shrawan-karki-187706428/',
     twitter: 'https://x.com/pratyushkarki6',
     instagram: 'https://www.instagram.com/ig_prasar7',
   },
