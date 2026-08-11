@@ -50,10 +50,13 @@ export function ContactApp() {
   ];
 
   return (
-    <div className="w-full max-w-[700px] h-full flex-1 mx-auto grid grid-cols-1 md:grid-cols-[220px_1fr] font-sans relative overflow-hidden rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px]">
+    <div 
+      className="w-full max-w-[700px] h-full max-h-[85vh] md:max-h-none flex-1 mx-auto flex flex-col md:grid md:grid-cols-[220px_1fr] font-sans relative overflow-y-auto md:overflow-hidden rounded-[1rem] shadow-2xl border border-black/5 bg-white/10 backdrop-blur-[20px] [-webkit-overflow-scrolling:touch]"
+      style={{ WebkitOverflowScrolling: 'touch' }}
+    >
 
       {/* Left Panel - Contact Info */}
-      <div className="h-full py-5 px-4 min-w-[140px] flex flex-col justify-between order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10">
+      <div className="h-auto md:h-full py-5 px-4 pb-8 md:pb-5 min-w-[140px] flex flex-col justify-between order-2 md:order-1 border-t md:border-t-0 md:border-r border-black/10 shrink-0">
         <h2 className="text-[14px] font-extrabold text-[#1e293b] tracking-wider mb-2">CONTACT INFO</h2>
 
         <div className="bg-white/50 rounded-xl p-3 flex justify-center mb-3 shadow-sm">
@@ -149,8 +152,8 @@ export function ContactApp() {
       </div>
 
       {/* Right Panel - Message Form */}
-      <div className="flex-1 flex flex-col p-5 h-full bg-white order-1 md:order-2 overflow-hidden">
-        <div className="flex flex-col h-full justify-between">
+      <div className="flex-1 flex flex-col p-5 pb-12 md:pb-5 h-auto md:h-full bg-white order-1 md:order-2 overflow-visible">
+        <div className="flex flex-col h-full justify-between pb-4 md:pb-0">
           <h3 className="text-[11px] font-bold tracking-wider text-zinc-800 uppercase mb-2">
             MESSAGE
           </h3>
@@ -172,7 +175,7 @@ export function ContactApp() {
               </button>
             </div>
           ) : (
-            <form onSubmit={submissionHandler} className="flex-1 flex flex-col justify-between min-h-0">
+            <form onSubmit={submissionHandler} className="w-full flex-1 flex flex-col justify-between min-h-0 overflow-visible">
               <div className="space-y-3">
                 {/* Name Input */}
                 <div className="relative border border-zinc-200 rounded-lg py-1.5 px-2.5 focus-within:border-zinc-400">
@@ -223,7 +226,7 @@ export function ContactApp() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full mt-3 active:scale-[0.98] text-white font-bold text-[10px] tracking-widest py-2.5 rounded-lg transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 ${isFormReady
+                className={`w-full mt-4 active:scale-[0.98] text-white font-bold text-[10px] tracking-widest py-3 rounded-lg transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 ${isFormReady
                   ? 'bg-blue-600 hover:bg-blue-700 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
                   : 'bg-zinc-950 hover:bg-zinc-800'
                   }`}

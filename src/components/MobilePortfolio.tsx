@@ -234,7 +234,7 @@ function SwipeableAppWindow({
       </div>
 
       {/* ── App Content ── */}
-      <div className="flex-1 overflow-hidden relative bg-inherit">
+      <div className="flex-1 overflow-y-auto relative bg-inherit [-webkit-overflow-scrolling:touch]" style={{ WebkitOverflowScrolling: 'touch' }}>
         <MemoizedAppContent
           appId={openApp}
           wallpaper={wallpaper}
