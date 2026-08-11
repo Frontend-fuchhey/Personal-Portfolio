@@ -77,7 +77,7 @@ export const INITIAL_PROJECTS = [
     id: 'portfolio',
     name: 'Shrawan OS',
     category: 'React', // <--- Added Category (or 'React' depending on your choice)
-    description: 'This portfolio! macOS-inspired interactive experience',
+    description: 'This portfolio! macOS-inspired interactive experience for Computers and Android for Mobiles to give experince of responsiveness',
     tech: ['React', 'TypeScript', 'Framer Motion', 'Tailwind CSS'],
     url: 'https://github.com/shrawan-karki/portfolio',
     iconType: 'emoji',

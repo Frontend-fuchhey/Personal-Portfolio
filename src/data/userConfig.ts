@@ -8,7 +8,7 @@ export const USER_CONFIG = {
     github: 'https://github.com/frontend-fuchhey',
     linkedin: 'https://www.linkedin.com/in/shrawan-karki-187706428/',
     twitter: 'https://x.com/pratyushkarki6',
-    instagram: 'https://www.instagram.com/ig_prasar7',
+    instagram: 'https://www.instagram.com/prasar_7/',
   },
   email: 'pratyushkarki6@gmail.com', // Assuming from previous knowledge or context
 };

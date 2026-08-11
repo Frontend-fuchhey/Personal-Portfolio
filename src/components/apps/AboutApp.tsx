@@ -144,7 +144,7 @@ export function AboutApp({
               },
               {
                 icon: <Instagram className="w-5 h-5" />,
-                href: "https://www.instagram.com/ig_prasar7",
+                href: "https://www.instagram.com/prasar_7/",
                 label: "Instagram",
               },
             ].map((social, i) => (
