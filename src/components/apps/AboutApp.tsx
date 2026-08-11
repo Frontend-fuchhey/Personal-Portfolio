@@ -134,7 +134,7 @@ export function AboutApp({
               },
               {
                 icon: <Linkedin className="w-5 h-5" />,
-                href: "https://www.linkedin.com/in/shrawan-karki-59b0ba392/",
+                href: "https://www.linkedin.com/in/shrawan-karki-187706428/",
                 label: "LinkedIn",
               },
               {
