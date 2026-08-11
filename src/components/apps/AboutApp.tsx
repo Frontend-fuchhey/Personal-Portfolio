@@ -179,7 +179,6 @@ export function AboutApp({
                         name: 'React',
                         icon: <svg className="w-4 h-4 text-[#61DAFB]" viewBox="-11.5 -10.23174 23 20.46348" fill="none" stroke="currentColor" strokeWidth="1"><ellipse rx="11" ry="4.2" /><ellipse rx="11" ry="4.2" transform="rotate(60)" /><ellipse rx="11" ry="4.2" transform="rotate(120)" /><circle r="2" fill="currentColor" /></svg>
                       },
-                      ,
                       {
                         name: 'JavaScript',
                         icon: <svg className="w-4 h-4 text-[#F7DF1E] fill-current" viewBox="0 0 448 512"><path d="M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.1 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h41.3v143.7zm99.6-42.5c4.8 21.6 18.6 34.6 38.8 34.6 18.6 0 31.5-9.3 31.5-24.3 0-16.8-12.3-22.8-33.1-31.9l-11.4-4.8c-32.5-14.1-54.1-31.3-54.1-68.5 0-38.2 30.4-66.4 72.7-66.4 39.4 0 63.2 17.7 71.3 43.6l-32.8 19.3c-5.7-11.7-14.4-17.7-37.3-17.7-17.1 0-28.3 8.7-28.3 22 0 14.4 9 20.1 27.7 28.3l12.3 5.4c39.1 17.1 59.8 34 59.8 73 0 41.6-31.3 70-79.9 70-52.3 0-77-24.3-86.8-54.4l34.1-19.6z" /></svg>
