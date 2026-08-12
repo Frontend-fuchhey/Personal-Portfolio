@@ -11,7 +11,7 @@ const DEFAULT_WINDOWS: Record<AppId, Omit<WindowState, 'isOpen' | 'isMinimized' 
   'cert-class12': { id: 'cert-class12', appId: 'cert-class12', title: 'Certificate - Class 12', x: 50, y: 50, width: 800, height: 600 },
   'cert-class10': { id: 'cert-class10', appId: 'cert-class10', title: 'Certificate - Class 10', x: 80, y: 80, width: 800, height: 600 },
   admin: { id: 'admin', appId: 'admin', title: 'System Administration — C-Panel', x: 0, y: 0, width: 950, height: 650 },
-  photos: { id: 'photos', appId: 'photos', title: 'Photos', x: 0, y: 0, width: 720, height: 500 },
+  photos: { id: 'photos', appId: 'photos', title: 'Photos', x: 0, y: 0, width: 1000, height: 650 },
 };
 
 let zCounter = 100;
