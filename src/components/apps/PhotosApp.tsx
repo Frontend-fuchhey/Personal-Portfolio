@@ -1,6 +1,10 @@
 import { useState, useEffect, memo, useMemo } from "react";
 import { Camera, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import imageA from "../../assets/galleryimages/ImageA.png";
+import imageB from "../../assets/galleryimages/ImageB.png";
+import imageC from "../../assets/galleryimages/ImageC.png";
+import imageD from "../../assets/galleryimages/ImageD.png";
 
 const galleryCategories = ["All", "Tech Team", "Events & Moments", "Projects & Hackathons"];
 
@@ -12,7 +16,7 @@ const galleryItems = [
     date: "February 2026",
     title: "Rato Topi Technical Support Operations",
     description: "Managing network infrastructure, web portals, live evaluation tools, and technical logistics during event operations.",
-    image: "https://placehold.co/600x400/1e293b/ffffff?text=Image+A",
+    image: imageA,
     tags: ["Network Routing", "Web Portals", "Rato Topi"]
   },
   {
@@ -22,7 +26,7 @@ const galleryItems = [
     date: "January 2026",
     title: "GPLC Intellect Award Ceremony & Champions",
     description: "Celebrating with champions, faculty, and administration during the grand finale and awards distribution.",
-    image: "https://placehold.co/600x400/0f172a/ffffff?text=Image+B",
+    image: imageB,
     tags: ["GPLC Intellect", "Recognition"]
   },
   {
@@ -32,7 +36,7 @@ const galleryItems = [
     date: "December 2025",
     title: "AI Summit Nepal — Kathmandu",
     description: "Engaging with industry leaders and technical teams at AI Summit Nepal, discussing autonomous agent architectures and frontend systems.",
-    image: "https://placehold.co/600x400/334155/ffffff?text=Image+C",
+    image: imageC,
     tags: ["AI Summit", "Kathmandu"]
   },
   {
@@ -42,7 +46,7 @@ const galleryItems = [
     date: "October 2025",
     title: "National AI Hackathon Highlights",
     description: "Participating and building full-stack interactive prototypes in competitive team environments.",
-    image: "https://placehold.co/600x400/475569/ffffff?text=Image+D",
+    image: imageD,
     tags: ["Hackathon", "AWS", "AI"]
   }
 ];
@@ -295,7 +299,7 @@ const PhotoCard = memo(
             alt={item.title}
             loading="lazy"
             onLoad={() => setLoaded(true)}
-            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${loaded ? "opacity-100 blur-0" : "opacity-0 blur-sm"}`}
+            className={`w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105 ${loaded ? "opacity-100 blur-0" : "opacity-0 blur-sm"}`}
           />
         </div>
 
