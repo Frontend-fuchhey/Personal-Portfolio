@@ -131,28 +131,32 @@ export function AboutApp({
                 icon: <Github className="w-5 h-5" />,
                 href: "https://github.com/frontend-fuchhey",
                 label: "GitHub",
+                rel: "me noopener noreferrer",
               },
               {
                 icon: <Linkedin className="w-5 h-5" />,
                 href: "https://www.linkedin.com/in/shrawan-karki-187706428/",
                 label: "LinkedIn",
+                rel: "me noopener noreferrer",
               },
               {
                 icon: <Twitter className="w-5 h-5" />,
                 href: "https://x.com/pratyushkarki6",
                 label: "Twitter",
+                rel: "noopener noreferrer",
               },
               {
                 icon: <Instagram className="w-5 h-5" />,
                 href: "https://www.instagram.com/prasar_7/",
                 label: "Instagram",
+                rel: "me noopener noreferrer",
               },
             ].map((social, i) => (
               <a
                 key={i}
                 href={social.href}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel={social.rel}
                 className="text-gray-400 dark:text-gray-500 hover:text-blue-500 transition-all transform hover:scale-125"
                 title={social.label}
               >

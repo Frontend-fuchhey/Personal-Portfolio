@@ -90,7 +90,7 @@ export function ContactApp() {
                   <a
                     href={item.link}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="me noopener noreferrer"
                     className="flex items-center flex-nowrap gap-2 cursor-pointer group hover:opacity-70 transition-all overflow-visible"
                   >
                     <Icon className="w-5 h-5 shrink-0" style={{ color: item.color }} />
