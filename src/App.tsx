@@ -201,7 +201,9 @@ export default function App() {
 
   useEffect(() => {
     const handleUrlChange = () => {
-      const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '') || window.location.hash.replace(/^#+/, '');
+      const cleanPath = window.location.pathname.split('?')[0].replace(/^\/+|\/+$/g, '');
+      const cleanHash = window.location.hash.split('?')[0].replace(/^#+/, '');
+      const rawPath = cleanPath || cleanHash;
       const targetApp = rawPath.toLowerCase().trim();
       const validApps = ['projects', 'resume', 'contact', 'terminal', 'about'];
 
@@ -227,7 +229,9 @@ export default function App() {
     closeWindow(id);
 
     if (win) {
-      const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '') || window.location.hash.replace(/^#+/, '');
+      const cleanPath = window.location.pathname.split('?')[0].replace(/^\/+|\/+$/g, '');
+      const cleanHash = window.location.hash.split('?')[0].replace(/^#+/, '');
+      const rawPath = cleanPath || cleanHash;
       const currentRoute = rawPath.toLowerCase().trim();
       
       const isRouteMatch = 

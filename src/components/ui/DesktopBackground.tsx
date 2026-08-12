@@ -40,7 +40,7 @@ export const DesktopBackground = memo(({ wallpaper, isMobile, children }: Deskto
 
   return (
     <div
-      className={`w-screen ${isMobile ? 'h-[100dvh]' : 'h-screen'} overflow-hidden relative select-none ${isMobile ? 'font-roboto' : ''}`}
+      className={`w-full max-w-full overflow-x-hidden ${isMobile ? 'h-[100dvh]' : 'h-screen'} overflow-hidden relative select-none ${isMobile ? 'font-roboto' : ''}`}
       style={{
         background: '#0d0f12',
       }}

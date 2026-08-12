@@ -125,19 +125,19 @@ export function ResumeView({ onBack, onClose }: { onBack?: () => void; onClose?:
                 <ul className="space-y-4 text-[11px]">
                   <li className="flex items-center gap-3" style={{ color: '#4b5563' }}>
                     <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#9ca3af' }} />
-                    <span className="break-all whitespace-normal text-xs">{contact.email}</span>
+                    <a href={`mailto:${contact.email}`} className="hover:text-blue-600 transition-colors break-all whitespace-normal text-xs">{contact.email}</a>
                   </li>
                   <li className="flex items-center gap-3" style={{ color: '#4b5563' }}>
                     <Globe className="w-4 h-4 flex-shrink-0" style={{ color: '#9ca3af' }} />
-                    <span>{contact.portfolio}</span>
+                    <a href="https://shrawankarki.com.np" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">{contact.portfolio}</a>
                   </li>
                   <li className="flex items-start gap-3" style={{ color: '#4b5563' }}>
                     <Github className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#9ca3af' }} />
-                    <span className="break-all whitespace-normal">{contact.github}</span>
+                    <a href="https://github.com/frontend-fuchhey" target="_blank" rel="me noopener noreferrer" className="hover:text-blue-600 transition-colors break-all whitespace-normal">{contact.github}</a>
                   </li>
                   <li className="flex items-start gap-3" style={{ color: '#4b5563' }}>
                     <Linkedin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#9ca3af' }} />
-                    <span className="break-all whitespace-normal">{contact.linkedin}</span>
+                    <a href="https://www.linkedin.com/in/shrawan-karki-187706428/" target="_blank" rel="me noopener noreferrer" className="hover:text-blue-600 transition-colors break-all whitespace-normal">{contact.linkedin}</a>
                   </li>
                 </ul>
               </div>
