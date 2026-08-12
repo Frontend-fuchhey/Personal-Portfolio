@@ -25,6 +25,7 @@ import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
 import profilePic from './assets/shrawan.jpg';
 import { ResumeView } from './components/ResumeView';
+import TextPressure from './components/ui/TextPressure';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -295,25 +296,17 @@ export default function App() {
                 style={{ zIndex: 0 }}
               >
                 <h1
-                  className="text-white font-bold text-center"
+                  className="text-white/95 text-center font-extrabold tracking-tighter text-4xl md:text-7xl lg:text-8xl"
                   style={{
-                    fontSize: 'clamp(3rem, 15vw, 5rem)',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1,
+                    textShadow: "0 2px 4px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6)",
                     fontFamily: 'Inter, system-ui, sans-serif',
+                    lineHeight: 1.1,
                   }}
                 >
-                  {USER_CONFIG.name.toUpperCase()}
+                  {USER_CONFIG.name}
                 </h1>
-                <p
-                  className="text-white font-light uppercase text-center mt-2"
-                  style={{
-                    fontSize: '12px',
-                    letterSpacing: '0.3em',
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                  }}
-                >
-                  {USER_CONFIG.title}
+                <p className="text-zinc-200 dark:text-zinc-300 font-medium text-lg md:text-2xl tracking-wide mt-2 opacity-90">
+                  Frontend Developer & UI/UX Designer
                 </p>
               </div>
               
@@ -343,38 +336,14 @@ export default function App() {
           >
             <div className="absolute w-[600px] h-[600px] rounded-full bg-white opacity-[0.03] blur-[100px] pointer-events-none" />
 
-            <h1
-              className="text-white text-center"
-              style={{
-                fontSize: 'clamp(2.6rem, 7.5vw, 6rem)',
-                fontWeight: 100,
-                opacity: 0.32,
-                letterSpacing: '0.18em',
-                lineHeight: 1.1,
-                fontFamily: 'Inter, system-ui, sans-serif',
-              }}
-            >
-              {USER_CONFIG.name.toUpperCase()}
-            </h1>
-
-            <motion.div 
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "12%", opacity: 0.18 }}
-              transition={{ delay: 1.0, duration: 1 }}
-              className="h-[1px] bg-white my-8 min-w-[80px]"
-            />
-
-            <p
-              className="text-white font-light uppercase text-center"
-              style={{
-                fontSize: 'clamp(0.5rem, 1.1vw, 0.7rem)',
-                opacity: 0.30,
-                letterSpacing: '0.45em',
-                fontFamily: 'Inter, system-ui, sans-serif',
-              }}
-            >
-              {USER_CONFIG.title}
-            </p>
+            <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 z-10 pointer-events-auto">
+              <div className="w-full relative min-h-[120px] md:min-h-[160px] flex items-center justify-center">
+                <TextPressure alpha={false} flex={false} italic={true} minFontSize={52} stroke={false} text="Shrawan Karki" textColor="#FFFFFF" weight={true} width={true}/>
+              </div>
+              <p className="text-zinc-200 dark:text-zinc-200 font-medium text-lg md:text-2xl tracking-wide mt-2 drop-shadow-md text-center">
+                Frontend Developer & UI/UX Designer
+              </p>
+            </div>
           </motion.div>
         )}
 
