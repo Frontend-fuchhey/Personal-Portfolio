@@ -6,34 +6,11 @@ const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-const getAttr = (distance: number, maxDist: number, minVal: number, maxVal: number) => {
-  const val = maxVal - Math.abs((maxVal * distance) / maxDist);
-  return Math.max(minVal, val + minVal);
-};
-
-const debounce = (func: Function, delay: number) => {
-  let timeoutId: any;
-  return (...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func.apply(null, args);
-    }, delay);
-  };
-};
-
 interface TextPressureProps {
   text?: string;
   fontFamily?: string;
   fontUrl?: string;
-  width?: boolean;
-  weight?: boolean;
-  italic?: boolean;
-  alpha?: boolean;
-  flex?: boolean;
-  stroke?: boolean;
-  scale?: boolean;
   textColor?: string;
-  strokeColor?: string;
   className?: string;
   minFontSize?: number;
 }
@@ -42,26 +19,16 @@ const TextPressure = ({
   text = 'Shrawan Karki',
   fontFamily = 'Roboto Flex',
   fontUrl = 'https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap',
-  width = true,
-  weight = true,
-  italic = true,
-  alpha = false,
-  flex = false,
-  stroke = false,
-  scale = false,
   textColor = '#FFFFFF',
-  strokeColor = '#5227FF',
   className = '',
-  minFontSize = 48
+  minFontSize = 44
 }: TextPressureProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const spansRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const cursorRef = useRef({ x: 0, y: 0 });
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const cursorRef = useRef({ x: -1000, y: -1000 });
   const [fontSize, setFontSize] = useState(minFontSize);
-  const [scaleY, setScaleY] = useState(1);
-  const [lineHeight, setLineHeight] = useState(1);
   const chars = text.split('');
 
   useEffect(() => {
@@ -70,152 +37,125 @@ const TextPressure = ({
       cursorRef.current.y = e.clientY;
     };
     const handleTouchMove = (e: TouchEvent) => {
-      const t = e.touches[0];
-      cursorRef.current.x = t.clientX;
-      cursorRef.current.y = t.clientY;
+      if (e.touches[0]) {
+        cursorRef.current.x = e.touches[0].clientX;
+        cursorRef.current.y = e.touches[0].clientY;
+      }
+    };
+    const handleMouseLeave = () => {
+      cursorRef.current.x = -1000;
+      cursorRef.current.y = -1000;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
-
-    if (containerRef.current) {
-      const { left, top, width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
-      mouseRef.current.x = left + containerW / 2;
-      mouseRef.current.y = top + containerH / 2;
-      cursorRef.current.x = mouseRef.current.x;
-      cursorRef.current.y = mouseRef.current.y;
-    }
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
   const setSize = useCallback(() => {
-    if (!containerRef.current || !titleRef.current) return;
-    const { width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
-    let newFontSize = containerW / (chars.length / 1.8);
-    newFontSize = Math.max(newFontSize, minFontSize);
-    setFontSize(newFontSize);
-    setScaleY(1);
-    setLineHeight(1);
-
-    requestAnimationFrame(() => {
-      if (!titleRef.current) return;
-      const textRect = titleRef.current.getBoundingClientRect();
-      if (scale && textRect.height > 0) {
-        const yRatio = containerH / textRect.height;
-        setScaleY(yRatio);
-        setLineHeight(yRatio);
-      }
-    });
-  }, [chars.length, minFontSize, scale]);
+    if (!containerRef.current) return;
+    const { width: containerW } = containerRef.current.getBoundingClientRect();
+    const calculatedSize = Math.max(containerW / (chars.length * 0.65), minFontSize);
+    setFontSize(calculatedSize);
+  }, [chars.length, minFontSize]);
 
   useEffect(() => {
-    const debouncedSetSize = debounce(setSize, 100);
-    debouncedSetSize();
-    window.addEventListener('resize', debouncedSetSize);
-    return () => window.removeEventListener('resize', debouncedSetSize);
+    setSize();
+    window.addEventListener('resize', setSize);
+    return () => window.removeEventListener('resize', setSize);
   }, [setSize]);
 
   useEffect(() => {
     let rafId: number;
+    let time = 0;
+
     const animate = () => {
-      mouseRef.current.x += (cursorRef.current.x - mouseRef.current.x) / 12;
-      mouseRef.current.y += (cursorRef.current.y - mouseRef.current.y) / 12;
+      time += 0.05;
+      mouseRef.current.x += (cursorRef.current.x - mouseRef.current.x) * 0.15;
+      mouseRef.current.y += (cursorRef.current.y - mouseRef.current.y) * 0.15;
 
-      if (titleRef.current) {
-        const titleRect = titleRef.current.getBoundingClientRect();
-        const maxDist = titleRect.width / 2;
+      const hoverRadius = 180; // Proximity threshold in pixels
 
-        spansRef.current.forEach(span => {
-          if (!span) return;
-          const rect = span.getBoundingClientRect();
-          const charCenter = {
-            x: rect.x + rect.width / 2,
-            y: rect.y + rect.height / 2
-          };
-          const d = dist(mouseRef.current, charCenter);
-          const wdth = width ? Math.floor(getAttr(d, maxDist, 25, 151)) : 100;
-          const wght = weight ? Math.floor(getAttr(d, maxDist, 100, 900)) : 400;
-          const italVal = italic ? getAttr(d, maxDist, 0, 1).toFixed(2) : 0;
-          const alphaVal = alpha ? getAttr(d, maxDist, 0.4, 1).toFixed(2) : 1;
+      spansRef.current.forEach((span, index) => {
+        if (!span) return;
+        const rect = span.getBoundingClientRect();
+        const charCenter = {
+          x: rect.x + rect.width / 2,
+          y: rect.y + rect.height / 2
+        };
 
-          const newFontVariationSettings = `'wght' ${wght}, 'wdth' ${wdth}, 'ital' ${italVal}`;
-          if (span.style.fontVariationSettings !== newFontVariationSettings) {
-            span.style.fontVariationSettings = newFontVariationSettings;
-          }
-          if (alpha && span.style.opacity !== alphaVal) {
-            span.style.opacity = alphaVal;
-          }
-        });
-      }
+        const d = dist(mouseRef.current, charCenter);
+
+        // Baseline (Idle state - crisp, clean, bold)
+        let wght = 700;
+        let wdth = 100;
+        let ital = 0;
+        let translateY = 0;
+
+        // Hover / Proximity Wobble Modulation
+        if (d < hoverRadius) {
+          const factor = 1 - d / hoverRadius; // 0 to 1 float
+          
+          // Smooth variable font modulation
+          wght = Math.min(900, Math.floor(700 + factor * 200));
+          wdth = Math.min(150, Math.floor(100 + factor * 45));
+          ital = parseFloat((factor * 0.8).toFixed(2));
+          
+          // Subtle wobble spring bounce
+          translateY = Math.sin(time * 4 + index) * (factor * 6);
+        }
+
+        const fontSettings = `'wght' ${wght}, 'wdth' ${wdth}, 'ital' ${ital}`;
+        if (span.style.fontVariationSettings !== fontSettings) {
+          span.style.fontVariationSettings = fontSettings;
+        }
+
+        const transformStyle = `translateY(${translateY.toFixed(1)}px)`;
+        if (span.style.transform !== transformStyle) {
+          span.style.transform = transformStyle;
+        }
+      });
+
       rafId = requestAnimationFrame(animate);
     };
 
     animate();
     return () => cancelAnimationFrame(rafId);
-  }, [width, weight, italic, alpha]);
+  }, []);
 
   const styleElement = useMemo(() => {
     return (
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('${fontUrl}');
-        .flex-pressure {
-          display: flex;
-          justify-content: center;
-        }
-        .stroke span {
-          position: relative;
-          color: ${textColor};
-        }
-        .stroke span::after {
-          content: attr(data-char);
-          position: absolute;
-          left: 0;
-          top: 0;
-          color: transparent;
-          z-index: -1;
-          -webkit-text-stroke-width: 3px;
-          -webkit-text-stroke-color: ${strokeColor};
-        }
-        .text-pressure-title {
+        .text-pressure-container {
+          font-family: '${fontFamily}', sans-serif;
           color: ${textColor};
         }
       `}} />
     );
-  }, [fontFamily, fontUrl, textColor, strokeColor]);
-
-  const dynamicClassName = [className, flex ? 'flex-pressure' : '', stroke ? 'stroke' : ''].filter(Boolean).join(' ');
+  }, [fontFamily, fontUrl, textColor]);
 
   return (
     <div
       ref={containerRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: 'auto',
-        background: 'transparent'
-      }}
+      className={`text-pressure-container w-full flex justify-center items-center select-none ${className}`}
+      style={{ background: 'transparent' }}
     >
       {styleElement}
       <h1
         ref={titleRef}
-        className={`text-pressure-title ${dynamicClassName}`}
+        className="flex justify-center items-center tracking-normal m-0 p-0"
         style={{
-          fontFamily,
-          textTransform: 'none',
           fontSize: `${fontSize}px`,
-          lineHeight,
-          transform: `scale(1, ${scaleY})`,
-          transformOrigin: 'center top',
-          margin: 0,
+          lineHeight: 1.1,
           textAlign: 'center',
-          userSelect: 'none',
-          whiteSpace: 'nowrap',
-          fontWeight: 100,
-          width: '100%'
+          color: textColor
         }}
       >
         {chars.map((char, i) => (
@@ -224,11 +164,11 @@ const TextPressure = ({
             ref={el => {
               spansRef.current[i] = el;
             }}
-            data-char={char}
             style={{
               display: 'inline-block',
-              color: stroke ? undefined : textColor,
-              transition: 'font-variation-settings 0.1s ease'
+              transition: 'font-variation-settings 0.15s ease-out, transform 0.15s ease-out',
+              willChange: 'transform, font-variation-settings',
+              fontVariationSettings: "'wght' 700, 'wdth' 100, 'ital' 0"
             }}
           >
             {char === ' ' ? '\u00A0' : char}
