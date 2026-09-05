@@ -88,8 +88,8 @@ export function ResumeView({ onBack, onClose }: { onBack?: () => void; onClose?:
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hidden sm:block">Digital Resume</h2>
         </div>
         <a
-          href="./Shrawan_Karki_CV.pdf"
-          download="Shrawan_Karki_CV.pdf"
+          href="/Shrawan_karki_CV.pdf"
+          download="Shrawan_karki_CV.pdf"
           target="_blank"
           className="flex items-center gap-2 px-4 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-lg transition-all font-bold text-sm shadow-md active:scale-95"
         >

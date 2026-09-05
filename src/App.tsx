@@ -27,6 +27,7 @@ import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
 import profilePic from './assets/shrawan.jpg';
 import { ResumeView } from './components/ResumeView';
+import { ResumeApp } from './components/apps/Resume';
 import TextPressure from './components/ui/TextPressure';
 
 const initialWallpaper = WALLPAPERS[0];
@@ -59,7 +60,7 @@ const MemoizedAppContent = memo(({
     case 'projects': return <ProjectsApp />;
     case 'terminal': return <TerminalApp onOpenApp={onOpenApp} />;
     case 'contact':  return <ContactApp />;
-    case 'resume':   return <ResumeView onClose={onClose} />;
+    case 'resume':   return <ResumeApp />;
     case 'settings': return (
       <SettingsApp 
         wallpaper={wallpaper} 
@@ -354,7 +355,7 @@ export default function App() {
           </motion.div>
         </div>
 
-        <DesktopWidget onOpenAbout={() => openWindow('about')} />
+        <DesktopWidget onOpenCv={() => openWindow('resume')} onOpenResume={() => openWindow('resume')} onOpenAbout={() => openWindow('resume')} />
 
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 100 }}>
           <AnimatePresence>

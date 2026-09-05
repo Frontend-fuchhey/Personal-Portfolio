@@ -8,7 +8,7 @@ const DEFAULT_WINDOWS: Record<AppId, Omit<WindowState, 'isOpen' | 'isMinimized' 
   terminal: { id: 'terminal', appId: 'terminal', title: 'Terminal', x: 0, y: 0, width: 680, height: 420 },
   contact: { id: 'contact', appId: 'contact', title: 'Contact', x: 0, y: 0, width: 520, height: 700 },
   settings: { id: 'settings', appId: 'settings', title: 'Settings', x: 0, y: 0, width: 560, height: 460 },
-  resume: { id: 'resume', appId: 'resume', title: 'Digital Resume — Shrawan Karki', x: 0, y: 0, width: 850, height: 620 },
+  resume: { id: 'resume', appId: 'resume', title: 'Curriculum Vitae — Shrawan Karki', x: 0, y: 0, width: 850, height: 650 },
   'cert-class12': { id: 'cert-class12', appId: 'cert-class12', title: 'Certificate - Class 12', x: 50, y: 50, width: 800, height: 600 },
   'cert-class10': { id: 'cert-class10', appId: 'cert-class10', title: 'Certificate - Class 10', x: 80, y: 80, width: 800, height: 600 },
   admin: { id: 'admin', appId: 'admin', title: 'System Administration — C-Panel', x: 0, y: 0, width: 950, height: 650 },
