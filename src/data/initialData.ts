@@ -4,6 +4,8 @@ import garmentIcon from '../assets/garmentflow.png';
 import gallery2 from '../assets/maingarment.png';
 import mbPortfolio from '../assets/mb.png';
 import lpPortfolio from '../assets/lp.png';
+import resumeIoBg from '../assets/resume-io.png';
+import resumeLogo from '../assets/resume-logo.png';
 
 export const INITIAL_ABOUT_DATA = {
   experience: [
@@ -66,6 +68,7 @@ export const INITIAL_PROJECTS = [
     tech: ['React.js', 'TypeScript', 'Tailwind CSS', 'Next.js'],
     url: 'https://github.com/Frontend-fuchhey/Garment-flow',
     demoUrl: 'https://garment-flow.app',
+    icon: garmentIcon,
     iconType: 'image',
     iconValue: garmentIcon,
     color: 'from-blue-500 to-cyan-500',
@@ -79,7 +82,7 @@ export const INITIAL_PROJECTS = [
     category: 'React', // <--- Added Category (or 'React' depending on your choice)
     description: 'This portfolio! macOS-inspired interactive experience for Computers and Android for Mobiles to give experince of responsiveness',
     tech: ['React', 'TypeScript', 'Framer Motion', 'Tailwind CSS'],
-    url: 'https://github.com/shrawan-karki/portfolio',
+    url: 'https://github.com/Frontend-fuchhey/Personal-Portfolio',
     iconType: 'emoji',
     iconValue: '💻',
     color: 'from-indigo-500 to-blue-600',
@@ -87,4 +90,28 @@ export const INITIAL_PROJECTS = [
     images: [lpPortfolio, mbPortfolio],
     coverImage: lpPortfolio
   },
+  {
+    id: "resume-io",
+    title: "Resume.io - Automatic Resume Builder",
+    name: "Resume.io",
+    description: "An automated resume creation and formatting application designed to generate clean, high-impact technical resumes with live preview and instant export.",
+    longDescription: "Built with modern web technologies and hosted on Cloudflare Workers edge network. Allows users to dynamically structure experience, technical skills, and education into professionally styled ATS-friendly layouts.",
+    longDesc: "Built with modern web technologies and hosted on Cloudflare Workers edge network. Allows users to dynamically structure experience, technical skills, and education into professionally styled ATS-friendly layouts.",
+    tags: ["React", "TypeScript", "Tailwind CSS", "Cloudflare Workers", "PDF Generation"],
+    tech: ["React", "TypeScript", "Tailwind CSS", "Cloudflare Workers", "PDF Generation"],
+    category: "Web Applications",
+    liveUrl: "https://resume-io.pratyushkarki6.workers.dev/",
+    demoUrl: "https://resume-io.pratyushkarki6.workers.dev/",
+    githubUrl: "https://github.com/Frontend-fuchhey/resume.io",
+    url: "https://github.com/Frontend-fuchhey/resume.io",
+    featured: true,
+    image: resumeIoBg,
+    coverImage: resumeIoBg,
+    images: [resumeIoBg],
+    icon: resumeLogo,
+    iconType: 'image',
+    iconValue: resumeLogo,
+    color: 'from-emerald-500 to-teal-600',
+    subHeader: 'Automatic Resume Builder with live preview & instant export.'
+  }
 ];

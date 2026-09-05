@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import { WindowState, AppId } from '../types/os';
 
 const DEFAULT_WINDOWS: Record<AppId, Omit<WindowState, 'isOpen' | 'isMinimized' | 'isMaximized' | 'zIndex'>> = {
-  about: { id: 'about', appId: 'about', title: 'About Me', x: 0, y: 0, width: 620, height: 480 },
+  about: { id: 'about', appId: 'about', title: 'About Me', x: 0, y: 0, width: 980, height: 660, minWidth: 700, minHeight: 500 },
+  aboutme: { id: 'aboutme', appId: 'aboutme', title: 'About Me', x: 0, y: 0, width: 980, height: 660, minWidth: 700, minHeight: 500 },
   projects: { id: 'projects', appId: 'projects', title: 'File Explorer — Projects', x: 0, y: 0, width: 860, height: 580 },
   terminal: { id: 'terminal', appId: 'terminal', title: 'Terminal', x: 0, y: 0, width: 680, height: 420 },
   contact: { id: 'contact', appId: 'contact', title: 'Contact', x: 0, y: 0, width: 520, height: 700 },
@@ -12,6 +13,7 @@ const DEFAULT_WINDOWS: Record<AppId, Omit<WindowState, 'isOpen' | 'isMinimized' 
   'cert-class10': { id: 'cert-class10', appId: 'cert-class10', title: 'Certificate - Class 10', x: 80, y: 80, width: 800, height: 600 },
   admin: { id: 'admin', appId: 'admin', title: 'System Administration — C-Panel', x: 0, y: 0, width: 950, height: 650 },
   photos: { id: 'photos', appId: 'photos', title: 'Photos', x: 0, y: 0, width: 1000, height: 650 },
+  tictactoe: { id: 'tictactoe', appId: 'tictactoe', title: 'Tic Tac Toe', x: 0, y: 0, width: 360, height: 500, minWidth: 320, minHeight: 460 },
 };
 
 let zCounter = 100;

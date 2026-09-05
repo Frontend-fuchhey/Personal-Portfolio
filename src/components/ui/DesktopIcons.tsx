@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, FolderOpen, Terminal, Mail, Settings as SettingsIcon, Image as ImageIcon } from 'lucide-react';
 import { AppId, WindowState } from "../../types/os";
+import { TicTacToeIcon } from '../icons/TicTacToeIcon';
 
 interface DesktopIcon {
   appId: AppId;
@@ -17,6 +18,7 @@ const DESKTOP_ICONS: DesktopIcon[] = [
   { appId: 'terminal', label: 'Terminal', icon: <Terminal className="w-9 h-9 text-white" />, color: 'from-gray-700 to-gray-900' },
   { appId: 'contact', label: 'Contact', icon: <Mail className="w-9 h-9 text-white" />, color: 'from-green-500 to-green-700' },
   { appId: 'settings', label: 'Settings', icon: <SettingsIcon className="w-9 h-9 text-white" />, color: 'from-slate-500 to-slate-700' },
+  { appId: 'tictactoe', label: 'Tic Tac Toe', icon: <TicTacToeIcon bare className="w-11 h-11 object-contain" />, color: 'bg-white border border-zinc-200/50' },
 ];
 
 interface DesktopIconsProps {
@@ -34,19 +36,8 @@ export function DesktopIcons({ windows, onOpen, isMobile }: DesktopIconsProps) {
     onOpen(appId);
   };
 
-  const handlePrefetch = (appId: AppId) => {
-    if (appId === 'photos') {
-      // Prefetch first 3 images for the gallery
-      const prefetchUrls = [
-        'https://picsum.photos/400/400?random=1',
-        'https://picsum.photos/400/400?random=2',
-        'https://picsum.photos/400/400?random=3'
-      ];
-      prefetchUrls.forEach(url => {
-        const img = new Image();
-        img.src = url;
-      });
-    }
+  const handlePrefetch = (_appId: AppId) => {
+    // Assets are local and statically bundled
   };
 
   return (
@@ -80,7 +71,7 @@ export function DesktopIcons({ windows, onOpen, isMobile }: DesktopIconsProps) {
               />
             )}
             <motion.div
-              className={`${isMobile ? 'w-[60px] h-[60px] rounded-[18px]' : 'w-16 h-16 rounded-2xl'} bg-gradient-to-br ${icon.color} flex items-center justify-center shadow-lg transition-all duration-300`}
+              className={`${isMobile ? 'w-[60px] h-[60px] rounded-[18px]' : 'w-16 h-16 rounded-2xl'} ${icon.color.includes('bg-') ? icon.color : `bg-gradient-to-br ${icon.color}`} flex items-center justify-center shadow-lg transition-all duration-300`}
               whileHover={{ 
                 scale: 1.05,
                 boxShadow: "0 0 25px rgba(255,255,255,0.25), 0 10px 15px -3px rgba(0,0,0,0.3)"

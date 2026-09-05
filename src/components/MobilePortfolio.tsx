@@ -10,6 +10,8 @@ import { ProjectsApp } from './apps/ProjectsApp';
 import { TerminalApp } from './apps/TerminalApp';
 import { ContactApp } from './apps/ContactApp';
 import { SettingsApp } from './apps/SettingsApp';
+import { TicTacToe } from './apps/TicTacToe';
+import { TicTacToeIcon } from './icons/TicTacToeIcon';
 
 import React, { memo } from 'react';
 
@@ -19,6 +21,7 @@ const MOBILE_APPS: { id: AppId; label: string; icon: React.ReactNode; color: str
   { id: 'terminal', label: 'Terminal', icon: <Terminal className="w-8 h-8 text-white" />,   color: 'from-gray-700 to-gray-900' },
   { id: 'contact',  label: 'Contact',  icon: <Mail className="w-8 h-8 text-white" />,       color: 'from-green-500 to-green-700' },
   { id: 'settings', label: 'Settings', icon: <Settings className="w-8 h-8 text-white" />,   color: 'from-slate-500 to-slate-700' },
+  { id: 'tictactoe', label: 'TicTacToe', icon: <TicTacToeIcon bare className="w-10 h-10 object-contain" />, color: 'bg-white border border-zinc-200/50' },
 ];
 
 const DOCK_APPS = MOBILE_APPS.slice(0, 4);
@@ -110,6 +113,7 @@ const MemoizedAppContent = memo(({
         onShowClockChange={onShowClockChange}
       />
     );
+    case 'tictactoe': return <TicTacToe />;
     default: return null;
   }
 });
@@ -531,7 +535,7 @@ function MobileHomeIcon({
     >
       <motion.button
         onClick={onTap}
-        className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${app.color} flex items-center justify-center shadow-lg`}
+        className={`w-16 h-16 rounded-2xl ${app.color.includes('bg-') ? app.color : `bg-gradient-to-br ${app.color}`} flex items-center justify-center shadow-lg`}
         whileTap={{ scale: 0.8 }}
         whileHover={{ scale: 1.06 }}
         transition={{ type: 'spring', damping: 18, stiffness: 380 }}

@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useMemo } from "react";
+import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { Camera, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import imageA from "../../assets/galleryimages/ImageA.png";
@@ -6,9 +6,15 @@ import imageB from "../../assets/galleryimages/ImageB.png";
 import imageC from "../../assets/galleryimages/ImageC.png";
 import imageD from "../../assets/galleryimages/ImageD.png";
 
-const galleryCategories = ["All", "Tech Team", "Events & Moments", "Projects & Hackathons"];
+// MUST BE OUTSIDE THE COMPONENT FUNCTION TO PREVENT CONSTANT RE-CREATION
+export const STATIC_GALLERY_CATEGORIES = [
+  "All",
+  "Tech Team",
+  "Events & Moments",
+  "Projects & Hackathons"
+] as const;
 
-const galleryItems = [
+export const STATIC_GALLERY_ITEMS = [
   {
     id: "01",
     category: "Tech Team",
@@ -51,31 +57,41 @@ const galleryItems = [
   }
 ];
 
+// Backwards-compatible aliases
+export const galleryCategories = STATIC_GALLERY_CATEGORIES;
+export const galleryItems = STATIC_GALLERY_ITEMS;
+
 export const PhotosApp = memo(() => {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
   const filteredItems = useMemo(() => {
-    if (activeCategory === "All") return galleryItems;
-    return galleryItems.filter((item) => item.category === activeCategory);
+    if (activeCategory === "All") return STATIC_GALLERY_ITEMS;
+    return STATIC_GALLERY_ITEMS.filter((item) => item.category === activeCategory);
   }, [activeCategory]);
 
-  const handleNext = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (selectedIdx !== null) {
-      setSelectedIdx((selectedIdx + 1) % filteredItems.length);
-    }
-  };
+  const handleSelectIdx = useCallback((idx: number) => {
+    setSelectedIdx(idx);
+  }, []);
 
-  const handlePrev = (e?: React.MouseEvent) => {
+  const handleNext = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (selectedIdx !== null) {
-      setSelectedIdx((selectedIdx - 1 + filteredItems.length) % filteredItems.length);
-    }
-  };
+    setSelectedIdx((prev) => {
+      if (prev === null) return null;
+      return (prev + 1) % filteredItems.length;
+    });
+  }, [filteredItems.length]);
+
+  const handlePrev = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedIdx((prev) => {
+      if (prev === null) return null;
+      return (prev - 1 + filteredItems.length) % filteredItems.length;
+    });
+  }, [filteredItems.length]);
 
   // Reset selected image index when category changes to avoid overflow index issues
   useEffect(() => {
@@ -96,7 +112,7 @@ export const PhotosApp = memo(() => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIdx, filteredItems]);
+  }, [selectedIdx, handleNext, handlePrev]);
 
   return (
     <div
@@ -131,7 +147,7 @@ export const PhotosApp = memo(() => {
               msOverflowStyle: 'none',
             }}
           >
-            {galleryCategories.map((category) => {
+            {STATIC_GALLERY_CATEGORIES.map((category) => {
               const isActive = activeCategory === category;
               return (
                 <button
@@ -157,7 +173,8 @@ export const PhotosApp = memo(() => {
               <PhotoCard
                 key={item.id}
                 item={item}
-                onClick={() => setSelectedIdx(idx)}
+                index={idx}
+                onSelect={handleSelectIdx}
               />
             ))}
           </div>
@@ -189,6 +206,11 @@ export const PhotosApp = memo(() => {
             {/* Main Lightbox Content Container */}
             <div
               className="relative w-full max-w-5xl bg-zinc-950 border border-zinc-800/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[85vh] md:h-[70vh]"
+              style={{
+                transform: 'translateZ(0)',
+                WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+                isolation: 'isolate'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Left Side: Image display */}
@@ -196,7 +218,13 @@ export const PhotosApp = memo(() => {
                 <img
                   src={filteredItems[selectedIdx].image}
                   alt={filteredItems[selectedIdx].title}
+                  decoding="async"
                   className="max-w-full max-h-full object-contain rounded-lg select-none"
+                  style={{
+                    transform: 'translateZ(0)',
+                    WebkitBackfaceVisibility: 'hidden',
+                    backfaceVisibility: 'hidden'
+                  }}
                 />
 
                 {/* Navigation Arrows */}
@@ -269,70 +297,83 @@ export const PhotosApp = memo(() => {
   );
 });
 
-// Photo Card component
-const PhotoCard = memo(
-  ({
-    item,
-    onClick,
-  }: {
-    item: typeof galleryItems[0];
-    onClick: () => void;
-  }) => {
-    const [loaded, setLoaded] = useState(false);
+interface PhotoCardProps {
+  item: typeof STATIC_GALLERY_ITEMS[0];
+  index: number;
+  onSelect: (index: number) => void;
+}
 
-    return (
-      <motion.div
-        whileHover={{ y: -4 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onClick}
-        className="group flex flex-col bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer p-4 h-full"
+// Photo Card component with GPU isolation to prevent glassmorphism clipping / flickering bugs
+const PhotoCard = memo(({ item, index, onSelect }: PhotoCardProps) => {
+  const handleClick = useCallback(() => {
+    onSelect(index);
+  }, [index, onSelect]);
+
+  return (
+    <motion.div
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleClick}
+      className="group flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer p-4 h-full"
+      style={{
+        transform: 'translateZ(0)',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        isolation: 'isolate',
+      }}
+    >
+      {/* Top Image Container with WebKit clipping fix */}
+      <div
+        className="relative rounded-xl overflow-hidden aspect-[4/3] w-full bg-zinc-100 dark:bg-zinc-800/50 mb-4"
+        style={{
+          transform: 'translateZ(0)',
+          WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+          isolation: 'isolate',
+        }}
       >
-        {/* Top Image Container */}
-        <div className="relative rounded-xl overflow-hidden aspect-[4/3] w-full bg-zinc-100 dark:bg-zinc-800/50 mb-4">
-          {/* Skeleton Loader */}
-          <div
-            className={`absolute inset-0 bg-zinc-200 dark:bg-zinc-800 animate-pulse ${loaded ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
-          />
+        <img
+          src={item.image}
+          alt={item.title}
+          loading="eager"
+          decoding="async"
+          className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+          style={{
+            transform: 'translateZ(0)',
+            WebkitBackfaceVisibility: 'hidden',
+            backfaceVisibility: 'hidden',
+          }}
+        />
+      </div>
 
-          <img
-            src={item.image}
-            alt={item.title}
-            loading="lazy"
-            onLoad={() => setLoaded(true)}
-            className={`w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105 ${loaded ? "opacity-100 blur-0" : "opacity-0 blur-sm"}`}
-          />
-        </div>
+      {/* Metadata Row */}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+          {item.id} / {item.subCategory}
+        </span>
+        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
+          {item.date}
+        </span>
+      </div>
 
-        {/* Metadata Row */}
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-            {item.id} / {item.subCategory}
+      {/* Title & Description */}
+      <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-1.5 leading-snug line-clamp-2">
+        {item.title}
+      </h3>
+      <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 line-clamp-3 leading-relaxed">
+        {item.description}
+      </p>
+
+      {/* Tags Footer */}
+      <div className="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+        {item.tags.map((tag) => (
+          <span
+            key={tag}
+            className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-md font-medium border border-zinc-200/50 dark:border-zinc-700/20"
+          >
+            {tag}
           </span>
-          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
-            {item.date}
-          </span>
-        </div>
-
-        {/* Title & Description */}
-        <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-1.5 leading-snug line-clamp-2">
-          {item.title}
-        </h3>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 line-clamp-3 leading-relaxed">
-          {item.description}
-        </p>
-
-        {/* Tags Footer */}
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-          {item.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-md font-medium border border-zinc-200/50 dark:border-zinc-700/20"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </motion.div>
-    );
-  },
-);
+        ))}
+      </div>
+    </motion.div>
+  );
+});

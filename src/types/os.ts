@@ -1,4 +1,4 @@
-export type AppId = 'about' | 'projects' | 'terminal' | 'contact' | 'settings' | 'resume' | 'cert-class12' | 'cert-class10' | 'admin' | 'photos';
+export type AppId = 'about' | 'aboutme' | 'projects' | 'terminal' | 'contact' | 'settings' | 'resume' | 'cert-class12' | 'cert-class10' | 'admin' | 'photos' | 'tictactoe';
 
 export interface WindowState {
   id: string;
@@ -11,6 +11,8 @@ export interface WindowState {
   y: number;
   width: number;
   height: number;
+  minWidth?: number;
+  minHeight?: number;
   zIndex: number;
 }
 
