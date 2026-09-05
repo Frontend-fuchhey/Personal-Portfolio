@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useIsMobile } from '../../hooks/use-mobile';
 import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOsData } from '../../hooks/useOsData';
 import { INITIAL_PROJECTS } from '../../data/initialData';
+import resumeIoBg from '../assets/resume-io.png';
 
 interface ProjectFeature {
   icon: any;
@@ -17,23 +19,30 @@ interface ProjectArchitecture {
 
 interface Project {
   id: string;
-  name: string;
+  name?: string;
+  title?: string;
   description: string;
   longDesc?: string | any;
-  tech: string[];
+  longDescription?: string | any;
+  tech?: string[];
+  tags?: string[];
   category?: string;
   stars?: number;
   forks?: number;
   url?: string;
+  githubUrl?: string;
   demoUrl?: string;
+  liveUrl?: string;
   icon?: string | any;
   iconType?: 'image' | 'emoji';
   iconValue?: string;
-  color: string;
+  color?: string;
   features?: ProjectFeature[];
   architecture?: ProjectArchitecture[];
   images?: string[];
   coverImage?: string;
+  image?: string;
+  featured?: boolean;
   subHeader?: string;
 }
 
@@ -42,7 +51,7 @@ export function ProjectsApp() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const [activeFilter, setActiveFilter] = useState<'all' | 'react' | 'web design'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'react' | 'web applications' | 'web design'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleProjectClick = (e: React.MouseEvent, project: Project) => {
@@ -60,19 +69,26 @@ export function ProjectsApp() {
   const filteredProjects = INITIAL_PROJECTS.filter((project) => {
     // Always read from INITIAL_PROJECTS (source of truth) — never stale context state
     if (activeFilter.toLowerCase() === 'all') return true;
-    return project.category?.toLowerCase().trim() === activeFilter.toLowerCase().trim();
+    const cat = (project.category || '').toLowerCase().trim();
+    const filter = activeFilter.toLowerCase().trim();
+    if (cat === filter) return true;
+    const techList = ((project as any).tech || (project as any).tags || []).map((t: string) => t.toLowerCase().trim());
+    return techList.includes(filter);
   });
 
   // Apply search on top of the category-filtered list
   const projectsData = (filteredProjects as Project[]).filter(project => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return project.name.toLowerCase().includes(q) ||
-      project.description.toLowerCase().includes(q) ||
-      project.tech.some(t => t.toLowerCase().includes(q));
+    const name = (project.name || project.title || '').toLowerCase();
+    const desc = (project.description || '').toLowerCase();
+    const tech = (project.tech || project.tags || []);
+    return name.includes(q) ||
+      desc.includes(q) ||
+      tech.some(t => t.toLowerCase().includes(q));
   });
 
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const isMobile = useIsMobile();
 
   return (
     <div className={`w-full h-full md:w-[860px] md:h-[580px] flex flex-col bg-white dark:bg-gray-900 overflow-hidden relative ${isMobile ? 'mobile-content-shift' : ''}`}>
@@ -90,7 +106,7 @@ export function ProjectsApp() {
 
             {/* Center Section — Filter Tab Navigation */}
             <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400 font-sans">
-              {(['all', 'react', 'web design'] as const).map((cat, idx, arr) => (
+              {(['all', 'react', 'web applications', 'web design'] as const).map((cat, idx, arr) => (
                 <span key={cat} className="flex items-center gap-3">
                   <button
                     onClick={() => setActiveFilter(cat)}
@@ -99,7 +115,7 @@ export function ProjectsApp() {
                       : 'hover:text-slate-600 cursor-pointer transition-colors duration-150'
                     }
                   >
-                    {cat === 'all' ? 'All' : cat === 'react' ? 'React' : 'Web Design'}
+                    {cat === 'all' ? 'All' : cat === 'react' ? 'React' : cat === 'web applications' ? 'Web Applications' : 'Web Design'}
                   </button>
                   {idx < arr.length - 1 && (
                     <span className="text-slate-200 pointer-events-none px-0.5">|</span>
@@ -142,8 +158,10 @@ export function ProjectsApp() {
               </div>
             ) : (
               projectsData.map(project => {
+                const projectName = project.name || project.title || 'Project';
                 const isEmoji = project.iconType === 'emoji' || (typeof project.icon === 'string' && !project.icon.includes('/') && !project.icon.includes('.'));
-                const iconDisplay = project.iconType === 'emoji' ? project.iconValue : (project.iconValue || project.icon);
+                const iconDisplay = project.iconType === 'emoji' ? (project.iconValue || '📄') : (project.iconValue || project.icon || '📄');
+                const projectColor = project.color || 'from-emerald-500 to-teal-600';
 
                 return (
                   <button
@@ -151,10 +169,10 @@ export function ProjectsApp() {
                     onClick={(e) => handleProjectClick(e, project)}
                     className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
                   >
-                    <div className={`w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + project.color : ''}`}>
-                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={project.name} className="w-16 h-16 object-cover rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10" />}
-                    </div>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 leading-tight break-words">{project.name}</span>
+                    <div className={`w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + projectColor : ''}`}>
+                    {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
+                  </div>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 leading-tight break-words">{projectName}</span>
                   </button>
                 )
               })
@@ -184,43 +202,45 @@ export function ProjectsApp() {
           <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
             <div className="max-w-2xl mx-auto pb-12">
 
-              <div className="relative mb-16 shadow-2xl rounded-3xl animate-in zoom-in-95 duration-500">
-                <div className={`w-full h-48 sm:h-64 rounded-3xl relative overflow-hidden ${!selected.coverImage ? `bg-gradient-to-br ${selected.color} flex items-center justify-center` : ''}`}>
-                  {selected.coverImage ? (
-                    <img 
-                      src={selected.coverImage} 
-                      alt="" 
-                      className="w-full h-full object-cover object-top rounded-3xl"
+              <div className="relative mb-16 shadow-2xl rounded-2xl animate-in zoom-in-95 duration-500">
+                {(() => {
+                  const bgImage = selected.id === 'resume-io' ? resumeIoBg : (selected.coverImage || selected.image);
+                  return bgImage ? (
+                    <div 
+                      className="w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-cover bg-center bg-no-repeat border border-slate-200/40 dark:border-slate-700/50 shadow-inner"
+                      style={{ backgroundImage: `url(${bgImage})` }}
                     />
                   ) : (
-                    <>
+                    <div className={`w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-gradient-to-br ${selected.color || 'from-emerald-500 to-teal-600'} flex items-center justify-center`}>
                       <div className="absolute inset-0 opacity-10 flex items-center justify-center">
                         <Code className="w-64 h-64 text-white transform -rotate-12 scale-150" />
                       </div>
                       <div className="text-8xl transform scale-125 opacity-30 drop-shadow-2xl saturate-150 mix-blend-overlay">
-                        {selected.iconType === 'emoji' ? selected.iconValue : <img src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
+                        {selected.iconType === 'emoji' ? (selected.iconValue || '📄') : <img src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
                       </div>
-                    </>
-                  )}
-                </div>
+                    </div>
+                  );
+                })()}
 
-                <div className="absolute -bottom-8 left-6 sm:left-10 w-24 h-24 rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-xl border border-gray-100 dark:border-gray-700 ring-4 ring-white/50 dark:ring-gray-900/50">
-                  <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl ${selected.iconType === 'emoji' ? 'bg-gradient-to-br ' + selected.color : 'bg-transparent'}`}>
-                    {selected.iconType === 'emoji' ? selected.iconValue : <img src={selected.iconValue || selected.icon} alt={selected.name} className="w-full h-full object-cover rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10" />}
+                <div className="absolute -bottom-8 left-6 sm:left-10 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2 shadow-2xl border border-white/20 dark:border-gray-700/60 ring-4 ring-white/50 dark:ring-gray-900/50 z-10">
+                  <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl shadow-inner ${selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? 'bg-gradient-to-br ' + (selected.color || 'from-emerald-500 to-teal-600') : 'bg-transparent'}`}>
+                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || '📄') : <img src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
                   </div>
                 </div>
               </div>
 
               <div className="px-2 sm:px-4 space-y-8">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">{selected.name}</h2>
+                  <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+                    {selected.id === 'resume-io' ? 'Resume.io' : (selected.name || selected.title)}
+                  </h2>
                   {selected.subHeader && (
                     <div className="text-indigo-600 dark:text-indigo-400 font-bold text-lg mb-4 tracking-tight">
                       {selected.subHeader}
                     </div>
                   )}
                   <div className="space-y-4 text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                    {(selected.longDesc || selected.description).split('||').map((paragraph: string, index: number) => {
+                    {(selected.longDesc || selected.longDescription || selected.description).split('||').map((paragraph: string, index: number) => {
                       const isHeader = paragraph.startsWith('🚀') || paragraph.startsWith('💡') || paragraph.startsWith('📈');
                       return (
                         <p 
@@ -240,7 +260,7 @@ export function ProjectsApp() {
                     <div className="flex flex-col gap-4">
                       {selected.features.map((feature, idx) => (
                         <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all items-start group">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selected.color} shadow-inner shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selected.color || 'from-indigo-500 to-blue-600'} shadow-inner shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform`}>
                             <feature.icon className="w-5 h-5 text-white drop-shadow-sm" />
                           </div>
                           <div className="pt-0.5">
@@ -253,11 +273,11 @@ export function ProjectsApp() {
                   </div>
                 )}
 
-                {selected.tech && selected.tech.length > 0 && (
+                {(selected.tech || selected.tags) && (selected.tech || selected.tags)!.length > 0 && (
                   <div className="space-y-4 lg:pt-2">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">Technical Highlights</h3>
                     <div className="flex flex-wrap gap-2.5">
-                      {selected.tech.map(t => (
+                      {(selected.tech || selected.tags)!.map(t => (
                         <span key={t} className="px-4 py-2 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 text-indigo-900 dark:text-blue-100 text-sm font-black tracking-wide rounded-xl border border-indigo-100/50 dark:border-indigo-800/50 shadow-sm hover:-translate-y-1 hover:shadow-md hover:from-indigo-100 hover:to-blue-100 dark:hover:from-indigo-800/60 dark:hover:to-blue-800/60 transition-all duration-300 cursor-default">
                           {t}
                         </span>
@@ -267,9 +287,9 @@ export function ProjectsApp() {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                  {selected.demoUrl && (
+                  {(selected.demoUrl || selected.liveUrl) && (
                     <a
-                      href={selected.demoUrl}
+                      href={selected.demoUrl || selected.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group flex flex-1 items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-black tracking-wider transition-all duration-300 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5"
@@ -278,12 +298,12 @@ export function ProjectsApp() {
                       LIVE DEMO
                     </a>
                   )}
-                  {selected.url && (
+                  {(selected.url || selected.githubUrl) && (
                     <a
-                      href={selected.url}
+                      href={selected.url || selected.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group flex items-center justify-center gap-2 ${selected.demoUrl ? 'flex-1' : 'w-full'} py-4 rounded-2xl bg-transparent text-gray-800 dark:text-gray-200 font-black tracking-wider transition-all duration-300 border-[3px] border-gray-800 dark:border-gray-200 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900`}
+                      className={`group flex items-center justify-center gap-2 ${(selected.demoUrl || selected.liveUrl) ? 'flex-1' : 'w-full'} py-4 rounded-2xl bg-transparent text-gray-800 dark:text-gray-200 font-black tracking-wider transition-all duration-300 border-[3px] border-gray-800 dark:border-gray-200 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900`}
                     >
                       <Github className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                       VIEW CODE
@@ -291,7 +311,7 @@ export function ProjectsApp() {
                   )}
                 </div>
 
-                {selected.images && selected.images.length > 0 && (
+                {((selected.images && selected.images.length > 0) || selected.image || selected.coverImage) && (
                   <div className="pt-10">
                     <div className="flex items-center gap-3 mb-6">
                       <Camera className="w-6 h-6 text-gray-700 dark:text-gray-300" />
@@ -300,7 +320,7 @@ export function ProjectsApp() {
                     <div className="h-px w-full bg-gradient-to-r from-gray-200 via-gray-200 to-transparent dark:from-gray-700 dark:via-gray-700 dark:to-transparent mb-8"></div>
 
                     <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-                      {selected.images.map((img, idx) => (
+                      {(selected.images && selected.images.length > 0 ? selected.images : [selected.coverImage || selected.image].filter(Boolean) as string[]).map((img, idx) => (
                         <motion.div
                           key={`${selected.id}-img-${idx}`}
                           layoutId={`image-${img}`}
@@ -311,7 +331,7 @@ export function ProjectsApp() {
                         >
                           <img
                             src={img}
-                            alt={`${selected.name} screenshot ${idx + 1}`}
+                            alt={`${selected.name || selected.title} screenshot ${idx + 1}`}
                             className={`rounded-2xl shadow-lg border border-gray-100/50 backdrop-blur-sm w-full h-full min-h-[300px] max-h-96 ${img.toString().includes('mb') ? 'object-contain mx-auto bg-gray-50/10 dark:bg-black/20' : 'object-cover'} aspect-[16/10]`}
                           />
                         </motion.div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { useIsMobile } from './hooks/use-mobile';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWindows } from './hooks/useWindows';
 import { Window } from './components/ui/Window';
@@ -13,6 +14,7 @@ import { ContactApp } from './components/apps/ContactApp';
 import { SettingsApp } from './components/apps/SettingsApp';
 import { AdminApp } from './components/apps/AdminApp';
 import { PhotosApp } from './components/apps/PhotosApp';
+import { TicTacToe } from './components/apps/TicTacToe';
 import { DesktopWidget } from './components/ui/DesktopWidget';
 import { AndroidStatusBar } from './components/android/AndroidStatusBar';
 import { AndroidDock } from './components/android/AndroidDock';
@@ -69,6 +71,7 @@ const MemoizedAppContent = memo(({
     case 'admin':    return <AdminApp />;
 
     case 'photos':   return <PhotosApp />;
+    case 'tictactoe': return <TicTacToe />;
     case 'cert-class12': return (
       <div className="w-full h-full bg-white flex items-center justify-center p-5">
         <img src="./certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
@@ -107,10 +110,7 @@ export default function App() {
 
   const [showClock, setShowClock] = useState(true);
   
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') return window.innerWidth < 768;
-    return false;
-  });
+  const isMobile = useIsMobile();
   
   const [isBooted, setIsBooted] = useState(false);
   const [isFading, setIsFading] = useState(false);
@@ -191,13 +191,8 @@ export default function App() {
     cacheImages();
   }, []);
 
-  useEffect(() => {
-    const updateDeviceStatus = () => setIsMobile(window.innerWidth < 768);
-    updateDeviceStatus();
-    window.addEventListener('resize', updateDeviceStatus);
-
-    return () => window.removeEventListener('resize', updateDeviceStatus);
-  }, []);
+  // isMobile detection is now handled by the useIsMobile() hook above
+  // which includes UA sniffing, screen.width, matchMedia, resize & orientationchange listeners
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -205,7 +200,7 @@ export default function App() {
       const cleanHash = window.location.hash.split('?')[0].replace(/^#+/, '');
       const rawPath = cleanPath || cleanHash;
       const targetApp = rawPath.toLowerCase().trim();
-      const validApps = ['projects', 'resume', 'contact', 'terminal', 'about'];
+      const validApps = ['projects', 'resume', 'contact', 'terminal', 'about', 'tictactoe'];
 
       if (validApps.includes(targetApp)) {
         openWindow(targetApp as AppId);
@@ -273,9 +268,15 @@ export default function App() {
         wallpaper={wallpaper} 
         isMobile={isMobile} 
       >
-        {isMobile && <AndroidStatusBar />}
+        {/* Mobile status bar: CSS-controlled visibility for instant matching */}
+        <div className="block md:hidden">
+          <AndroidStatusBar />
+        </div>
         
-        {!isMobile && <TopBar onOpenApp={openWindow} showClock={showClock} />}
+        {/* Desktop top bar: CSS-controlled visibility */}
+        <div className="hidden md:block">
+          <TopBar onOpenApp={openWindow} showClock={showClock} />
+        </div>
 
         <div 
           ref={desktopRef}
@@ -285,52 +286,54 @@ export default function App() {
 
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.08)', zIndex: 1 }} />
 
-        {isMobile ? (
-          <div 
-            className="flex flex-col justify-between h-full w-full relative z-[2]"
-            style={{ display: anyWindowOpen ? 'none' : 'flex' }}
-          >
-            <div className="pt-16 flex-none">
-              <ClockWidget />
-            </div>
+        {/* ===== MOBILE HOME SCREEN: CSS-visible on <768px ===== */}
+        <div 
+          className="block md:hidden flex flex-col justify-between h-full w-full relative z-[2]"
+          style={{ display: anyWindowOpen ? 'none' : undefined }}
+        >
+          <div className="pt-16 flex-none">
+            <ClockWidget />
+          </div>
 
-            <div className="flex-1 relative flex items-center justify-center">
-              <div 
-                className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-10"
-                style={{ zIndex: 0 }}
-              >
-                <h1
-                  className="text-white/95 text-center font-extrabold tracking-tighter text-4xl md:text-7xl lg:text-8xl"
-                  style={{
-                    textShadow: "0 2px 4px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6)",
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {USER_CONFIG.name}
-                </h1>
-                <p className="text-zinc-200 dark:text-zinc-300 font-medium text-lg md:text-2xl tracking-wide mt-2 opacity-90">
-                  Frontend Developer & UI/UX Designer
-                </p>
-              </div>
-              
-              <div className="relative w-full h-full flex flex-col pt-4 overflow-y-auto" style={{ zIndex: 1, paddingBottom: isMobile ? '100px' : '0' }}>
-                <DesktopIcons 
-                  windows={windows}
-                  onOpen={handleAppClick} 
-                  isMobile={true}
-                />
-              </div>
-            </div>
-
+          <div className="flex-1 relative flex items-center justify-center">
             <div 
-              className="flex-none relative"
-              style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}
+              className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-10"
+              style={{ zIndex: 0 }}
             >
-               <AndroidDock onOpen={handleAppClick} />
+              <h1
+                className="text-white/95 text-center font-extrabold tracking-tighter text-4xl"
+                style={{
+                  textShadow: "0 2px 4px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6)",
+                  fontFamily: 'Inter, system-ui, sans-serif',
+                  lineHeight: 1.1,
+                }}
+              >
+                {USER_CONFIG.name}
+              </h1>
+              <p className="text-zinc-200 dark:text-zinc-300 font-medium text-lg tracking-wide mt-2 opacity-90">
+                Frontend Developer & UI/UX Designer
+              </p>
+            </div>
+            
+            <div className="relative w-full h-full flex flex-col pt-4 overflow-y-auto" style={{ zIndex: 1, paddingBottom: '100px' }}>
+              <DesktopIcons 
+                windows={windows}
+                onOpen={handleAppClick} 
+                isMobile={true}
+              />
             </div>
           </div>
-        ) : (
+
+          <div 
+            className="flex-none relative"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}
+          >
+             <AndroidDock onOpen={handleAppClick} />
+          </div>
+        </div>
+
+        {/* ===== DESKTOP HOME SCREEN: CSS-visible on >=768px ===== */}
+        <div className="hidden md:block">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -349,7 +352,7 @@ export default function App() {
               </p>
             </div>
           </motion.div>
-        )}
+        </div>
 
         <DesktopWidget onOpenAbout={() => openWindow('about')} />
 
@@ -388,6 +391,7 @@ export default function App() {
           </AnimatePresence>
         </div>
 
+        {/* Mobile back button */}
         <AnimatePresence>
           {isMobile && anyWindowOpen && (
             <GlobalBackButton 
@@ -402,20 +406,22 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {!isMobile && (
+        {/* Desktop icons: CSS-controlled visibility */}
+        <div className="hidden md:block">
           <DesktopIcons 
             windows={windows}
             onOpen={handleAppClick} 
-            isMobile={isMobile}
+            isMobile={false}
           />
-        )}
+        </div>
 
-        {!isMobile && (
+        {/* Desktop dock: CSS-controlled visibility */}
+        <div className="hidden md:block">
           <Dock 
             windows={windows} 
             onOpen={handleAppClick} 
           />
-        )}
+        </div>
       </DesktopBackground>
     </OsDataProvider>
   );

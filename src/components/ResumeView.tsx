@@ -1,4 +1,5 @@
 import { Github, Linkedin, Mail, Globe, ArrowLeft, Download, X } from "lucide-react";
+import { useIsMobile } from '../hooks/use-mobile';
 
 export function ResumeView({ onBack, onClose }: { onBack?: () => void; onClose?: () => void }) {
 
@@ -55,7 +56,7 @@ export function ResumeView({ onBack, onClose }: { onBack?: () => void; onClose?:
 
   const languages = ["English (Professional)", "Nepali (Native)", "Hindi (Fluent)"];
 
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const isMobile = useIsMobile();
 
   return (
     <div className={`absolute inset-0 w-full h-full bg-[#f9fafb] dark:bg-[#111827] font-sans flex flex-col overflow-hidden ${isMobile ? 'mobile-content-shift' : ''}`}

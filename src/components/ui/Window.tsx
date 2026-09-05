@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react';
+import { useIsMobile } from '../../hooks/use-mobile';
 import { motion, useDragControls } from 'framer-motion';
 import { X, Minus, Square, Maximize2 } from 'lucide-react';
 import { WindowState } from '../../types/os';
@@ -26,6 +27,7 @@ export function Window({
   children,
   isRecentsView,
 }: WindowProps) {
+  const isMobile = useIsMobile();
   const dragControls = useDragControls();
   const handleDragEnd = useCallback(
     (_e: any, info: any) => {
@@ -36,7 +38,6 @@ export function Window({
 
   if (!win.isOpen || win.isMinimized) return null;
 
-  const isMobile = window.innerWidth < 768;
   const disableDragging = isMobile;
 
   const windowStyle = isMobile
@@ -63,8 +64,25 @@ export function Window({
             y: '-50%',
             width: win.width,
             height: 460,
+            minWidth: win.minWidth,
+            minHeight: win.minHeight,
             maxWidth: '95vw',
             maxHeight: 'calc(100vh - 120px)',
+            borderRadius: '1rem',
+          }
+      : (win.appId === 'about' || win.appId === 'aboutme')
+        ? {
+            top: 36,
+            left: '50%',
+            x: win.x,
+            y: win.y,
+            width: win.width,
+            height: win.height,
+            minWidth: win.minWidth || 700,
+            minHeight: win.minHeight || 500,
+            maxWidth: '95vw',
+            maxHeight: 'calc(100vh - 120px)',
+            marginLeft: -win.width / 2,
             borderRadius: '1rem',
           }
         : { 
@@ -74,6 +92,8 @@ export function Window({
             y: win.y, 
             width: win.width, 
             height: win.height,
+            minWidth: win.minWidth,
+            minHeight: win.minHeight,
             maxWidth: '95vw',
             maxHeight: 'calc(100vh - 120px)',
             marginTop: -win.height / 2,
@@ -136,8 +156,8 @@ export function Window({
         <div
           className="window-header flex items-center gap-2 px-3 h-10 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
           style={{ 
-            background: win.appId === 'admin' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.4)', 
-            borderBottom: win.appId === 'admin' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.3)' 
+            background: (win.appId === 'admin') ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255,255,255,0.4)', 
+            borderBottom: (win.appId === 'admin') ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.3)' 
           }}
           onPointerDown={(e) => {
             if (!win.isMaximized && !disableDragging) dragControls.start(e);
@@ -175,7 +195,7 @@ export function Window({
             </div>
           </div>
 
-          <span className={`flex-1 text-center text-xs font-semibold font-sans truncate pr-14 ${win.appId === 'admin' ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+          <span className={`flex-1 text-center text-xs font-semibold font-sans truncate pr-14 ${(win.appId === 'admin') ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
             {win.title}
           </span>
         </div>
