@@ -98,7 +98,7 @@ export function Window({
             maxHeight: 'calc(100vh - 120px)',
             marginTop: -win.height / 2,
             marginLeft: -win.width / 2,
-            borderRadius: '1rem',
+            borderRadius: win.appId === 'resume' ? '20px' : '1rem',
           };
 
   const mobileVariants = {
@@ -121,7 +121,7 @@ export function Window({
   return (
     <motion.div
       key={win.id}
-      className={`absolute window-container ${win.appId === 'about' ? 'about-me-window' : ''} ${isMobile ? 'bg-white' : 'glass-window'} shadow-2xl overflow-hidden flex flex-col`}
+      className={`absolute window-container ${win.appId === 'about' ? 'about-me-window' : ''} ${win.appId === 'resume' ? 'resume-window bg-white/95 text-slate-800 backdrop-blur-xl border border-slate-200/80' : (isMobile ? 'bg-white' : 'glass-window')} shadow-2xl overflow-hidden flex flex-col`}
       style={{ 
         ...windowStyle,
         zIndex: 1000 + (win.zIndex || 0), 
@@ -156,8 +156,8 @@ export function Window({
         <div
           className="window-header flex items-center gap-2 px-3 h-10 flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
           style={{ 
-            background: (win.appId === 'admin') ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255,255,255,0.4)', 
-            borderBottom: (win.appId === 'admin') ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.3)' 
+            background: (win.appId === 'admin') ? 'rgba(24, 24, 27, 0.95)' : (win.appId === 'resume') ? 'rgba(248, 250, 252, 0.92)' : 'rgba(255,255,255,0.4)', 
+            borderBottom: (win.appId === 'admin') ? '1px solid rgba(255,255,255,0.1)' : (win.appId === 'resume') ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid rgba(255,255,255,0.3)' 
           }}
           onPointerDown={(e) => {
             if (!win.isMaximized && !disableDragging) dragControls.start(e);
@@ -167,7 +167,7 @@ export function Window({
             <div className="relative flex items-center justify-center">
               <button
                 onClick={(e) => { e.stopPropagation(); onClose(win.id); }}
-                className="red-circle close-btn w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 transition-colors flex items-center justify-center group"
+                className="red-circle close-btn w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 transition-colors flex items-center justify-center group cursor-pointer"
               >
                 <X className="w-2 h-2 text-black/40 opacity-0 group-hover:opacity-100" />
               </button>
@@ -176,7 +176,7 @@ export function Window({
             <div className="relative flex items-center justify-center">
               <button
                 onClick={(e) => { e.stopPropagation(); onMinimize(win.id); }}
-                className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#febc2e]/80 transition-colors flex items-center justify-center group"
+                className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#febc2e]/80 transition-colors flex items-center justify-center group cursor-pointer"
               >
                 <Minus className="w-2 h-2 text-black/40 opacity-0 group-hover:opacity-100" />
               </button>
@@ -185,7 +185,7 @@ export function Window({
             <div className="relative flex items-center justify-center">
               <button
                 onClick={(e) => { e.stopPropagation(); onMaximize(win.id); }}
-                className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#28c840]/80 transition-colors flex items-center justify-center group"
+                className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#28c840]/80 transition-colors flex items-center justify-center group cursor-pointer"
               >
                 {win.isMaximized
                   ? <Square className="w-2 h-2 text-black/40 opacity-0 group-hover:opacity-100" />
@@ -195,7 +195,7 @@ export function Window({
             </div>
           </div>
 
-          <span className={`flex-1 text-center text-xs font-semibold font-sans truncate pr-14 ${(win.appId === 'admin') ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+          <span className={`flex-1 text-center text-xs font-semibold font-sans truncate pr-14 ${(win.appId === 'admin') ? 'text-white' : (win.appId === 'resume') ? 'text-slate-700' : 'text-gray-600 dark:text-gray-300'}`}>
             {win.title}
           </span>
         </div>
@@ -204,7 +204,7 @@ export function Window({
 
       <div
         className={`window-content flex-1 ${isMobile ? 'overflow-y-auto h-full pt-[60px] pb-[50px] px-0' : 'overflow-hidden'}`}
-        style={{ background: isMobile ? '#FFFFFF' : 'transparent' }}
+        style={{ background: isMobile ? '#FFFFFF' : (win.appId === 'resume' ? '#f8fafc' : 'transparent') }}
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
       >
