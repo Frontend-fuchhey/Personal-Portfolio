@@ -21,12 +21,15 @@ export interface Wallpaper {
   name: string;
   value: string;
   type: 'gradient' | 'solid' | 'url';
+  url?: string;
+  preview?: string;
 }
 
 export function wallpaperStyle(wp: Wallpaper): React.CSSProperties {
-  if (wp.type === 'url') {
+  if (wp.type === 'url' || wp.url) {
+    const bgUrl = wp.url || wp.value;
     return {
-      backgroundImage: `url(${wp.value})`,
+      backgroundImage: `url(${bgUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     };

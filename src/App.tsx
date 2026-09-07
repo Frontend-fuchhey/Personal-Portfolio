@@ -93,7 +93,11 @@ export default function App() {
       const saved = localStorage.getItem('shrawan_os_wallpaper');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          if (parsed.id === 'v7_wave') {
+            return initialWallpaper;
+          }
+          return parsed;
         } catch (e) {
           return initialWallpaper;
         }
@@ -178,7 +182,7 @@ export default function App() {
 
   useEffect(() => {
     const cacheImages = async () => {
-      const srcArray = ['/fluid_wave_bg.png', profilePic];
+      const srcArray = ['/w3.png', '/fluid_wave_bg.png', profilePic];
       const promises = srcArray.map((src) => {
         return new Promise((resolve) => {
           const img = new Image();
