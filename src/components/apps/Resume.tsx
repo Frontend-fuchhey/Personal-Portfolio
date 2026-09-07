@@ -463,7 +463,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
           /* Native Document Layout */
           <>
             {/* 2. Narrow Left Sidebar (~190px) */}
-            <aside className="hidden md:flex w-[185px] lg:w-48.75 shrink-0 flex-col bg-slate-50/70 dark:bg-slate-900/60 border-r border-slate-200/70 dark:border-slate-800/80 p-3 justify-between select-none">
+            <aside className="hidden md:flex w-46.25 lg:w-48.75 shrink-0 flex-col bg-slate-50/70 dark:bg-slate-900/60 border-r border-slate-200/70 dark:border-slate-800/80 p-3 justify-between select-none">
               <div className="space-y-3">
                 <div className="px-2 pt-1 pb-0.5">
                   <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
@@ -549,7 +549,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
               ref={scrollContainerRef}
               className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-slate-950 p-6 sm:p-10 lg:p-12 scroll-smooth"
             >
-              <div className="max-w-[740px] mx-auto space-y-8">
+              <div className="max-w-185 mx-auto space-y-8">
                 {/* Profile Header (No floating card, dark navy title, subtle divider) */}
                 <header
                   id="resume-sec-overview"
@@ -649,7 +649,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                           {group.skills.map((skill, sIdx) => (
                             <span
                               key={sIdx}
-                              className="px-2.5 py-1 rounded-[8px] text-[12px] font-normal bg-slate-100/70 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 shadow-none cursor-default"
+                              className="px-2.5 py-1 rounded-xl text-[12px] font-normal bg-slate-100/70 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 shadow-none cursor-default"
                             >
                               {skill}
                             </span>
