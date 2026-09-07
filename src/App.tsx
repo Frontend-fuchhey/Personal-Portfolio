@@ -29,6 +29,7 @@ import profilePic from './assets/shrawan.jpg';
 import { ResumeView } from './components/ResumeView';
 import { ResumeApp } from './components/apps/Resume';
 import TextPressure from './components/ui/TextPressure';
+import { ControlCenter } from './components/os/ControlCenter';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -114,6 +115,8 @@ export default function App() {
   };
 
   const [showClock, setShowClock] = useState(true);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
   
   const isMobile = useIsMobile();
   
@@ -280,7 +283,17 @@ export default function App() {
         
         {/* Desktop top bar: CSS-controlled visibility */}
         <div className="hidden md:block">
-          <TopBar onOpenApp={openWindow} showClock={showClock} />
+          <TopBar
+            onOpenApp={openWindow}
+            showClock={showClock}
+            wallpaper={wallpaper}
+            onWallpaperChange={setWallpaper}
+            isFocusMode={isFocusMode}
+            onToggleFocusMode={() => setIsFocusMode((prev) => !prev)}
+            isControlCenterOpen={isControlCenterOpen}
+            onToggleControlCenter={() => setIsControlCenterOpen((prev) => !prev)}
+            onCloseControlCenter={() => setIsControlCenterOpen(false)}
+          />
         </div>
 
         <div 
@@ -359,7 +372,9 @@ export default function App() {
           </motion.div>
         </div>
 
-        <DesktopWidget onOpenCv={() => openWindow('resume')} onOpenResume={() => openWindow('resume')} onOpenAbout={() => openWindow('resume')} />
+        <div className={`transition-all duration-300 ${isFocusMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <DesktopWidget onOpenCv={() => openWindow('resume')} onOpenResume={() => openWindow('resume')} onOpenAbout={() => openWindow('resume')} />
+        </div>
 
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 100 }}>
           <AnimatePresence>
@@ -412,7 +427,7 @@ export default function App() {
         </AnimatePresence>
 
         {/* Desktop icons: CSS-controlled visibility */}
-        <div className="hidden md:block">
+        <div className={`hidden md:block transition-all duration-300 ${isFocusMode ? 'opacity-0 pointer-events-none scale-95' : 'opacity-100 scale-100'}`}>
           <DesktopIcons 
             windows={windows}
             onOpen={handleAppClick} 
@@ -420,7 +435,20 @@ export default function App() {
           />
         </div>
 
-        {/* Desktop dock: CSS-controlled visibility */}
+        {/* Control Center Popover (Z-Index 100) */}
+        {isControlCenterOpen && (
+          <ControlCenter
+            isOpen={isControlCenterOpen}
+            onClose={() => setIsControlCenterOpen(false)}
+            onOpenApp={openWindow}
+            wallpaper={wallpaper}
+            onWallpaperChange={setWallpaper}
+            isFocusMode={isFocusMode}
+            onToggleFocusMode={() => setIsFocusMode((prev) => !prev)}
+          />
+        )}
+
+        {/* Bottom Dock (Always Rendered, Z-Index 50) */}
         <div className="hidden md:block">
           <Dock 
             windows={windows} 

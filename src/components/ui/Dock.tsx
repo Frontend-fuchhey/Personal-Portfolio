@@ -33,7 +33,7 @@ export function Dock({ windows, onOpen }: DockProps) {
   const isOpen = (appId: AppId) => windows.some(w => w.appId === appId && (w.isOpen || w.isMinimized));
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[500]">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[50]">
       <motion.div
         className="glass-dock rounded-2xl px-3 py-2 flex items-end gap-1.5"
         initial={{ y: 80, opacity: 0 }}
