@@ -17,7 +17,6 @@ import {
   User,
   Check,
   MapPin,
-  Phone,
   Eye,
   Copy,
   X,
@@ -272,7 +271,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       const sections = navItems.map((item) =>
         document.getElementById(`resume-sec-${item.id}`),
       );
-      const scrollPos = container.scrollTop + 100;
+      const scrollPos = container.scrollTop + 80;
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const sec = sections[i];
@@ -298,56 +297,52 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans select-text overflow-hidden">
-      {/* 1. Application Toolbar Header */}
-      <div className="shrink-0 h-11 bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-3 sm:px-4 flex items-center justify-between z-20">
+    <div className="w-full h-full flex flex-col bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans select-text overflow-hidden">
+      {/* 1. Simplified Native Document Toolbar (Height ~56px) */}
+      <div className="shrink-0 h-14 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800 px-4 sm:px-5 flex items-center justify-between z-20">
         {/* Left: Document Info */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/70 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
             <FileText className="w-4 h-4" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate leading-tight flex items-center gap-1.5">
+            <span className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate leading-tight">
               Shrawan_karki_CV.pdf
             </span>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 leading-tight">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 leading-tight">
               PDF Document
             </span>
           </div>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* View Mode Segmented Control */}
-          <div className="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200/70 dark:border-slate-700 text-[11px] font-medium mr-1">
-            <button
-              onClick={() => setViewMode("dashboard")}
-              className={`px-2.5 py-1 rounded-md transition-all ${
-                viewMode === "dashboard"
-                  ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
-              }`}
-            >
-              Dashboard
-            </button>
+        {/* Right: Actions (Download PDF, Print, More) */}
+        <div className="flex items-center gap-2">
+          {/* Subtle View Mode Toggle */}
+          {viewMode === "dashboard" ? (
             <button
               onClick={() => setViewMode("pdf")}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
-                viewMode === "pdf"
-                  ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-xs font-medium transition cursor-pointer"
+              title="View raw PDF document"
             >
-              <Eye className="w-3 h-3" />
-              View PDF
+              <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span className="hidden sm:inline">View PDF</span>
             </button>
-          </div>
+          ) : (
+            <button
+              onClick={() => setViewMode("dashboard")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/70 dark:border-blue-800/60 text-xs font-medium transition cursor-pointer"
+              title="Switch to designed document view"
+            >
+              <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span className="hidden sm:inline">Document View</span>
+            </button>
+          )}
 
           {/* Download PDF Button */}
           <a
             href={pdfPath}
             download="Shrawan_karki_CV.pdf"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition shadow-xs active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition active:scale-95 cursor-pointer"
             title="Download PDF"
           >
             <Download className="w-3.5 h-3.5" />
@@ -357,7 +352,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
           {/* Print Button */}
           <button
             onClick={handlePrint}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 transition text-xs flex items-center gap-1.5 cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 transition text-xs font-medium flex items-center gap-1.5 cursor-pointer"
             title="Print Document"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -376,25 +371,23 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
 
             {showMoreMenu && (
               <div
-                className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg py-1.5 z-50 text-xs"
+                className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl py-1 z-50 text-xs"
                 onClick={() => setShowMoreMenu(false)}
               >
                 <button
                   onClick={() =>
                     setViewMode(viewMode === "dashboard" ? "pdf" : "dashboard")
                   }
-                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/70 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5 text-blue-500" />
-                  {viewMode === "dashboard"
-                    ? "Switch to Raw PDF"
-                    : "Switch to Dashboard"}
+                  {viewMode === "dashboard" ? "View Raw PDF" : "View Document"}
                 </button>
                 <a
                   href={pdfPath}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/70 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                   Open PDF in New Tab
@@ -406,14 +399,14 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                       "PDF Link",
                     )
                   }
-                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/70 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5 text-slate-400" />
                   Copy Resume Link
                 </button>
                 <button
                   onClick={() => copyToClipboard(contact.email, "Email")}
-                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/70 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <Mail className="w-3.5 h-3.5 text-slate-400" />
                   Copy Email Address
@@ -426,14 +419,14 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
 
       {/* Copy notification popup */}
       {copiedText && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-          <Check className="w-3.5 h-3.5 text-green-400" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-150">
+          <Check className="w-3.5 h-3.5 text-emerald-400 dark:text-emerald-600" />
           <span>{copiedText} copied to clipboard!</span>
         </div>
       )}
 
       {/* Mobile Horizontal Navigation Header */}
-      <div className="md:hidden shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800 px-3 py-2 overflow-x-auto flex items-center gap-1.5 custom-scrollbar">
+      <div className="md:hidden shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/70 dark:border-slate-800 px-3 py-2 overflow-x-auto flex items-center gap-1.5 custom-scrollbar">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -442,9 +435,9 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
-                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/70 dark:border-blue-800/60"
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-semibold"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               }`}
             >
@@ -467,34 +460,19 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
             />
           </div>
         ) : (
-          /* Dashboard Layout */
+          /* Native Document Layout */
           <>
-            {/* 2. Left Sidebar */}
-            <aside className="hidden md:flex w-51.25 lg:w-55 shrink-0 flex-col bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800/80 p-3.5 justify-between select-none">
-              <div className="space-y-4">
-                {/* Profile Brief */}
-                <div className="px-2 pt-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
-                      SK
-                    </div>
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 dark:border-emerald-800/50 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Available
-                    </div>
-                  </div>
-                  <h1 className="text-xs font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                    SHRAWAN KARKI
-                  </h1>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                    Full Stack Web Developer
-                  </p>
+            {/* 2. Narrow Left Sidebar (~190px) */}
+            <aside className="hidden md:flex w-[185px] lg:w-[195px] shrink-0 flex-col bg-slate-50/70 dark:bg-slate-900/60 border-r border-slate-200/70 dark:border-slate-800/80 p-3 justify-between select-none">
+              <div className="space-y-3">
+                <div className="px-2 pt-1 pb-0.5">
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    Document
+                  </span>
                 </div>
 
-                <div className="h-px bg-slate-200/60 dark:bg-slate-800" />
-
                 {/* Navigation Items */}
-                <nav className="space-y-1">
+                <nav className="space-y-0.5">
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeSection === item.id;
@@ -502,385 +480,325 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                       <button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        className={`w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-[10px] transition-all text-left group cursor-pointer ${
+                        className={`w-full flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-md transition-colors text-left cursor-pointer ${
                           isActive
-                            ? "bg-blue-50/90 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold shadow-xs"
+                            ? "bg-blue-50/80 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 font-medium"
                             : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
                         }`}
                       >
                         <Icon
-                          className={`w-4 h-4 transition-colors ${
+                          className={`w-3.5 h-3.5 transition-colors ${
                             isActive
                               ? "text-blue-600 dark:text-blue-400"
-                              : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+                              : "text-slate-400 dark:text-slate-500"
                           }`}
                         />
-                        <span className="flex-1">{item.label}</span>
-                        {isActive && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400" />
-                        )}
+                        <span className="truncate">{item.label}</span>
                       </button>
                     );
                   })}
                 </nav>
               </div>
 
-              {/* Bottom: Let's Connect */}
+              {/* Bottom: LET'S CONNECT */}
               <div className="pt-3 border-t border-slate-200/60 dark:border-slate-800">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 mb-2">
-                  Let&apos;s Connect
+                  LET&apos;S CONNECT
                 </p>
-                <div className="grid grid-cols-4 gap-1 px-1">
+                <div className="flex items-center gap-1 px-1">
                   <a
                     href={contact.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-slate-100/70 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center transition group cursor-pointer"
+                    className="p-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                     title="GitHub"
                   >
-                    <Github className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                    <Github className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={contact.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-slate-100/70 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center transition group cursor-pointer"
+                    className="p-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                     title="LinkedIn"
                   >
-                    <Linkedin className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                    <Linkedin className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={`mailto:${contact.email}`}
-                    className="p-2 rounded-lg bg-slate-100/70 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center transition group cursor-pointer"
+                    className="p-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                     title="Email"
                   >
-                    <Mail className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                    <Mail className="w-3.5 h-3.5" />
                   </a>
                   <a
                     href={contact.portfolio}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-slate-100/70 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center transition group cursor-pointer"
+                    className="p-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                     title="Portfolio"
                   >
-                    <Globe className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                    <Globe className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
             </aside>
 
-            {/* 3. Main Scrollable Dashboard Area */}
+            {/* 3. Main Typeset Document Area (Max width ~740px) */}
             <main
               ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-8 scroll-smooth"
+              className="flex-1 overflow-y-auto custom-scrollbar bg-white dark:bg-slate-950 p-6 sm:p-10 lg:p-12 scroll-smooth"
             >
-              {/* Profile Header with subtle blue gradient accent */}
-              <section
-                id="resume-sec-overview"
-                className="relative overflow-hidden rounded-2xl border border-blue-100/80 dark:border-blue-900/30 bg-gradient-to-br from-blue-50/70 via-indigo-50/30 to-white dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-slate-900/40 p-5 sm:p-7 shadow-xs"
-              >
-                {/* Subtle ambient gradient accent */}
-                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-blue-400/10 dark:bg-blue-500/5 blur-3xl pointer-events-none" />
+              <div className="max-w-[740px] mx-auto space-y-8">
+                {/* Profile Header (No floating card, dark navy title, subtle divider) */}
+                <header
+                  id="resume-sec-overview"
+                  className="pb-6 border-b border-slate-200/80 dark:border-slate-800/80"
+                >
+                  <h1 className="text-3xl sm:text-[34px] font-bold text-slate-900 dark:text-white tracking-tight leading-tight uppercase">
+                    {contact.name}
+                  </h1>
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-100/70 dark:bg-blue-900/40 border border-blue-200/60 dark:border-blue-800/50 text-[11px] font-semibold text-blue-700 dark:text-blue-300">
-                      <span>Curriculum Vitae</span>
-                      <span className="w-1 h-1 rounded-full bg-blue-500" />
-                      <span>Updated 2026</span>
-                    </div>
+                  <p className="text-[15px] sm:text-[16px] text-slate-600 dark:text-slate-300 font-normal mt-1.5">
+                    {contact.headline}
+                  </p>
 
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                      {contact.name}
-                    </h1>
-
-                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 leading-snug">
-                      {contact.headline}
-                    </p>
-
-                    {/* Contact Details */}
-                    <div className="flex flex-wrap items-center gap-y-2 gap-x-4 pt-2 text-xs text-slate-600 dark:text-slate-400">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{contact.location}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-slate-400" />
-                        <a
-                          href={`tel:${contact.phone}`}
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          {contact.phone}
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-slate-400" />
-                        <a
-                          href={`mailto:${contact.email}`}
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          {contact.email}
-                        </a>
-                      </div>
-                    </div>
+                  {/* Contact Metadata */}
+                  <div className="flex flex-wrap items-center gap-y-1.5 gap-x-3 pt-3 text-[12px] sm:text-[13px] text-slate-500 dark:text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{contact.location}</span>
+                    </span>
+                    <span>&bull;</span>
+                    <a
+                      href={`tel:${contact.phone}`}
+                      className="hover:text-blue-600 transition-colors"
+                    >
+                      {contact.phone}
+                    </a>
+                    <span>&bull;</span>
+                    <a
+                      href={`mailto:${contact.email}`}
+                      className="hover:text-blue-600 transition-colors"
+                    >
+                      {contact.email}
+                    </a>
                   </div>
 
                   {/* External Links */}
-                  <div className="flex flex-wrap md:flex-col gap-2 shrink-0 pt-2 md:pt-0">
+                  <div className="flex items-center gap-4 pt-3 text-[13px] font-medium text-blue-600 dark:text-blue-400">
                     <a
                       href={contact.portfolio}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition group cursor-pointer"
+                      className="inline-flex items-center gap-1 hover:underline cursor-pointer"
                     >
                       <span>Portfolio</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ExternalLink className="w-3 h-3 text-blue-500/80" />
                     </a>
                     <a
                       href={contact.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition group cursor-pointer"
+                      className="inline-flex items-center gap-1 hover:underline cursor-pointer"
                     >
                       <span>GitHub</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ExternalLink className="w-3 h-3 text-blue-500/80" />
                     </a>
                     <a
                       href={contact.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition group cursor-pointer"
+                      className="inline-flex items-center gap-1 hover:underline cursor-pointer"
                     >
                       <span>LinkedIn</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ExternalLink className="w-3 h-3 text-blue-500/80" />
                     </a>
                   </div>
-                </div>
-              </section>
+                </header>
 
-              {/* Professional Summary Card */}
-              <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-3">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                  <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Professional Summary</span>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  Full Stack Web Developer with hands-on experience building
-                  production-grade React applications and end-to-end systems
-                  using Node.js, Supabase, and Firebase. Combines precise UI/UX
-                  execution — translating Figma designs into pixel-accurate,
-                  responsive components — with backend proficiency in database
-                  schema design, authentication, and secure API integration.
-                </p>
-              </section>
+                {/* Professional Summary */}
+                <section className="space-y-2.5">
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                    Professional Summary
+                  </h2>
+                  <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+                    Full Stack Web Developer with hands-on experience building
+                    production-grade React applications and end-to-end systems
+                    using Node.js, Supabase, and Firebase. Combines precise UI/UX
+                    execution — translating Figma designs into pixel-accurate,
+                    responsive components — with backend proficiency in database
+                    schema design, authentication, and secure API integration.
+                  </p>
+                </section>
 
-              {/* Technical Skills Section */}
-              <section id="resume-sec-skills" className="space-y-4">
-                <div className="flex items-center justify-between pb-1 border-b border-slate-200/70 dark:border-slate-800">
-                  <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                    <Code2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Technical Skills</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400">
-                    Organized by specialization
-                  </span>
-                </div>
+                {/* Technical Skills */}
+                <section id="resume-sec-skills" className="space-y-4 pt-2">
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
+                    Technical Skills
+                  </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  {skillGroups.map((group, idx) => (
-                    <div
-                      key={idx}
-                      className={`rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition ${
-                        group.title === "Frontend & Frameworks"
-                          ? "md:col-span-2"
-                          : ""
-                      }`}
-                    >
-                      <h2 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2.5 flex items-center justify-between">
-                        <span>{group.title}</span>
-                        <span className="text-[10px] font-medium text-slate-400">
-                          {group.skills.length} skills
-                        </span>
-                      </h2>
-                      <div className="flex flex-wrap gap-1.5">
-                        {group.skills.map((skill, sIdx) => (
-                          <span
-                            key={sIdx}
-                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700/80 hover:-translate-y-0.5 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-xs transition-all cursor-default"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                  <div className="space-y-3.5">
+                    {skillGroups.map((group, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <h3 className="text-[13px] font-medium text-slate-800 dark:text-slate-200">
+                          {group.title}
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          {group.skills.map((skill, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="px-2.5 py-1 rounded-[8px] text-[12px] font-normal bg-slate-100/70 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 shadow-none cursor-default"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                </section>
 
-              {/* Work Experience Section (Vertical Timeline) */}
-              <section id="resume-sec-experience" className="space-y-4">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-200/70 dark:border-slate-800 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                  <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Work Experience</span>
-                </div>
+                {/* Work Experience (Simple Timeline, No Heavy Cards) */}
+                <section id="resume-sec-experience" className="space-y-4 pt-2">
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
+                    Work Experience
+                  </h2>
 
-                <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2.5 before:bottom-2.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
-                  {experiences.map((exp, idx) => (
-                    <div key={idx} className="relative group">
-                      {/* Timeline Node */}
-                      <span
-                        className={`absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 bg-white dark:bg-slate-950 flex items-center justify-center transition-transform group-hover:scale-125 ${
-                          exp.current
-                            ? "border-blue-600 dark:border-blue-400"
-                            : "border-slate-300 dark:border-slate-600"
-                        }`}
-                      >
+                  <div className="relative pl-5 space-y-6 border-l border-slate-200 dark:border-slate-800 ml-1.5">
+                    {experiences.map((exp, idx) => (
+                      <div key={idx} className="relative group">
+                        {/* Timeline node */}
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
+                          className={`absolute -left-[24.5px] top-1.5 w-2 h-2 rounded-full ${
                             exp.current
-                              ? "bg-blue-600 dark:bg-blue-400"
-                              : "bg-slate-400"
+                              ? "bg-blue-600 dark:bg-blue-400 ring-4 ring-blue-50 dark:ring-blue-950"
+                              : "bg-slate-300 dark:bg-slate-600"
                           }`}
                         />
-                      </span>
 
-                      {/* Experience Card */}
-                      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 sm:p-5 shadow-xs hover:shadow-sm hover:border-blue-200 dark:hover:border-blue-900/40 transition">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
-                          <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                            {exp.title}
-                          </h2>
-                          <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-md w-fit ${
-                              exp.current
-                                ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/50"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                            }`}
-                          >
-                            {exp.period}
-                          </span>
+                        <div className="space-y-1.5">
+                          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                            <h3 className="text-[15px] sm:text-[16px] font-semibold text-slate-900 dark:text-white">
+                              {exp.title}
+                            </h3>
+                            <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">
+                              {exp.period}
+                            </span>
+                          </div>
+
+                          <p className="text-[13px] font-medium text-slate-600 dark:text-slate-400">
+                            {exp.company}
+                          </p>
+
+                          <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
+                            {exp.description}
+                          </p>
+
+                          {exp.highlights && exp.highlights.length > 0 && (
+                            <ul className="space-y-1 text-[13px] text-slate-600 dark:text-slate-400 pt-1">
+                              {exp.highlights.map((h, hIdx) => (
+                                <li key={hIdx} className="flex items-start gap-2">
+                                  <span className="text-blue-600 dark:text-blue-400 select-none mt-0.5">
+                                    •
+                                  </span>
+                                  <span className="leading-relaxed">{h}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
-
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2.5">
-                          {exp.company}
-                        </p>
-
-                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
-                          {exp.description}
-                        </p>
-
-                        {exp.highlights && exp.highlights.length > 0 && (
-                          <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                            {exp.highlights.map((h, hIdx) => (
-                              <li key={hIdx} className="flex items-start gap-2">
-                                <span className="text-blue-500 mt-1">•</span>
-                                <span className="leading-normal">{h}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                </section>
 
-              {/* Education Section */}
-              <section id="resume-sec-education" className="space-y-4">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-200/70 dark:border-slate-800 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                  <GraduationCap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Academic Foundation</span>
-                </div>
+                {/* Education */}
+                <section id="resume-sec-education" className="space-y-4 pt-2">
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
+                    Education
+                  </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                  {educationList.map((edu, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 shadow-xs hover:shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
-                              edu.status === "Ongoing"
-                                ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50"
-                                : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50"
-                            }`}
-                          >
-                            {edu.status}
-                          </span>
-                          <span className="text-[10px] font-medium text-slate-400">
+                  <div className="space-y-5">
+                    {educationList.map((edu, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                          <h3 className="text-[15px] font-semibold text-slate-900 dark:text-white">
+                            {edu.degree}
+                          </h3>
+                          <span className="text-[12px] text-slate-500 dark:text-slate-400 font-normal">
                             {edu.period}
                           </span>
                         </div>
 
-                        <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
-                          {edu.degree}
-                        </h2>
+                        <div className="flex items-center gap-2 text-[13px] text-slate-600 dark:text-slate-400">
+                          <span>{edu.institution}</span>
+                          {edu.status && (
+                            <>
+                              <span>&bull;</span>
+                              <span className="text-[12px] text-slate-500">
+                                {edu.status}
+                              </span>
+                            </>
+                          )}
+                        </div>
 
-                        <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                          {edu.institution}
-                        </p>
-
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                        <p className="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed">
                           {edu.detail}
                         </p>
+
+                        {"certImage" in edu && edu.certImage && (
+                          <div className="pt-1">
+                            <button
+                              onClick={() =>
+                                setActiveCertificate({
+                                  title: edu.certTitle || edu.degree,
+                                  image: edu.certImage!,
+                                })
+                              }
+                              className="inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer pt-0.5"
+                            >
+                              <Award className="w-3.5 h-3.5" />
+                              <span>View Certificate</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
-
-                      {"certImage" in edu && edu.certImage && (
-                        <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
-                          <button
-                            onClick={() =>
-                              setActiveCertificate({
-                                title: edu.certTitle || edu.degree,
-                                image: edu.certImage!,
-                              })
-                            }
-                            className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/50 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200/60 dark:border-slate-700 text-xs font-medium transition cursor-pointer"
-                          >
-                            <Award className="w-3.5 h-3.5 text-blue-500" />
-                            <span>View Certificate</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* Projects Section */}
-              <section id="resume-sec-projects" className="space-y-4">
-                <div className="flex items-center justify-between pb-1 border-b border-slate-200/70 dark:border-slate-800">
-                  <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                    <FolderGit2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Featured Projects</span>
+                    ))}
                   </div>
-                  <span className="text-[10px] text-slate-400">
-                    Production & Open Source
-                  </span>
-                </div>
+                </section>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                  {featuredProjects.map((proj, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition flex flex-col justify-between"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between gap-1">
-                          <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                            {proj.title}
-                          </h2>
-                          <div className="flex items-center gap-1">
+                {/* Projects */}
+                <section id="resume-sec-projects" className="space-y-4 pt-2">
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
+                    Projects
+                  </h2>
+
+                  <div className="space-y-5">
+                    {featuredProjects.map((proj, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <h3 className="text-[15px] font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>{proj.title}</span>
+                            <span className="text-slate-400 font-normal text-xs">
+                              &bull;
+                            </span>
+                            <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+                              {proj.subtitle}
+                            </span>
+                          </h3>
+
+                          <div className="flex items-center gap-2.5 shrink-0">
                             {proj.github && (
                               <a
                                 href={proj.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1 rounded-md text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                                title="View Repository"
+                                className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                                title="View Code"
                               >
-                                <Github className="w-3.5 h-3.5" />
+                                <span>Code</span>
+                                <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
                             {proj.live && (
@@ -888,95 +806,87 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                                 href={proj.live}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition cursor-pointer"
+                                className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
                                 title="Live Demo"
                               >
-                                <ExternalLink className="w-3.5 h-3.5" />
+                                <span>Demo</span>
+                                <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
                           </div>
                         </div>
 
-                        <p className="text-[11px] font-medium text-blue-600 dark:text-blue-400">
-                          {proj.subtitle}
-                        </p>
-
-                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <p className="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed">
                           {proj.description}
                         </p>
+
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {proj.tech.map((t, tIdx) => (
+                            <span
+                              key={tIdx}
+                              className="px-2 py-0.5 rounded-[6px] text-[11px] font-normal bg-slate-100/70 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                </section>
 
-                      <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-1">
-                        {proj.tech.map((t, tIdx) => (
-                          <span
-                            key={tIdx}
-                            className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                {/* Certifications */}
+                <section
+                  id="resume-sec-certifications"
+                  className="space-y-4 pt-2"
+                >
+                  <h2 className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wider pb-1.5 border-b border-slate-200/70 dark:border-slate-800">
+                    Certifications
+                  </h2>
 
-              {/* Certifications Section */}
-              <section id="resume-sec-certifications" className="space-y-4">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-200/70 dark:border-slate-800 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-                  <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Verified Certifications</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {certifications.map((cert) => (
-                    <div
-                      key={cert.id}
-                      className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-4 shadow-xs flex items-center justify-between gap-3 hover:border-blue-200 dark:hover:border-blue-900/40 transition"
-                    >
-                      <div className="space-y-1 min-w-0">
-                        <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-                          Year {cert.year}
-                        </span>
-                        <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-                          {cert.title}
-                        </h2>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {cert.issuer} • {cert.institution}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          setActiveCertificate({
-                            title: cert.title,
-                            image: cert.image,
-                          })
-                        }
-                        className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 text-xs font-semibold transition shrink-0 cursor-pointer flex items-center gap-1.5"
+                  <div className="space-y-3">
+                    {certifications.map((cert) => (
+                      <div
+                        key={cert.id}
+                        className="flex items-baseline justify-between gap-3"
                       >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Inspect</span>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                        <div className="space-y-0.5">
+                          <h3 className="text-[14px] font-medium text-slate-900 dark:text-white">
+                            {cert.title}
+                          </h3>
+                          <p className="text-[12px] text-slate-500 dark:text-slate-400">
+                            {cert.issuer} &bull; {cert.institution} ({cert.year}
+                            )
+                          </p>
+                        </div>
 
-              {/* Bottom Document Footer */}
-              <div className="pt-6 pb-2 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/60 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2">
-                <span>Shrawan Karki — Curriculum Vitae</span>
-                <span className="flex items-center gap-1.5">
-                  <span>Built with React, TypeScript & Tailwind CSS</span>
-                  <span>•</span>
+                        <button
+                          onClick={() =>
+                            setActiveCertificate({
+                              title: cert.title,
+                              image: cert.image,
+                            })
+                          }
+                          className="text-[12px] font-medium text-blue-600 dark:text-blue-400 hover:underline shrink-0 cursor-pointer"
+                        >
+                          View Certificate
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Document Footer */}
+                <div className="pt-6 pb-4 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2">
+                  <span>Curriculum Vitae &mdash; Shrawan Karki</span>
                   <a
                     href={pdfPath}
                     download="Shrawan_karki_CV.pdf"
                     className="text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    Download Original PDF
+                    Download PDF Document
                   </a>
-                </span>
+                </div>
               </div>
             </main>
           </>
@@ -986,30 +896,30 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       {/* Certificate Lightbox Modal */}
       {activeCertificate && (
         <div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setActiveCertificate(null)}
         >
           <div
-            className="relative max-w-2xl w-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-white/20 p-4 space-y-3"
+            className="relative max-w-2xl w-full bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                <Award className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200/70 dark:border-slate-800">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 {activeCertificate.title}
               </h3>
               <button
                 onClick={() => setActiveCertificate(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="w-full max-h-[70vh] overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-2">
+            <div className="w-full max-h-[70vh] overflow-hidden rounded-lg bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-2">
               <img
                 src={activeCertificate.image}
                 alt={activeCertificate.title}
-                className="max-w-full max-h-[65vh] object-contain rounded-lg shadow-sm"
+                className="max-w-full max-h-[65vh] object-contain rounded shadow-xs"
               />
             </div>
             <div className="flex justify-end gap-2 pt-1">
