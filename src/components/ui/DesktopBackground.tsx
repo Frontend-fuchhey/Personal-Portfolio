@@ -14,7 +14,7 @@ export const DesktopBackground = memo(({ wallpaper, isMobile, children }: Deskto
     if (wallpaper.type === 'url') {
       setIsLoaded(false);
       const img = new Image();
-      img.src = wallpaper.value;
+      img.src = wallpaper.url || wallpaper.value;
       
       const handleLoad = () => {
         setIsLoaded(true);

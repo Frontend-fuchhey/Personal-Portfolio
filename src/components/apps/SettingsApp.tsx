@@ -62,7 +62,7 @@ export function SettingsApp({
               }`}
               style={
                 wp.type === 'url' 
-                  ? { backgroundImage: `url(${wp.value})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                  ? { backgroundImage: `url(${wp.url || wp.value})`, backgroundSize: 'cover', backgroundPosition: 'center' }
                   : { background: wp.value }
               }
             >

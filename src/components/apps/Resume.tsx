@@ -463,7 +463,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
           /* Native Document Layout */
           <>
             {/* 2. Narrow Left Sidebar (~190px) */}
-            <aside className="hidden md:flex w-[185px] lg:w-[195px] shrink-0 flex-col bg-slate-50/70 dark:bg-slate-900/60 border-r border-slate-200/70 dark:border-slate-800/80 p-3 justify-between select-none">
+            <aside className="hidden md:flex w-[185px] lg:w-48.75 shrink-0 flex-col bg-slate-50/70 dark:bg-slate-900/60 border-r border-slate-200/70 dark:border-slate-800/80 p-3 justify-between select-none">
               <div className="space-y-3">
                 <div className="px-2 pt-1 pb-0.5">
                   <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
@@ -625,10 +625,11 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                   <p className="text-[14px] leading-relaxed text-slate-700 dark:text-slate-300 font-normal">
                     Full Stack Web Developer with hands-on experience building
                     production-grade React applications and end-to-end systems
-                    using Node.js, Supabase, and Firebase. Combines precise UI/UX
-                    execution — translating Figma designs into pixel-accurate,
-                    responsive components — with backend proficiency in database
-                    schema design, authentication, and secure API integration.
+                    using Node.js, Supabase, and Firebase. Combines precise
+                    UI/UX execution — translating Figma designs into
+                    pixel-accurate, responsive components — with backend
+                    proficiency in database schema design, authentication, and
+                    secure API integration.
                   </p>
                 </section>
 
@@ -698,7 +699,10 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
                           {exp.highlights && exp.highlights.length > 0 && (
                             <ul className="space-y-1 text-[13px] text-slate-600 dark:text-slate-400 pt-1">
                               {exp.highlights.map((h, hIdx) => (
-                                <li key={hIdx} className="flex items-start gap-2">
+                                <li
+                                  key={hIdx}
+                                  className="flex items-start gap-2"
+                                >
                                   <span className="text-blue-600 dark:text-blue-400 select-none mt-0.5">
                                     •
                                   </span>
