@@ -1,27 +1,76 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  User, FolderOpen, Terminal, Mail, Settings,
-  Wifi, Battery, Signal, ChevronDown, Home, X
-} from 'lucide-react';
-import { AppId, Wallpaper, wallpaperStyle } from '../types/os';
-import { AboutApp } from './apps/AboutApp';
-import { ProjectsApp } from './apps/ProjectsApp';
-import { TerminalApp } from './apps/TerminalApp';
-import { ContactApp } from './apps/ContactApp';
-import { SettingsApp } from './apps/SettingsApp';
-import { TicTacToe } from './apps/TicTacToe';
-import { TicTacToeIcon } from './icons/TicTacToeIcon';
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import {
+  User,
+  FolderOpen,
+  Terminal,
+  Mail,
+  Settings,
+  Wifi,
+  Battery,
+  Signal,
+  ChevronDown,
+  Home,
+  X,
+} from "lucide-react";
+import { AppId, Wallpaper, wallpaperStyle } from "../types/os";
+import { AboutApp } from "./apps/AboutApp";
+import { ProjectsApp } from "./apps/ProjectsApp";
+import { TerminalApp } from "./apps/TerminalApp";
+import { ContactApp } from "./apps/ContactApp";
+import { SettingsApp } from "./apps/SettingsApp";
+import { TicTacToe } from "./apps/TicTacToe";
+import { TicTacToeIcon } from "./icons/TicTacToeIcon";
 
-import React, { memo } from 'react';
+import React, { memo } from "react";
 
-const MOBILE_APPS: { id: AppId; label: string; icon: React.ReactNode; color: string }[] = [
-  { id: 'about',    label: 'About',    icon: <User className="w-8 h-8 text-white" />,       color: 'from-blue-500 to-blue-700' },
-  { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-8 h-8 text-white" />, color: 'from-orange-400 to-orange-600' },
-  { id: 'terminal', label: 'Terminal', icon: <Terminal className="w-8 h-8 text-white" />,   color: 'from-gray-700 to-gray-900' },
-  { id: 'contact',  label: 'Contact',  icon: <Mail className="w-8 h-8 text-white" />,       color: 'from-green-500 to-green-700' },
-  { id: 'settings', label: 'Settings', icon: <Settings className="w-8 h-8 text-white" />,   color: 'from-slate-500 to-slate-700' },
-  { id: 'tictactoe', label: 'TicTacToe', icon: <TicTacToeIcon bare className="w-10 h-10 object-contain" />, color: 'bg-white border border-zinc-200/50' },
+const MOBILE_APPS: {
+  id: AppId;
+  label: string;
+  icon: React.ReactNode;
+  color: string;
+}[] = [
+  {
+    id: "about",
+    label: "About",
+    icon: <User className="w-8 h-8 text-white" />,
+    color: "from-blue-500 to-blue-700",
+  },
+  {
+    id: "projects",
+    label: "Projects",
+    icon: <FolderOpen className="w-8 h-8 text-white" />,
+    color: "from-orange-400 to-orange-600",
+  },
+  {
+    id: "terminal",
+    label: "Terminal",
+    icon: <Terminal className="w-8 h-8 text-white" />,
+    color: "from-gray-700 to-gray-900",
+  },
+  {
+    id: "contact",
+    label: "Contact",
+    icon: <Mail className="w-8 h-8 text-white" />,
+    color: "from-green-500 to-green-700",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: <Settings className="w-8 h-8 text-white" />,
+    color: "from-slate-500 to-slate-700",
+  },
+  {
+    id: "tictactoe",
+    label: "TicTacToe",
+    icon: <TicTacToeIcon bare className="w-10 h-10 object-contain" />,
+    color: "bg-white border border-zinc-200/50",
+  },
 ];
 
 const DOCK_APPS = MOBILE_APPS.slice(0, 4);
@@ -42,7 +91,7 @@ function MobileStatusBar() {
   }, []);
 
   const formatTime = (d: Date) =>
-    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="relative z-10 flex items-center justify-between px-5 pt-3 pb-1">
@@ -67,9 +116,13 @@ function MobileHomeClock() {
   }, []);
 
   const formatTime = (d: Date) =>
-    d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   const formatDate = (d: Date) =>
-    d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    d.toLocaleDateString([], {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
 
   return (
     <motion.div
@@ -87,36 +140,45 @@ function MobileHomeClock() {
   );
 }
 
-const MemoizedAppContent = memo(({
-  appId,
-  wallpaper,
-  onWallpaperChange,
-  showClock,
-  onShowClockChange
-}: {
-  appId: AppId;
-  wallpaper: Wallpaper;
-  onWallpaperChange: (w: Wallpaper) => void;
-  showClock: boolean;
-  onShowClockChange: (s: boolean) => void;
-}) => {
-  switch (appId) {
-    case 'about':    return <AboutApp />;
-    case 'projects': return <ProjectsApp />;
-    case 'terminal': return <TerminalApp />;
-    case 'contact':  return <ContactApp />;
-    case 'settings': return (
-      <SettingsApp
-        wallpaper={wallpaper}
-        onWallpaperChange={onWallpaperChange}
-        showClock={showClock}
-        onShowClockChange={onShowClockChange}
-      />
-    );
-    case 'tictactoe': return <TicTacToe />;
-    default: return null;
-  }
-});
+const MemoizedAppContent = memo(
+  ({
+    appId,
+    wallpaper,
+    onWallpaperChange,
+    showClock,
+    onShowClockChange,
+  }: {
+    appId: AppId;
+    wallpaper: Wallpaper;
+    onWallpaperChange: (w: Wallpaper) => void;
+    showClock: boolean;
+    onShowClockChange: (s: boolean) => void;
+  }) => {
+    switch (appId) {
+      case "about":
+        return <AboutApp />;
+      case "projects":
+        return <ProjectsApp />;
+      case "terminal":
+        return <TerminalApp />;
+      case "contact":
+        return <ContactApp />;
+      case "settings":
+        return (
+          <SettingsApp
+            wallpaper={wallpaper}
+            onWallpaperChange={onWallpaperChange}
+            showClock={showClock}
+            onShowClockChange={onShowClockChange}
+          />
+        );
+      case "tictactoe":
+        return <TicTacToe />;
+      default:
+        return null;
+    }
+  },
+);
 
 // ── Swipeable App Window ──────────────────────────────────────────────────────
 function SwipeableAppWindow({
@@ -130,7 +192,7 @@ function SwipeableAppWindow({
   onHome,
 }: {
   openApp: AppId;
-  currentApp: typeof MOBILE_APPS[number] | undefined;
+  currentApp: (typeof MOBILE_APPS)[number] | undefined;
   wallpaper: Wallpaper;
   onWallpaperChange: (w: Wallpaper) => void;
   showClock: boolean;
@@ -151,13 +213,16 @@ function SwipeableAppWindow({
     isSwiping.current = false;
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta > 0) {
-      isSwiping.current = true;
-      y.set(delta);
-    }
-  }, [y]);
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const delta = e.touches[0].clientY - touchStartY.current;
+      if (delta > 0) {
+        isSwiping.current = true;
+        y.set(delta);
+      }
+    },
+    [y],
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (isSwiping.current && y.get() > 80) {
@@ -173,26 +238,26 @@ function SwipeableAppWindow({
       key={openApp}
       className="absolute inset-0 z-30 flex flex-col"
       style={{
-        borderRadius: '20px 20px 0 0',
-        overflow: 'hidden',
+        borderRadius: "20px 20px 0 0",
+        overflow: "hidden",
         y,
         opacity,
         scale,
-        background: 'rgba(255,255,255,0.97)',
+        background: "rgba(255,255,255,0.97)",
       }}
-      initial={{ y: '100%' }}
+      initial={{ y: "100%" }}
       animate={{ y: 0 }}
-      exit={{ y: '100%' }}
-      transition={{ type: 'spring', damping: 30, stiffness: 320, mass: 0.8 }}
+      exit={{ y: "100%" }}
+      transition={{ type: "spring", damping: 30, stiffness: 320, mass: 0.8 }}
     >
       {/* ── App Title Bar with swipe handle ── */}
       <div
-        className="flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
+        className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0 cursor-grab active:cursor-grabbing"
         style={{
-          background: 'rgba(255,255,255,0.90)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          background: "rgba(255,255,255,0.90)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(0,0,0,0.07)",
           minHeight: 52,
         }}
         onTouchStart={handleTouchStart}
@@ -207,7 +272,9 @@ function SwipeableAppWindow({
 
         <div className="flex items-center gap-2 mt-1">
           {currentApp && (
-            <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${currentApp.color} flex items-center justify-center`}>
+            <div
+              className={`w-7 h-7 rounded-lg bg-linear-to-br ${currentApp.color} flex items-center justify-center`}
+            >
               <span className="scale-75">{currentApp.icon}</span>
             </div>
           )}
@@ -223,12 +290,12 @@ function SwipeableAppWindow({
           style={{
             width: 32,
             height: 32,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.08)',
-            border: '1px solid rgba(0,0,0,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.08)",
+            border: "1px solid rgba(0,0,0,0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             marginTop: 4,
             flexShrink: 0,
           }}
@@ -238,7 +305,10 @@ function SwipeableAppWindow({
       </div>
 
       {/* ── App Content ── */}
-      <div className="flex-1 overflow-y-auto relative bg-inherit [-webkit-overflow-scrolling:touch]" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div
+        className="flex-1 overflow-y-auto relative bg-inherit [-webkit-overflow-scrolling:touch]"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
         <MemoizedAppContent
           appId={openApp}
           wallpaper={wallpaper}
@@ -250,14 +320,14 @@ function SwipeableAppWindow({
 
       {/* ── Bottom Bar: Home + Exit ── */}
       <div
-        className="flex-shrink-0 flex items-center justify-between px-6"
+        className="shrink-0 flex items-center justify-between px-6"
         style={{
-          background: 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(0,0,0,0.07)',
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderTop: "1px solid rgba(0,0,0,0.07)",
           paddingTop: 10,
-          paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
+          paddingBottom: "max(14px, env(safe-area-inset-bottom, 14px))",
         }}
       >
         {/* Home button — minimise all windows back to desktop */}
@@ -266,10 +336,10 @@ function SwipeableAppWindow({
           aria-label="Go to home screen"
           className="flex items-center gap-1.5 px-5 py-2.5 rounded-full text-gray-700 font-semibold text-xs uppercase tracking-wide"
           style={{
-            background: 'rgba(0,0,0,0.07)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            border: '1px solid rgba(0,0,0,0.1)',
+            background: "rgba(0,0,0,0.07)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1px solid rgba(0,0,0,0.1)",
             minWidth: 44,
             minHeight: 44,
           }}
@@ -304,24 +374,25 @@ function FloatingCloseButton({ onClose }: { onClose: () => void }) {
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.7 }}
-      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+      transition={{ type: "spring", damping: 20, stiffness: 300 }}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: 16,
         right: 16,
         zIndex: 200,
         width: 48,
         height: 48,
-        borderRadius: '50%',
-        background: 'rgba(255,255,255,0.18)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        border: '1.5px solid rgba(255,255,255,0.35)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
+        borderRadius: "50%",
+        background: "rgba(255,255,255,0.18)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        border: "1.5px solid rgba(255,255,255,0.35)",
+        boxShadow:
+          "0 4px 24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.3)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
       }}
       whileTap={{ scale: 0.88 }}
       whileHover={{ scale: 1.08 }}
@@ -339,13 +410,16 @@ export function MobilePortfolio({
 }: MobilePortfolioProps) {
   const [openApp, setOpenApp] = useState<AppId | null>(null);
 
-  const currentApp = MOBILE_APPS.find(a => a.id === openApp);
+  const currentApp = MOBILE_APPS.find((a) => a.id === openApp);
   const handleClose = () => setOpenApp(null);
 
   return (
     <div
       className="w-screen h-screen overflow-hidden relative flex flex-col"
-      style={{ ...wallpaperStyle(wallpaper), transition: 'background 0.7s ease' }}
+      style={{
+        ...wallpaperStyle(wallpaper),
+        transition: "background 0.7s ease",
+      }}
     >
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
@@ -355,20 +429,20 @@ export function MobilePortfolio({
         className="absolute pointer-events-none select-none flex flex-col items-center"
         style={{
           zIndex: 5,
-          top: '38%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '100%',
+          top: "38%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "100%",
         }}
       >
         <h1
           className="text-white font-bold text-center"
           style={{
-            fontSize: 'clamp(2.2rem, 10vw, 4rem)',
+            fontSize: "clamp(2.2rem, 10vw, 4rem)",
             opacity: 0.22,
-            letterSpacing: '-0.03em',
+            letterSpacing: "-0.03em",
             lineHeight: 1,
-            fontFamily: 'Inter, system-ui, sans-serif',
+            fontFamily: "Inter, system-ui, sans-serif",
           }}
         >
           Shrawan Karki
@@ -376,11 +450,11 @@ export function MobilePortfolio({
         <p
           className="text-white font-light uppercase text-center"
           style={{
-            fontSize: 'clamp(0.55rem, 2.5vw, 0.75rem)',
+            fontSize: "clamp(0.55rem, 2.5vw, 0.75rem)",
             opacity: 0.18,
-            marginTop: '0.5rem',
-            letterSpacing: '0.22em',
-            fontFamily: 'Inter, system-ui, sans-serif',
+            marginTop: "0.5rem",
+            letterSpacing: "0.22em",
+            fontFamily: "Inter, system-ui, sans-serif",
           }}
         >
           Frontend Developer &amp; UI Designer
@@ -391,9 +465,7 @@ export function MobilePortfolio({
       <MobileStatusBar />
 
       {/* ── Lock-screen style clock ── */}
-      <AnimatePresence>
-        {!openApp && <MobileHomeClock />}
-      </AnimatePresence>
+      <AnimatePresence>{!openApp && <MobileHomeClock />}</AnimatePresence>
 
       {/* ── App Icon Grid ── */}
       <AnimatePresence>
@@ -403,7 +475,7 @@ export function MobilePortfolio({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ type: 'spring', damping: 24, stiffness: 260 }}
+            transition={{ type: "spring", damping: 24, stiffness: 260 }}
             className="relative z-10 flex-1 px-6 pt-2 pb-2"
           >
             <div className="grid grid-cols-3 gap-x-4 gap-y-6">
@@ -447,20 +519,22 @@ export function MobilePortfolio({
         key="dock"
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 260, delay: 0.1 }}
-        className="relative z-50 w-full px-4 pb-4 flex-shrink-0"
-        style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))' }}
+        transition={{ type: "spring", damping: 24, stiffness: 260, delay: 0.1 }}
+        className="relative z-50 w-full px-4 pb-4 shrink-0"
+        style={{
+          paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))",
+        }}
       >
         <div
           className="flex items-center justify-around px-4 py-3 rounded-2xl w-full"
           style={{
-            background: 'rgba(255,255,255,0.22)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            border: '1px solid rgba(255,255,255,0.35)',
+            background: "rgba(255,255,255,0.22)",
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            border: "1px solid rgba(255,255,255,0.35)",
           }}
         >
-          {DOCK_APPS.map(app => (
+          {DOCK_APPS.map((app) => (
             <motion.button
               key={app.id}
               onClick={() => {
@@ -471,21 +545,22 @@ export function MobilePortfolio({
                 }
               }}
               aria-label={`Open ${app.label}`}
-              className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${app.color} flex items-center justify-center shadow-lg relative`}
+              className={`w-14 h-14 rounded-2xl bg-linear-to-br ${app.color} flex items-center justify-center shadow-lg relative`}
               style={{
-                outline: openApp === app.id ? '2.5px solid rgba(255,255,255,0.7)' : 'none',
+                outline:
+                  openApp === app.id
+                    ? "2.5px solid rgba(255,255,255,0.7)"
+                    : "none",
                 outlineOffset: 2,
               }}
               whileTap={{ scale: 0.85 }}
               whileHover={{ scale: 1.1 }}
-              transition={{ type: 'spring', damping: 18, stiffness: 380 }}
+              transition={{ type: "spring", damping: 18, stiffness: 380 }}
             >
               {app.icon}
               {/* Active dot indicator */}
               {openApp === app.id && (
-                <span
-                  className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white"
-                />
+                <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white" />
               )}
             </motion.button>
           ))}
@@ -497,11 +572,11 @@ export function MobilePortfolio({
               aria-label="Home"
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
-                background: 'rgba(255,255,255,0.18)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1.5px solid rgba(255,255,255,0.35)',
-                boxShadow: '0 2px 16px rgba(0,0,0,0.18)',
+                background: "rgba(255,255,255,0.18)",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                border: "1.5px solid rgba(255,255,255,0.35)",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.18)",
               }}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -531,20 +606,20 @@ function MobileHomeIcon({
       className="flex flex-col items-center gap-1.5"
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay, type: 'spring', damping: 20, stiffness: 300 }}
+      transition={{ delay, type: "spring", damping: 20, stiffness: 300 }}
     >
       <motion.button
         onClick={onTap}
-        className={`w-16 h-16 rounded-2xl ${app.color.includes('bg-') ? app.color : `bg-gradient-to-br ${app.color}`} flex items-center justify-center shadow-lg`}
+        className={`w-16 h-16 rounded-2xl ${app.color.includes("bg-") ? app.color : `bg-linear-to-br ${app.color}`} flex items-center justify-center shadow-lg`}
         whileTap={{ scale: 0.8 }}
         whileHover={{ scale: 1.06 }}
-        transition={{ type: 'spring', damping: 18, stiffness: 380 }}
+        transition={{ type: "spring", damping: 18, stiffness: 380 }}
       >
         {app.icon}
       </motion.button>
       <span
         className="text-white text-xs font-medium text-center leading-tight"
-        style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+        style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
       >
         {app.label}
       </span>
