@@ -27,7 +27,7 @@ const SHRAWAN_KNOWLEDGE = [
   },
   {
     keywords: ['resume', 'cv', 'builder', 'resume.io'],
-    response: "Check out Resume.io! It's an automated resume builder built by Shrawan hosted on Cloudflare Workers. Live URL: [https://resume-io.pratyushkarki6.workers.dev/](https://resume-io.pratyushkarki6.workers.dev/)"
+    response: "Check out Resume.io! It's an automated resume builder built by Shrawan hosted on Cloudflare Workers. Live URL: [https://resumeio.pages.dev/](https://resumeio.pages.dev/)"
   },
   {
     keywords: ['projects', 'work', 'built', 'portfolio', 'creations'],
