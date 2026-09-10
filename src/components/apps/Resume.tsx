@@ -218,7 +218,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
         "High-impact resume creation engine hosted on Cloudflare Workers edge network featuring real-time layout preview, ATS compliance, and instant export.",
       tech: ["React", "TypeScript", "Cloudflare Workers", "Tailwind CSS"],
       github: "https://github.com/Frontend-fuchhey/resume.io",
-      live: "https://resume-io.pratyushkarki6.workers.dev/",
+      live: "https://resumeio.pages.dev/",
     },
   ];
 
