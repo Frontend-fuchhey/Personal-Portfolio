@@ -31,6 +31,7 @@ import { ResumeApp } from './components/apps/Resume';
 import TextPressure from './components/ui/TextPressure';
 import { preloadAllAssets } from './utils/preloadAssets';
 import { SafeImage } from './components/ui/SafeImage';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -376,18 +377,20 @@ export default function App() {
                     dragConstraints={desktopRef}
                     isRecentsView={isRecentsView}
                   >
-                    <MemoizedAppContent
-                      appId={win.appId}
-                      wallpaper={wallpaper}
-                      onWallpaperChange={setWallpaper}
-                      onOpenApp={handleAppClick}
-                      windowId={win.id}
-                      onUpdateSize={updateSize}
-                      showClock={showClock}
-                      setShowClock={setShowClock}
-                      onResumeStateChange={setIsResumeOpen}
-                      onClose={() => handleCloseWindow(win.id)}
-                    />
+                    <ErrorBoundary>
+                      <MemoizedAppContent
+                        appId={win.appId}
+                        wallpaper={wallpaper}
+                        onWallpaperChange={setWallpaper}
+                        onOpenApp={handleAppClick}
+                        windowId={win.id}
+                        onUpdateSize={updateSize}
+                        showClock={showClock}
+                        setShowClock={setShowClock}
+                        onResumeStateChange={setIsResumeOpen}
+                        onClose={() => handleCloseWindow(win.id)}
+                      />
+                    </ErrorBoundary>
                   </Window>
                 </div>
               ))}
