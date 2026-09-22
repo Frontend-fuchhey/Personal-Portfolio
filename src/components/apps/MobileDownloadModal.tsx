@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Smartphone, Check, Copy, QrCode, ShieldCheck, Share, ArrowRight, Settings, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
+import QRCode from 'qrcode';
 
 interface DownloadInfo {
   android?: {
@@ -35,13 +36,35 @@ export function MobileDownloadModal({
   const [copied, setCopied] = useState(false);
   const [iosDownloaded, setIosDownloaded] = useState(false);
   const [androidDownloaded, setAndroidDownloaded] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   if (!isOpen) return null;
 
   const currentUrl = typeof window !== 'undefined' ? window.location.origin : 'https://shrawankarki.com.np';
+  const targetUrl = typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')
+    ? window.location.origin
+    : 'https://shrawankarki.com.np';
+
   const apkUrl = downloads?.android?.url || '/downloads/ShrawanOS.apk';
   const apkFilename = downloads?.android?.filename || 'ShrawanOS.apk';
   const profileUrl = downloads?.ios?.profileUrl || '/downloads/ShrawanOS.mobileconfig';
+
+  useEffect(() => {
+    QRCode.toDataURL(targetUrl, {
+      width: 240,
+      margin: 1,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      },
+      errorCorrectionLevel: 'M'
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch(() => {
+        // Fallback to online QR API
+        setQrDataUrl(`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(targetUrl)}`);
+      });
+  }, [targetUrl]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
@@ -334,41 +357,18 @@ export function MobileDownloadModal({
                 animate={{ opacity: 1, scale: 1 }}
                 className="space-y-4 flex flex-col items-center text-center"
               >
-                <div className="p-4 bg-white rounded-2xl shadow-md border border-slate-200 dark:border-slate-700 inline-block">
-                  <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none">
-                    <rect width="100" height="100" fill="white" rx="8" />
-                    {/* Top-Left Corner */}
-                    <rect x="10" y="10" width="24" height="24" rx="4" fill="#0f172a" />
-                    <rect x="14" y="14" width="16" height="16" rx="2" fill="white" />
-                    <rect x="18" y="18" width="8" height="8" rx="1" fill="#4f46e5" />
-                    {/* Top-Right Corner */}
-                    <rect x="66" y="10" width="24" height="24" rx="4" fill="#0f172a" />
-                    <rect x="70" y="14" width="16" height="16" rx="2" fill="white" />
-                    <rect x="74" y="18" width="8" height="8" rx="1" fill="#4f46e5" />
-                    {/* Bottom-Left Corner */}
-                    <rect x="10" y="66" width="24" height="24" rx="4" fill="#0f172a" />
-                    <rect x="14" y="70" width="16" height="16" rx="2" fill="white" />
-                    <rect x="18" y="74" width="8" height="8" rx="1" fill="#4f46e5" />
-                    {/* Pattern Dots */}
-                    <rect x="38" y="12" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="48" y="12" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="40" y="24" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="52" y="24" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="14" y="40" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="24" y="44" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="38" y="38" width="10" height="10" rx="2" fill="#4f46e5" />
-                    <rect x="54" y="38" width="8" height="8" rx="1" fill="#0f172a" />
-                    <rect x="68" y="40" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="78" y="44" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="40" y="54" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="52" y="54" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="40" y="68" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="52" y="68" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="68" y="68" width="6" height="6" rx="1" fill="#0f172a" />
-                    <rect x="78" y="72" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="68" y="80" width="6" height="6" rx="1" fill="#4f46e5" />
-                    <rect x="78" y="82" width="6" height="6" rx="1" fill="#0f172a" />
-                  </svg>
+                <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 dark:border-slate-700 inline-block">
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt="Scan to open Shrawan OS on phone"
+                      className="w-44 h-44 rounded-xl object-contain block"
+                    />
+                  ) : (
+                    <div className="w-44 h-44 flex items-center justify-center text-xs text-slate-400">
+                      Generating QR...
+                    </div>
+                  )}
                 </div>
 
                 <div>
