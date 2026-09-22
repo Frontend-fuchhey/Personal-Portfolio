@@ -88,7 +88,22 @@ export const INITIAL_PROJECTS = [
     color: 'from-indigo-500 to-blue-600',
     subHeader: 'A macOS-inspired portfolio experience.',
     images: [lpPortfolio, mbPortfolio],
-    coverImage: lpPortfolio
+    coverImage: lpPortfolio,
+    downloads: {
+      android: {
+        url: '/downloads/ShrawanOS.apk',
+        filename: 'ShrawanOS.apk',
+        version: 'v1.0.0',
+        size: '14.2 MB',
+        label: 'Android APK'
+      },
+      ios: {
+        url: 'https://shrawankarki.com.np',
+        profileUrl: '/downloads/ShrawanOS.mobileconfig',
+        version: 'v1.0.0',
+        label: 'iOS Version'
+      }
+    }
   },
   {
     id: "resume-io",

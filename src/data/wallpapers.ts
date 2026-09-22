@@ -1,3 +1,4 @@
+import type { Wallpaper } from '../types/os';
 export type { Wallpaper } from '../types/os';
 
 export const DEFAULT_WALLPAPER = '/w3.png';

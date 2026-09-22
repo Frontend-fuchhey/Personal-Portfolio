@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
-import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X } from 'lucide-react';
+import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X, Smartphone, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOsData } from '../../hooks/useOsData';
 import { INITIAL_PROJECTS } from '../../data/initialData';
 import resumeIoBg from '../assets/resume-io.png';
+import { MobileDownloadModal } from './MobileDownloadModal';
 
 interface ProjectFeature {
   icon: any;
@@ -15,6 +16,22 @@ interface ProjectFeature {
 interface ProjectArchitecture {
   title: string;
   description: string | any;
+}
+
+interface ProjectDownloads {
+  android?: {
+    url: string;
+    filename?: string;
+    version?: string;
+    size?: string;
+    label?: string;
+  };
+  ios?: {
+    url?: string;
+    profileUrl?: string;
+    version?: string;
+    label?: string;
+  };
 }
 
 interface Project {
@@ -44,12 +61,14 @@ interface Project {
   image?: string;
   featured?: boolean;
   subHeader?: string;
+  downloads?: ProjectDownloads;
 }
 
 export function ProjectsApp() {
   const { projects } = useOsData() as { projects: Project[] };
   const [selected, setSelected] = useState<Project | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const [activeFilter, setActiveFilter] = useState<'all' | 'react' | 'web applications' | 'web design'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,6 +83,7 @@ export function ProjectsApp() {
     e.preventDefault();
     e.stopPropagation();
     setSelected(null);
+    setIsDownloadModalOpen(false);
   };
 
   const filteredProjects = INITIAL_PROJECTS.filter((project) => {
@@ -169,9 +189,14 @@ export function ProjectsApp() {
                     onClick={(e) => handleProjectClick(e, project)}
                     className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
                   >
-                    <div className={`w-16 h-16 flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + projectColor : ''}`}>
-                    {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
-                  </div>
+                    <div className={`w-16 h-16 relative flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + projectColor : ''}`}>
+                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
+                      {(project.downloads || project.id === 'portfolio') && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900" title="Mobile Download Available">
+                          <Download className="w-2.5 h-2.5" />
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300 leading-tight break-words">{projectName}</span>
                   </button>
                 )
@@ -287,6 +312,16 @@ export function ProjectsApp() {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                  {(selected.downloads || selected.id === 'portfolio') && (
+                    <button
+                      type="button"
+                      onClick={() => setIsDownloadModalOpen(true)}
+                      className="group flex flex-1 items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-[length:200%_auto] hover:bg-right text-white font-black tracking-wider transition-all duration-300 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <Smartphone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      DOWNLOAD MOBILE APP
+                    </button>
+                  )}
                   {(selected.demoUrl || selected.liveUrl) && (
                     <a
                       href={selected.demoUrl || selected.liveUrl}
@@ -303,7 +338,7 @@ export function ProjectsApp() {
                       href={selected.url || selected.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group flex items-center justify-center gap-2 ${(selected.demoUrl || selected.liveUrl) ? 'flex-1' : 'w-full'} py-4 rounded-2xl bg-transparent text-gray-800 dark:text-gray-200 font-black tracking-wider transition-all duration-300 border-[3px] border-gray-800 dark:border-gray-200 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900`}
+                      className={`group flex items-center justify-center gap-2 ${(selected.demoUrl || selected.liveUrl || selected.downloads || selected.id === 'portfolio') ? 'flex-1' : 'w-full'} py-4 rounded-2xl bg-transparent text-gray-800 dark:text-gray-200 font-black tracking-wider transition-all duration-300 border-[3px] border-gray-800 dark:border-gray-200 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900`}
                     >
                       <Github className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                       VIEW CODE
@@ -374,6 +409,13 @@ export function ProjectsApp() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <MobileDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        projectName={selected?.name || selected?.title || 'Shrawan OS'}
+        downloads={selected?.downloads}
+      />
     </div>
   );
 }
