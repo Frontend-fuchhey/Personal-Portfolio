@@ -38,8 +38,6 @@ export function MobileDownloadModal({
   const [androidDownloaded, setAndroidDownloaded] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
-  if (!isOpen) return null;
-
   const currentUrl = typeof window !== 'undefined' ? window.location.origin : 'https://shrawankarki.com.np';
   const targetUrl = typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')
     ? window.location.origin
@@ -50,21 +48,39 @@ export function MobileDownloadModal({
   const profileUrl = downloads?.ios?.profileUrl || '/downloads/ShrawanOS.mobileconfig';
 
   useEffect(() => {
-    QRCode.toDataURL(targetUrl, {
-      width: 240,
-      margin: 1,
-      color: {
-        dark: '#0f172a',
-        light: '#ffffff'
-      },
-      errorCorrectionLevel: 'M'
-    })
-      .then((url) => setQrDataUrl(url))
-      .catch(() => {
-        // Fallback to online QR API
+    if (!isOpen) return;
+
+    let isMounted = true;
+    try {
+      QRCode.toDataURL(targetUrl, {
+        width: 240,
+        margin: 1,
+        color: {
+          dark: '#0f172a',
+          light: '#ffffff'
+        },
+        errorCorrectionLevel: 'M'
+      })
+        .then((url) => {
+          if (isMounted) setQrDataUrl(url);
+        })
+        .catch(() => {
+          if (isMounted) {
+            setQrDataUrl(`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(targetUrl)}`);
+          }
+        });
+    } catch {
+      if (isMounted) {
         setQrDataUrl(`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(targetUrl)}`);
-      });
-  }, [targetUrl]);
+      }
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, targetUrl]);
+
+  if (!isOpen) return null;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
@@ -74,23 +90,32 @@ export function MobileDownloadModal({
 
   const handleIosDownload = () => {
     setIosDownloaded(true);
-    // Create download link and trigger
     const link = document.createElement('a');
     link.href = profileUrl;
-    link.download = 'ShrawanOS.mobileconfig';
+    link.setAttribute('download', 'ShrawanOS.mobileconfig');
+    link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+      if (document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
+    }, 200);
   };
 
   const handleAndroidDownload = () => {
     setAndroidDownloaded(true);
     const link = document.createElement('a');
     link.href = apkUrl;
-    link.download = apkFilename;
+    link.setAttribute('download', apkFilename);
+    link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+      if (document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
+    }, 200);
   };
 
   return (
