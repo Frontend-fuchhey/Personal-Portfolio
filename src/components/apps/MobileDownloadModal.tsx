@@ -339,10 +339,10 @@ export function MobileDownloadModal({
                   </button>
 
                   <div className="flex items-center justify-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
-                    <span>Size: {downloads?.android?.size || '14.2 MB'}</span>
+                    <span>Size: {downloads?.android?.size || '109 KB'}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                      <ShieldCheck className="w-3.5 h-3.5" /> Verified Clean Package
+                      <ShieldCheck className="w-3.5 h-3.5" /> Verified Signed APK
                     </span>
                   </div>
                 </div>
@@ -355,7 +355,7 @@ export function MobileDownloadModal({
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                     <div className="text-xs text-slate-600 dark:text-slate-300">
-                      <span className="font-bold text-slate-900 dark:text-white">Download started!</span> Tap the downloaded APK in your notifications to install.
+                      <span className="font-bold text-slate-900 dark:text-white">Download started!</span> Once downloaded, tap the file in your notification bar or Downloads folder to install.
                     </div>
                   </motion.div>
                 )}
@@ -363,14 +363,35 @@ export function MobileDownloadModal({
                 {/* Android Steps */}
                 <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-200/60 dark:border-slate-700/50">
                   <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                    How to install on Android
+                    How to install APK on Android
                   </h5>
                   <ol className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 list-decimal list-inside leading-relaxed">
-                    <li>Tap <strong>Download Android APK</strong> above.</li>
-                    <li>Tap the completed file in your notifications or Downloads folder.</li>
+                    <li>If Chrome warns <em>"File might be harmful"</em>, tap <strong>Download anyway</strong>.</li>
+                    <li>Open the downloaded <strong>ShrawanOS.apk</strong> from notifications.</li>
                     <li>If prompted, tap <strong>Settings</strong> &amp; toggle <em>Allow from this source</em>.</li>
-                    <li>Tap <strong>Install</strong> to add Shrawan OS to your phone.</li>
+                    <li>Tap <strong>Install</strong> to add Shrawan OS to your home screen!</li>
                   </ol>
+                </div>
+
+                {/* Alternative: Chrome Instant Install */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                      <Share className="w-3.5 h-3.5 text-emerald-500" />
+                      Alternative: Chrome 1-Tap Install
+                    </span>
+                    <span className="text-[10px] text-slate-400">Instant</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">
+                    In Chrome browser on your Android phone:
+                  </p>
+                  <div className="flex items-center justify-between gap-1 text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                    <span className="flex items-center gap-1">1. Tap menu (⋮)</span>
+                    <ChevronRight className="w-3 h-3 text-slate-400" />
+                    <span className="flex items-center gap-1">2. "Install app" ⊞</span>
+                    <ChevronRight className="w-3 h-3 text-slate-400" />
+                    <span className="flex items-center gap-1">3. Tap "Install"</span>
+                  </div>
                 </div>
               </motion.div>
             )}

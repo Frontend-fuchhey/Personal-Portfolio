@@ -93,9 +93,9 @@ export const INITIAL_PROJECTS = [
       android: {
         url: '/downloads/ShrawanOS.apk',
         filename: 'ShrawanOS.apk',
-        version: 'v1.0.0',
-        size: '14.2 MB',
-        label: 'Android APK'
+        version: 'v1.0.1',
+        size: '12 MB',
+        label: 'Android APK (Offline Ready)'
       },
       ios: {
         url: 'https://shrawankarki.com.np',
