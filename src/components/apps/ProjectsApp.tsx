@@ -6,6 +6,7 @@ import { useOsData } from '../../hooks/useOsData';
 import { INITIAL_PROJECTS } from '../../data/initialData';
 import resumeIoBg from '../assets/resume-io.png';
 import { MobileDownloadModal } from './MobileDownloadModal';
+import { SafeImage } from '../ui/SafeImage';
 
 interface ProjectFeature {
   icon: any;
@@ -190,7 +191,7 @@ export function ProjectsApp() {
                     className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
                   >
                     <div className={`w-16 h-16 relative flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + projectColor : ''}`}>
-                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <img src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
+                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <SafeImage src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
                       {(project.downloads || project.id === 'portfolio') && (
                         <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900" title="Mobile Download Available">
                           <Download className="w-2.5 h-2.5" />
@@ -241,7 +242,7 @@ export function ProjectsApp() {
                         <Code className="w-64 h-64 text-white transform -rotate-12 scale-150" />
                       </div>
                       <div className="text-8xl transform scale-125 opacity-30 drop-shadow-2xl saturate-150 mix-blend-overlay">
-                        {selected.iconType === 'emoji' ? (selected.iconValue || '📄') : <img src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
+                        {selected.iconType === 'emoji' ? (selected.iconValue || '📄') : <SafeImage src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
                       </div>
                     </div>
                   );
@@ -249,7 +250,7 @@ export function ProjectsApp() {
 
                 <div className="absolute -bottom-8 left-6 sm:left-10 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2 shadow-2xl border border-white/20 dark:border-gray-700/60 ring-4 ring-white/50 dark:ring-gray-900/50 z-10">
                   <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl shadow-inner ${selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? 'bg-gradient-to-br ' + (selected.color || 'from-emerald-500 to-teal-600') : 'bg-transparent'}`}>
-                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || '📄') : <img src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
+                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || '📄') : <SafeImage src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
                   </div>
                 </div>
               </div>
@@ -364,7 +365,7 @@ export function ProjectsApp() {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setSelectedImage(img)}
                         >
-                          <img
+                          <SafeImage
                             src={img}
                             alt={`${selected.name || selected.title} screenshot ${idx + 1}`}
                             className={`rounded-2xl shadow-lg border border-gray-100/50 backdrop-blur-sm w-full h-full min-h-[300px] max-h-96 ${img.toString().includes('mb') ? 'object-contain mx-auto bg-gray-50/10 dark:bg-black/20' : 'object-cover'} aspect-[16/10]`}

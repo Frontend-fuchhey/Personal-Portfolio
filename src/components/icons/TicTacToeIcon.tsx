@@ -1,6 +1,8 @@
 import React from 'react';
+import localTicTacToeIcon from '../../assets/tictactoe.png';
+import { SafeImage } from '../ui/SafeImage';
 
-export const TIC_TAC_TOE_ICON_URL = 'https://cdn-icons-png.flaticon.com/512/10199/10199746.png';
+export const TIC_TAC_TOE_ICON_URL = localTicTacToeIcon;
 
 interface TicTacToeIconProps {
   className?: string;
@@ -10,7 +12,7 @@ interface TicTacToeIconProps {
 export const TicTacToeIcon: React.FC<TicTacToeIconProps> = ({ className, bare = false }) => {
   if (bare) {
     return (
-      <img
+      <SafeImage
         src={TIC_TAC_TOE_ICON_URL}
         alt="Tic Tac Toe"
         className={className || 'w-11 h-11 object-contain'}
@@ -21,7 +23,7 @@ export const TicTacToeIcon: React.FC<TicTacToeIconProps> = ({ className, bare = 
 
   return (
     <div className={`w-full h-full rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md border border-zinc-200/50 ${className || ''}`}>
-      <img
+      <SafeImage
         src={TIC_TAC_TOE_ICON_URL}
         alt="Tic Tac Toe"
         className="w-full h-full object-contain"
