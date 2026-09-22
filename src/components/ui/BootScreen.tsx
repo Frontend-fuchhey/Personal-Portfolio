@@ -3,10 +3,18 @@ import { useState, useEffect } from 'react';
 interface BootScreenProps {
   isFading: boolean;
   onLaunch: () => void;
+  isReady?: boolean;
+  preloadProgress?: number;
 }
 
-export const BootScreen = ({ isFading, onLaunch }: BootScreenProps) => {
+export const BootScreen = ({
+  isFading,
+  onLaunch,
+  isReady = true,
+  preloadProgress = 0
+}: BootScreenProps) => {
   const [liveTime, setLiveTime] = useState(() => new Date().toLocaleTimeString());
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   // Real-time Clock Sync
   useEffect(() => {
@@ -16,37 +24,59 @@ export const BootScreen = ({ isFading, onLaunch }: BootScreenProps) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Quick 1.5 Second Boot Sequence Timer
+  // Minimum display timer (1.1s) for smooth visual transition
   useEffect(() => {
-    const bootTimer = setTimeout(() => {
-      onLaunch();
-    }, 1500);
+    const minTimer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, 1100);
+    return () => clearTimeout(minTimer);
+  }, []);
 
-    return () => clearTimeout(bootTimer);
+  // Launch once both minimum time has passed and all critical assets are preloaded
+  useEffect(() => {
+    if (minTimeElapsed && isReady) {
+      onLaunch();
+    }
+  }, [minTimeElapsed, isReady, onLaunch]);
+
+  // Safety fallback: launch after 4.5 seconds regardless of network conditions
+  useEffect(() => {
+    const safetyTimer = setTimeout(() => {
+      onLaunch();
+    }, 4500);
+    return () => clearTimeout(safetyTimer);
   }, [onLaunch]);
 
   return (
-    <div className={`fixed inset-0 z-50 bg-gradient-to-b from-[#1c1c1e] to-[#0a0a0a] font-sans text-white p-8 flex flex-col justify-center items-center select-none overflow-hidden transition-opacity duration-700 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+    <div className={`fixed inset-0 z-50 bg-gradient-to-b from-[#1c1c1e] to-[#0a0a0a] font-sans text-white p-8 flex flex-col justify-center items-center select-none overflow-hidden transition-opacity duration-700 ${isFading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
 
       {/* Top Status Bar Maintained */}
       <div className="w-full absolute top-0 left-0 border-b border-white/5 px-6 py-2 flex justify-between items-center font-mono text-[11px] text-zinc-400">
         <span>SHRAWAN_OS[v 7] :: Nepalese Developer ꔪ</span>
-        <span>TIME: {liveTime}  |  SESSION: 00:14  |  BOOT_TARGET: [GUEST]</span>
+        <span>TIME: {liveTime}  |  STATUS: {preloadProgress >= 100 ? 'READY' : 'PRELOADING'}  |  BOOT_TARGET: [GUEST]</span>
       </div>
 
       {/* Minimalist Login Center Layout */}
-      <div className="flex flex-col items-center gap-6 text-center animate-fade-in">
+      <div className="flex flex-col items-center gap-5 text-center animate-fade-in">
         <h1 className="text-xs font-semibold tracking-[0.2em] text-zinc-400 uppercase">
-          Signing In...
+          {preloadProgress >= 100 ? 'Starting Session...' : 'Preparing Environment...'}
         </h1>
+
         {/* White Rounded Loaded Spinner */}
         <div className="relative flex items-center justify-center">
           <div className="w-12 h-12 rounded-full border-4 border-white/10 border-t-white animate-spin"></div>
         </div>
 
-        {/* Modern Minimalist Greeting Block */}
-        <div className="space-y-2">
+        {/* Progress Bar for Smooth Visual Feedback */}
+        <div className="w-44 h-1 bg-white/10 rounded-full overflow-hidden mt-1 shadow-inner">
+          <div
+            className="h-full bg-white/80 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${Math.max(12, preloadProgress)}%` }}
+          />
+        </div>
 
+        {/* Modern Minimalist Greeting Block */}
+        <div className="space-y-2 mt-2">
           <p className="text-sm font-bold tracking-[0.15em] text-white uppercase sm:text-base px-4 max-w-xl leading-relaxed">
             WELCOME TO SHRAWAN KARKI PORTFOLIO
           </p>

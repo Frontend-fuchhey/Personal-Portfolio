@@ -21,6 +21,7 @@ import {
   Copy,
   X,
 } from "lucide-react";
+import { SafeImage } from "../ui/SafeImage";
 
 interface ResumeAppProps {
   onOpenApp?: (appId: any) => void;
@@ -175,7 +176,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       detail:
         "Achieved excellence with specialization in Mathematics and Computer Science.",
       certId: "cert-class12",
-      certImage: "./certificates/class12.jpg",
+      certImage: "/certificates/class12.jpg",
       certTitle: "+2 Science Certificate (Class 12)",
     },
     {
@@ -186,7 +187,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       detail:
         "Foundational education with focus on STEM subjects and computer fundamentals.",
       certId: "cert-class10",
-      certImage: "./certificates/class10.jpg",
+      certImage: "/certificates/class10.jpg",
       certTitle: "SEE Certificate (Class 10)",
     },
   ];
@@ -230,7 +231,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       issuer: "National Examinations Board (NEB)",
       institution: "Arniko College, Biratnagar",
       year: "2081",
-      image: "./certificates/class12.jpg",
+      image: "/certificates/class12.jpg",
     },
     {
       id: "cert-class10",
@@ -238,7 +239,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
       issuer: "Government of Nepal Examination Board",
       institution: "Arniko Secondary School, Biratnagar",
       year: "2079",
-      image: "./certificates/class10.jpg",
+      image: "/certificates/class10.jpg",
     },
   ];
 
@@ -920,7 +921,7 @@ export const ResumeApp: React.FC<ResumeAppProps> = ({}) => {
               </button>
             </div>
             <div className="w-full max-h-[70vh] overflow-hidden rounded-lg bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-2">
-              <img
+              <SafeImage
                 src={activeCertificate.image}
                 alt={activeCertificate.title}
                 className="max-w-full max-h-[65vh] object-contain rounded shadow-xs"

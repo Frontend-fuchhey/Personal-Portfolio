@@ -29,6 +29,8 @@ import profilePic from './assets/shrawan.jpg';
 import { ResumeView } from './components/ResumeView';
 import { ResumeApp } from './components/apps/Resume';
 import TextPressure from './components/ui/TextPressure';
+import { preloadAllAssets } from './utils/preloadAssets';
+import { SafeImage } from './components/ui/SafeImage';
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -75,12 +77,12 @@ const MemoizedAppContent = memo(({
     case 'tictactoe': return <TicTacToe />;
     case 'cert-class12': return (
       <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <img src="./certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
+        <SafeImage src="/certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
       </div>
     );
     case 'cert-class10': return (
       <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <img src="./certificates/class10.jpg" alt="Certificate Class 10" className="w-auto h-full object-contain shadow-2xl" />
+        <SafeImage src="/certificates/class10.jpg" alt="Certificate Class 10" className="w-auto h-full object-contain shadow-2xl" />
       </div>
     );
     default: return null;
@@ -119,6 +121,16 @@ export default function App() {
   
   const [isBooted, setIsBooted] = useState(false);
   const [isFading, setIsFading] = useState(false);
+  const [preloadProgress, setPreloadProgress] = useState(0);
+  const [isPreloadComplete, setIsPreloadComplete] = useState(false);
+
+  useEffect(() => {
+    preloadAllAssets((progress) => {
+      setPreloadProgress(progress.percentage);
+    }).then(() => {
+      setIsPreloadComplete(true);
+    });
+  }, []);
 
   const handleLaunch = useCallback(() => {
     if (isFading) return;
@@ -179,22 +191,6 @@ export default function App() {
       minimizeWindow(win.id);
     }
   };
-
-  useEffect(() => {
-    const cacheImages = async () => {
-      const srcArray = ['/w3.png', '/fluid_wave_bg.png', profilePic];
-      const promises = srcArray.map((src) => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      });
-      await Promise.all(promises);
-    };
-    cacheImages();
-  }, []);
 
   // isMobile detection is now handled by the useIsMobile() hook above
   // which includes UA sniffing, screen.width, matchMedia, resize & orientationchange listeners
@@ -263,6 +259,8 @@ export default function App() {
       <BootScreen 
         isFading={isFading} 
         onLaunch={handleLaunch} 
+        isReady={isPreloadComplete}
+        preloadProgress={preloadProgress}
       />
     );
   }
