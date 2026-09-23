@@ -244,39 +244,48 @@ export const PhotosApp = memo(() => {
               </div>
 
               {/* Right Side: Details pane */}
-              <div className="w-full md:w-80 bg-zinc-900 border-t md:border-t-0 md:border-l border-zinc-800/80 p-6 flex flex-col justify-between overflow-y-auto">
+              <div className="w-full md:w-80 bg-white border-t md:border-t-0 md:border-l border-zinc-200 p-6 flex flex-col justify-between overflow-y-auto">
                 <div>
-                  {/* Category & Index */}
+                  {/* Category, Date & Close */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
                       {filteredItems[selectedIdx].id} / {filteredItems[selectedIdx].subCategory}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium">
-                      {filteredItems[selectedIdx].date}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-zinc-400 font-medium">
+                        {filteredItems[selectedIdx].date}
+                      </span>
+                      <button
+                        onClick={() => setSelectedIdx(null)}
+                        className="p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-full transition-colors cursor-pointer"
+                        title="Close"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-bold text-zinc-100 mb-3 leading-snug">
+                  <h3 className="text-base font-bold text-zinc-900 mb-3 leading-snug">
                     {filteredItems[selectedIdx].title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-xs md:text-sm text-zinc-400 leading-relaxed mb-6">
+                  <p className="text-xs md:text-sm text-zinc-600 leading-relaxed mb-6">
                     {filteredItems[selectedIdx].description}
                   </p>
                 </div>
 
                 {/* Tags & Footer */}
-                <div className="border-t border-zinc-800/80 pt-4 mt-4">
-                  <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-2">
+                <div className="border-t border-zinc-200 pt-4 mt-4">
+                  <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block mb-2">
                     Tags
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {filteredItems[selectedIdx].tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md font-medium border border-zinc-700/30"
+                        className="text-[10px] bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-md font-medium border border-zinc-200/80"
                       >
                         {tag}
                       </span>
@@ -284,7 +293,7 @@ export const PhotosApp = memo(() => {
                   </div>
 
                   {/* Counter */}
-                  <div className="text-center text-[10px] text-zinc-500 uppercase tracking-widest mt-6">
+                  <div className="text-center text-[10px] text-zinc-400 uppercase tracking-widest mt-6">
                     {selectedIdx + 1} of {filteredItems.length}
                   </div>
                 </div>
