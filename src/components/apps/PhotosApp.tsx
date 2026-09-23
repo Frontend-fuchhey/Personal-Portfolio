@@ -192,12 +192,12 @@ export const PhotosApp = memo(() => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-9999999 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-9999999 flex items-center justify-center p-4 md:p-10 bg-white/80 backdrop-blur-md"
             onClick={() => setSelectedIdx(null)}
           >
             {/* Close Button */}
             <button
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-50 cursor-pointer"
+              className="absolute top-6 right-6 p-2 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 hover:text-zinc-900 border border-zinc-300/80 shadow-sm transition-colors z-50 cursor-pointer"
               onClick={() => setSelectedIdx(null)}
             >
               <X className="w-6 h-6" />
@@ -205,7 +205,7 @@ export const PhotosApp = memo(() => {
 
             {/* Main Lightbox Content Container */}
             <div
-              className="relative w-full max-w-5xl bg-zinc-950 border border-zinc-800/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[85vh] md:h-[70vh]"
+              className="relative w-full max-w-5xl bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[85vh] md:h-[70vh]"
               style={{
                 transform: 'translateZ(0)',
                 WebkitMaskImage: '-webkit-radial-gradient(white, black)',
@@ -214,12 +214,12 @@ export const PhotosApp = memo(() => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Left Side: Image display */}
-              <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden p-4 group">
+              <div className="flex-1 bg-white relative flex items-center justify-center overflow-hidden p-4 md:p-6 group border-b md:border-b-0 md:border-r border-zinc-200">
                 <img
                   src={filteredItems[selectedIdx].image}
                   alt={filteredItems[selectedIdx].title}
                   decoding="async"
-                  className="max-w-full max-h-full object-contain rounded-lg select-none"
+                  className="max-w-full max-h-full object-contain rounded-lg select-none shadow-sm"
                   style={{
                     transform: 'translateZ(0)',
                     WebkitBackfaceVisibility: 'hidden',
@@ -229,14 +229,14 @@ export const PhotosApp = memo(() => {
 
                 {/* Navigation Arrows */}
                 <button
-                  className="absolute left-4 p-3 rounded-full bg-black/40 text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
+                  className="absolute left-4 p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
                   onClick={handlePrev}
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
 
                 <button
-                  className="absolute right-4 p-3 rounded-full bg-black/40 text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
+                  className="absolute right-4 p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
                   onClick={handleNext}
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -244,7 +244,7 @@ export const PhotosApp = memo(() => {
               </div>
 
               {/* Right Side: Details pane */}
-              <div className="w-full md:w-80 bg-white border-t md:border-t-0 md:border-l border-zinc-200 p-6 flex flex-col justify-between overflow-y-auto">
+              <div className="w-full md:w-80 bg-white p-6 flex flex-col justify-between overflow-y-auto">
                 <div>
                   {/* Category, Date & Close */}
                   <div className="flex items-center justify-between mb-4">
