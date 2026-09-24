@@ -3,6 +3,9 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "MY_GMAIL_ADDRESS"
+
 # Ensure proper MIME types and download headers for mobile and document assets
 [[headers]]
   for = "/downloads/*.mobileconfig"
