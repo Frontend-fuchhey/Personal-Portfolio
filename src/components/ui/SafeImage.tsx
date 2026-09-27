@@ -28,6 +28,9 @@ export const SafeImage = React.forwardRef<HTMLImageElement, SafeImageProps>(({
   // Combine forwarded ref and local ref
   const setRef = (node: HTMLImageElement | null) => {
     localRef.current = node;
+    if (node && node.complete && node.naturalWidth > 0) {
+      setIsLoaded(true);
+    }
     if (typeof forwardedRef === 'function') {
       forwardedRef(node);
     } else if (forwardedRef) {
@@ -36,10 +39,16 @@ export const SafeImage = React.forwardRef<HTMLImageElement, SafeImageProps>(({
   };
 
   useEffect(() => {
+    setHasError(false);
     // Check if the image is already cached/complete
     if (localRef.current && localRef.current.complete && localRef.current.naturalWidth > 0) {
       setIsLoaded(true);
     }
+    // Safety timer to prevent image staying hidden indefinitely
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 400);
+    return () => clearTimeout(timer);
   }, [src]);
 
   const handleLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {

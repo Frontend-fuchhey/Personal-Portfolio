@@ -24,11 +24,14 @@ export const BootScreen = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Minimum display timer (1.1s) for smooth visual transition
+  // Minimum display timer (300ms on mobile, 500ms on desktop) for smooth visual transition
   useEffect(() => {
+    const isMobileDevice = typeof window !== 'undefined' && (
+      window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    );
     const minTimer = setTimeout(() => {
       setMinTimeElapsed(true);
-    }, 1100);
+    }, isMobileDevice ? 300 : 500);
     return () => clearTimeout(minTimer);
   }, []);
 
@@ -39,11 +42,14 @@ export const BootScreen = ({
     }
   }, [minTimeElapsed, isReady, onLaunch]);
 
-  // Safety fallback: launch after 4.5 seconds regardless of network conditions
+  // Safety fallback: launch quickly (1.0s mobile, 2.0s desktop) regardless of network conditions
   useEffect(() => {
+    const isMobileDevice = typeof window !== 'undefined' && (
+      window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    );
     const safetyTimer = setTimeout(() => {
       onLaunch();
-    }, 4500);
+    }, isMobileDevice ? 1000 : 2000);
     return () => clearTimeout(safetyTimer);
   }, [onLaunch]);
 

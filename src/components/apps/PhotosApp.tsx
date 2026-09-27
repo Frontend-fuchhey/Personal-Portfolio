@@ -2,8 +2,8 @@ import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { Camera, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import imageA from "../../assets/galleryimages/ImageA.png";
-import imageB from "../../assets/galleryimages/ImageB.png";
-import imageC from "../../assets/galleryimages/ImageC.png";
+import imageB from "../../assets/galleryimages/ImageB.jpg";
+import imageC from "../../assets/galleryimages/ImageC.jpg";
 import imageD from "../../assets/galleryimages/ImageD.png";
 
 // MUST BE OUTSIDE THE COMPONENT FUNCTION TO PREVENT CONSTANT RE-CREATION
@@ -205,7 +205,7 @@ export const PhotosApp = memo(() => {
 
             {/* Main Lightbox Content Container */}
             <div
-              className="relative w-full max-w-5xl bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[85vh] md:h-[70vh]"
+              className="relative w-full max-w-5xl bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[90vh] md:h-[70vh]"
               style={{
                 transform: 'translateZ(0)',
                 WebkitMaskImage: '-webkit-radial-gradient(white, black)',
@@ -214,7 +214,7 @@ export const PhotosApp = memo(() => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Left Side: Image display */}
-              <div className="flex-1 bg-white relative flex items-center justify-center overflow-hidden p-4 md:p-6 group border-b md:border-b-0 md:border-r border-zinc-200">
+              <div className="flex-[1.5] min-h-[45vh] md:min-h-0 bg-white relative flex items-center justify-center overflow-hidden p-3 md:p-6 group border-b md:border-b-0 md:border-r border-zinc-200">
                 <img
                   src={filteredItems[selectedIdx].image}
                   alt={filteredItems[selectedIdx].title}
@@ -229,22 +229,22 @@ export const PhotosApp = memo(() => {
 
                 {/* Navigation Arrows */}
                 <button
-                  className="absolute left-4 p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
+                  className="absolute left-2 md:left-4 p-2.5 md:p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-90 md:opacity-0 md:group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
                   onClick={handlePrev}
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
 
                 <button
-                  className="absolute right-4 p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
+                  className="absolute right-2 md:right-4 p-2.5 md:p-3 rounded-full bg-white/90 text-zinc-700 hover:bg-white hover:text-zinc-950 border border-zinc-200/80 shadow-md transition-all opacity-90 md:opacity-0 md:group-hover:opacity-100 hover:scale-105 z-10 cursor-pointer"
                   onClick={handleNext}
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
               </div>
 
               {/* Right Side: Details pane */}
-              <div className="w-full md:w-80 bg-white p-6 flex flex-col justify-between overflow-y-auto">
+              <div className="w-full md:w-80 bg-white p-4 md:p-6 flex flex-col justify-between overflow-y-auto max-h-[40vh] md:max-h-full flex-1 md:flex-initial">
                 <div>
                   {/* Category, Date & Close */}
                   <div className="flex items-center justify-between mb-4">

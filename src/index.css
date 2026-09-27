@@ -344,9 +344,8 @@
 }
 
 .image-render-crisp {
+  image-rendering: auto !important;
   image-rendering: -webkit-optimize-contrast !important;
-  image-rendering: crisp-edges !important;
-  image-rendering: pixelated !important;
   transform: translateZ(0) !important;
   backface-visibility: hidden !important;
   -webkit-font-smoothing: antialiased;

@@ -12,9 +12,11 @@ interface TicTacToeIconProps {
 export const TicTacToeIcon: React.FC<TicTacToeIconProps> = ({ className, bare = false }) => {
   if (bare) {
     return (
-      <SafeImage
+      <img
         src={TIC_TAC_TOE_ICON_URL}
         alt="Tic Tac Toe"
+        loading="eager"
+        decoding="async"
         className={className || 'w-11 h-11 object-contain'}
         draggable={false}
       />
@@ -23,9 +25,11 @@ export const TicTacToeIcon: React.FC<TicTacToeIconProps> = ({ className, bare = 
 
   return (
     <div className={`w-full h-full rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md border border-zinc-200/50 ${className || ''}`}>
-      <SafeImage
+      <img
         src={TIC_TAC_TOE_ICON_URL}
         alt="Tic Tac Toe"
+        loading="eager"
+        decoding="async"
         className="w-full h-full object-contain"
         draggable={false}
       />

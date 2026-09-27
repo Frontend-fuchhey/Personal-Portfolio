@@ -368,7 +368,7 @@ export function ProjectsApp() {
                           <SafeImage
                             src={img}
                             alt={`${selected.name || selected.title} screenshot ${idx + 1}`}
-                            className={`rounded-2xl shadow-lg border border-gray-100/50 backdrop-blur-sm w-full h-full min-h-[300px] max-h-96 ${img.toString().includes('mb') ? 'object-contain mx-auto bg-gray-50/10 dark:bg-black/20' : 'object-cover'} aspect-[16/10]`}
+                            className="rounded-2xl shadow-lg border border-gray-100/50 backdrop-blur-sm w-full h-auto min-h-[200px] sm:min-h-[260px] max-h-96 object-contain bg-zinc-950/5 dark:bg-zinc-900/30 p-1"
                           />
                         </motion.div>
                       ))}
