@@ -114,12 +114,11 @@ export function AboutApp({
                   ref={profileImgRef}
                   src={profilePic}
                   alt={USER_CONFIG.name}
+                  loading="eager"
+                  decoding="async"
                   onLoad={() => setIsProfileLoaded(true)}
-                  className={`w-full h-full object-cover object-center rounded-full image-render-crisp transition-opacity duration-500 ease-in-out ${isProfileLoaded ? "opacity-100" : "opacity-0"}`}
+                  className={`w-full h-full object-cover object-center rounded-full transition-opacity duration-300 ease-in-out ${isProfileLoaded ? "opacity-100" : "opacity-95"}`}
                   style={{
-                    // @ts-ignore
-                    WebkitImageRendering: 'optimize-contrast',
-                    imageRendering: 'crisp-edges',
                     transform: 'translateZ(0)',
                     backfaceVisibility: 'hidden'
                   }}

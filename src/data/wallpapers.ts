@@ -1,21 +1,21 @@
 import type { Wallpaper } from '../types/os';
 export type { Wallpaper } from '../types/os';
 
-export const DEFAULT_WALLPAPER = '/w3.png';
+export const DEFAULT_WALLPAPER = '/w3.jpg';
 
 export const WALLPAPERS: Wallpaper[] = [
   {
     id: 'w3-default',
     name: 'W3 Wallpaper',
-    value: '/w3.png',
-    url: '/w3.png',
+    value: '/w3.jpg',
+    url: '/w3.jpg',
     type: 'url',
   },
   {
     id: 'fluid-wave',
     name: 'Fluid Wave',
-    value: '/fluid_wave_bg.png',
-    url: '/fluid_wave_bg.png',
+    value: '/fluid_wave_bg.jpg',
+    url: '/fluid_wave_bg.jpg',
     type: 'url',
   },
   { id: 'aurora',   name: 'Aurora',       value: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%)', type: 'gradient' },

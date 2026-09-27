@@ -77,13 +77,13 @@ const MemoizedAppContent = memo(({
     case 'photos':   return <PhotosApp />;
     case 'tictactoe': return <TicTacToe />;
     case 'cert-class12': return (
-      <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <SafeImage src="/certificates/class12.jpg" alt="Certificate Class 12" className="w-auto h-full object-contain shadow-2xl" />
+      <div className="w-full h-full bg-zinc-900/5 dark:bg-zinc-950 flex items-center justify-center p-3 sm:p-6 overflow-auto">
+        <SafeImage src="/certificates/class12.jpg" alt="Certificate Class 12" className="max-w-full max-h-[85vh] sm:max-h-full w-auto h-auto object-contain rounded-xl shadow-2xl border border-zinc-200/50" />
       </div>
     );
     case 'cert-class10': return (
-      <div className="w-full h-full bg-white flex items-center justify-center p-5">
-        <SafeImage src="/certificates/class10.jpg" alt="Certificate Class 10" className="w-auto h-full object-contain shadow-2xl" />
+      <div className="w-full h-full bg-zinc-900/5 dark:bg-zinc-950 flex items-center justify-center p-3 sm:p-6 overflow-auto">
+        <SafeImage src="/certificates/class10.jpg" alt="Certificate Class 10" className="max-w-full max-h-[85vh] sm:max-h-full w-auto h-auto object-contain rounded-xl shadow-2xl border border-zinc-200/50" />
       </div>
     );
     default: return null;
@@ -97,7 +97,7 @@ export default function App() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed.id === 'v7_wave') {
+          if (parsed.id === 'v7_wave' || parsed.url === '/w3.png' || parsed.value === '/w3.png') {
             return initialWallpaper;
           }
           return parsed;

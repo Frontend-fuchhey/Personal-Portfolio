@@ -26,6 +26,14 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-motion': ['framer-motion', 'motion-dom'],
+          'vendor-icons': ['lucide-react'],
+        }
+      }
+    }
   },
   server: {
     port,

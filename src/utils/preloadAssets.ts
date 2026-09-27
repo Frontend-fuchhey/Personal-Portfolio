@@ -1,46 +1,42 @@
 import profilePic from '../assets/shrawan.jpg';
 import garmentIcon from '../assets/garmentflow.png';
-import gallery2 from '../assets/maingarment.png';
+import gallery2 from '../assets/maingarment.jpg';
 import mbPortfolio from '../assets/mb.png';
-import lpPortfolio from '../assets/lp.png';
+import lpPortfolio from '../assets/lp.jpg';
 import resumeIoBg from '../assets/resume-io.png';
 import resumeLogo from '../assets/resume-logo.png';
 import itahariLogo from '../assets/itahari-logo.png';
 import arnikoLogo from '../assets/arniko-logo.png';
 import imageA from '../assets/galleryimages/ImageA.png';
-import imageB from '../assets/galleryimages/ImageB.png';
-import imageC from '../assets/galleryimages/ImageC.png';
+import imageB from '../assets/galleryimages/ImageB.jpg';
+import imageC from '../assets/galleryimages/ImageC.jpg';
 import imageD from '../assets/galleryimages/ImageD.png';
 import tictactoeIcon from '../assets/tictactoe.png';
 
+// Critical assets required strictly for the initial desktop / mobile home screen
 export const CRITICAL_IMAGES: string[] = [
-  // Primary desktop & wallpaper assets
-  '/w3.png',
-  '/fluid_wave_bg.png',
+  '/w3.jpg',
   profilePic,
+  tictactoeIcon,
+];
 
-  // Projects app icons & preview images
+// Secondary background assets loaded AFTER the session is interactive
+export const SECONDARY_IMAGES: string[] = [
+  '/fluid_wave_bg.jpg',
   garmentIcon,
   resumeLogo,
   resumeIoBg,
   gallery2,
   lpPortfolio,
   mbPortfolio,
-
-  // Education & certificates
   itahariLogo,
   arnikoLogo,
   '/certificates/class10.jpg',
   '/certificates/class12.jpg',
-
-  // Photos app gallery
   imageA,
   imageB,
   imageC,
   imageD,
-
-  // System & app icons
-  tictactoeIcon,
   '/apple-touch-icon.png',
 ];
 
@@ -89,8 +85,13 @@ export interface PreloadProgress {
  */
 export async function preloadAllAssets(
   onProgress?: (progress: PreloadProgress) => void,
-  maxTimeoutMs = 5000
+  maxTimeoutMs = 1500
 ): Promise<void> {
+  const isMobile = typeof window !== 'undefined' && (
+    window.innerWidth < 768 || 
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  );
+
   const total = CRITICAL_IMAGES.length;
   let loaded = 0;
 
@@ -107,15 +108,26 @@ export async function preloadAllAssets(
     updateProgress();
   });
 
-  // Race all preloads against a safety timeout
+  // Race all preloads against a fast safety timeout (800ms mobile, 1500ms desktop)
   const timeoutPromise = new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve();
-    }, maxTimeoutMs);
+    }, isMobile ? 800 : maxTimeoutMs);
   });
 
   await Promise.race([
     Promise.allSettled(preloadPromises),
     timeoutPromise
   ]);
+
+  // Silently preload secondary assets in the background during idle time
+  if (typeof window !== 'undefined') {
+    const idleCallback = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1000));
+    idleCallback(() => {
+      SECONDARY_IMAGES.forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
+    });
+  }
 }

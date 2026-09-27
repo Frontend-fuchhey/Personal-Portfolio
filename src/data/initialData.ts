@@ -1,9 +1,9 @@
 import itahariLogo from '../assets/itahari-logo.png';
 import arnikoLogo from '../assets/arniko-logo.png';
 import garmentIcon from '../assets/garmentflow.png';
-import gallery2 from '../assets/maingarment.png';
+import gallery2 from '../assets/maingarment.jpg';
 import mbPortfolio from '../assets/mb.png';
-import lpPortfolio from '../assets/lp.png';
+import lpPortfolio from '../assets/lp.jpg';
 import resumeIoBg from '../assets/resume-io.png';
 import resumeLogo from '../assets/resume-logo.png';
 
