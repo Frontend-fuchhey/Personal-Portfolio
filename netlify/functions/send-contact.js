@@ -16,7 +16,7 @@ function escapeHtml(str = '') {
 }
 
 /**
- * Generates the sleek, modern dark-themed Portfolio OS auto-reply email template.
+ * Generates an elegant, professional, clean auto-reply email template.
  */
 function buildAutoReplyHtml(name, message) {
   const safeName = escapeHtml(name);
@@ -27,109 +27,73 @@ function buildAutoReplyHtml(name, message) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transmission Received — Shrawan OS</title>
+  <title>Thank you for getting in touch</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f1f5f9; -webkit-font-smoothing: antialiased;">
-  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0b0f19; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1f2937; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; padding: 40px 16px;">
     <tr>
       <td align="center">
-        <!-- Container Card -->
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #111827; border: 1px solid #1f2937; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);">
-          
-          <!-- OS Window Header -->
+        <!-- Main Card -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
           <tr>
-            <td style="padding: 16px 20px; background-color: #172033; border-bottom: 1px solid #1f2937;">
-              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td width="55" valign="middle">
-                    <!-- macOS style traffic lights -->
-                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #ef4444; margin-right: 6px;"></span>
-                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #f59e0b; margin-right: 6px;"></span>
-                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #10b981;"></span>
-                  </td>
-                  <td align="right" valign="middle" style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #94a3b8; text-transform: uppercase;">
-                    Shrawan OS // Contact Terminal
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Banner / Greeting -->
-          <tr>
-            <td style="padding: 32px 28px 20px 28px;">
-              <div style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;">
-                Status: Transmission Received & Logged
-              </div>
-              <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">
+            <td style="padding: 36px 32px 32px 32px;">
+              <!-- Greeting -->
+              <h1 style="margin: 0 0 18px 0; font-size: 20px; font-weight: 600; color: #111827; line-height: 1.4;">
                 Hi ${safeName},
               </h1>
-              <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #cbd5e1;">
-                Thank you for reaching out through my Portfolio OS! Your message has been received and delivered directly to my personal inbox. I typically review and respond to new messages within 24 hours.
-              </p>
-            </td>
-          </tr>
 
-          <!-- Echoed Message Box -->
-          <tr>
-            <td style="padding: 0 28px 20px 28px;">
-              <div style="background-color: #0a0f1d; border: 1px solid #1e293b; border-left: 3px solid #3b82f6; border-radius: 8px; padding: 16px 18px;">
-                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px;">
-                  Echoed Message Content
+              <p style="margin: 0 0 18px 0; font-size: 15px; line-height: 1.6; color: #374151;">
+                Thank you for reaching out. I have received your message and will review it shortly. You can expect a response within 24 to 48 hours.
+              </p>
+
+              <!-- Message Summary Box -->
+              <div style="margin: 24px 0; background-color: #f9fafb; border: 1px solid #e5e7eb; border-left: 3px solid #2563eb; border-radius: 6px; padding: 16px 18px;">
+                <div style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                  Summary of your message:
                 </div>
-                <div style="font-size: 13px; line-height: 1.6; color: #e2e8f0; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;">
+                <div style="font-size: 14px; line-height: 1.6; color: #374151; word-break: break-word;">
                   ${safeMessage}
                 </div>
               </div>
-            </td>
-          </tr>
 
-          <!-- Communication Note -->
-          <tr>
-            <td style="padding: 0 28px 24px 28px;">
-              <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #94a3b8;">
-                If your project is time-sensitive or includes additional files/specifications, simply reply directly to this email thread anytime.
+              <p style="margin: 0 0 28px 0; font-size: 14px; line-height: 1.6; color: #4b5563;">
+                If you have any urgent updates or additional information, please feel free to reply directly to this email.
               </p>
-            </td>
-          </tr>
 
-          <!-- Divider -->
-          <tr>
-            <td style="padding: 0 28px;">
-              <div style="height: 1px; background-color: #1e293b; width: 100%;"></div>
-            </td>
-          </tr>
+              <!-- Divider -->
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 0 0 24px 0;" />
 
-          <!-- Signature & Footer -->
-          <tr>
-            <td style="padding: 24px 28px 28px 28px;">
-              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td>
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Shrawan Karki</div>
-                    <div style="font-size: 12px; color: #38bdf8; margin-top: 2px;">Frontend Developer &amp; UI/UX Designer</div>
-                    <div style="font-size: 12px; color: #64748b; margin-top: 12px;">
-                      <a href="https://shrawankarki.com.np" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 500;">shrawankarki.com.np</a> &bull;
-                      <a href="https://github.com/frontend-fuchhey" target="_blank" style="color: #94a3b8; text-decoration: none; margin-left: 6px;">GitHub</a> &bull;
-                      <a href="https://www.linkedin.com/in/shrawan-karki-187706428/" target="_blank" style="color: #94a3b8; text-decoration: none; margin-left: 6px;">LinkedIn</a>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Micro Footer -->
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; margin-top: 16px;">
-          <tr>
-            <td align="center" style="font-size: 11px; color: #475569;">
-              Sent automatically from Shrawan Portfolio OS &bull; Morang, Nepal
+              <!-- Professional Signature -->
+              <div>
+                <p style="margin: 0 0 4px 0; font-size: 14px; color: #4b5563;">
+                  Best regards,
+                </p>
+                <div style="font-size: 15px; font-weight: 600; color: #111827;">
+                  Shrawan Karki
+                </div>
+                <div style="font-size: 13px; color: #6b7280; margin-top: 2px;">
+                  Frontend Developer &amp; UI/UX Designer
+                </div>
+                <div style="font-size: 13px; margin-top: 12px;">
+                  <a href="https://shrawankarki.com.np" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 500;">shrawankarki.com.np</a>
+                  <span style="color: #9ca3af; margin: 0 6px;">&bull;</span>
+                  <a href="https://www.linkedin.com/in/shrawan-karki-187706428/" target="_blank" style="color: #4b5563; text-decoration: none;">LinkedIn</a>
+                  <span style="color: #9ca3af; margin: 0 6px;">&bull;</span>
+                  <a href="https://github.com/frontend-fuchhey" target="_blank" style="color: #4b5563; text-decoration: none;">GitHub</a>
+                </div>
+              </div>
             </td>
           </tr>
         </table>
 
+        <!-- Footer -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; margin-top: 20px;">
+          <tr>
+            <td align="center" style="font-size: 12px; color: #9ca3af;">
+              This is an automated confirmation sent from shrawankarki.com.np
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -146,7 +110,7 @@ async function sendViaWeb3FormsFallback({ name, email, message }) {
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({
       access_key: process.env.WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY,
-      subject: `[Portfolio Contact - Fallback] Message from ${name}`,
+      subject: `[Portfolio Contact] Message from ${name}`,
       from_name: name,
       email: email,
       message: message,
@@ -246,20 +210,20 @@ export const handler = async (event) => {
 
     // 1. Notification Email to Shrawan
     const notificationHtml = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <h2 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">New Contact Message from Portfolio OS</h2>
-        <p><strong>Sender:</strong> ${escapeHtml(trimmedName)}</p>
-        <p><strong>Email:</strong> <a href="mailto:${escapeHtml(trimmedEmail)}">${escapeHtml(trimmedEmail)}</a></p>
-        <p><strong>Date:</strong> ${new Date().toUTCString()}</p>
-        <div style="margin-top: 16px; padding: 16px; background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 4px;">
-          <h4 style="margin: 0 0 8px 0; color: #475569; font-size: 12px; text-transform: uppercase;">Message Content:</h4>
-          <div style="white-space: pre-wrap; color: #0f172a;">${escapeHtml(trimmedMessage)}</div>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
+        <h2 style="color: #0f172a; margin-top: 0; font-size: 18px; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">New Message from Portfolio Website</h2>
+        <p style="margin: 12px 0 6px 0;"><strong>Sender Name:</strong> ${escapeHtml(trimmedName)}</p>
+        <p style="margin: 6px 0 6px 0;"><strong>Sender Email:</strong> <a href="mailto:${escapeHtml(trimmedEmail)}" style="color: #2563eb;">${escapeHtml(trimmedEmail)}</a></p>
+        <p style="margin: 6px 0 16px 0; color: #64748b; font-size: 13px;"><strong>Date:</strong> ${new Date().toUTCString()}</p>
+        <div style="margin-top: 16px; padding: 16px; background-color: #f8fafc; border-left: 3px solid #2563eb; border-radius: 6px;">
+          <div style="margin: 0 0 8px 0; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Message:</div>
+          <div style="white-space: pre-wrap; color: #1e293b; font-size: 14px; line-height: 1.6;">${escapeHtml(trimmedMessage)}</div>
         </div>
       </div>
     `;
 
     const notificationPromise = transporter.sendMail({
-      from: `"Shrawan OS Portfolio" <${gmailUser}>`,
+      from: `"Portfolio Contact Form" <${gmailUser}>`,
       to: RECIPIENT_EMAIL,
       replyTo: trimmedEmail,
       subject: `[Portfolio Contact] Message from ${trimmedName}`,
@@ -267,14 +231,14 @@ export const handler = async (event) => {
       html: notificationHtml,
     });
 
-    // 2. High-end Auto-Reply Email to Visitor
+    // 2. Clean, Professional Auto-Reply Email to Visitor
     const autoReplyHtml = buildAutoReplyHtml(trimmedName, trimmedMessage);
-    const autoReplyText = `Hi ${trimmedName},\n\nThank you for reaching out through my Portfolio OS! Your transmission has been received and logged into my inbox. I typically review and respond to new messages within 24 hours.\n\nECHOED MESSAGE CONTENT:\n"${trimmedMessage}"\n\nIf your project is time-sensitive, simply reply directly to this email.\n\nBest,\nShrawan Karki\nFrontend Developer & UI/UX Designer\nhttps://shrawankarki.com.np`;
+    const autoReplyText = `Hi ${trimmedName},\n\nThank you for reaching out. I have received your message and will review it shortly. You can expect a response within 24 to 48 hours.\n\nSummary of your message:\n"${trimmedMessage}"\n\nIf you have any urgent updates or additional information, please feel free to reply directly to this email.\n\nBest regards,\nShrawan Karki\nFrontend Developer & UI/UX Designer\nhttps://shrawankarki.com.np`;
 
     const autoReplyPromise = transporter.sendMail({
       from: `"Shrawan Karki" <${gmailUser}>`,
       to: trimmedEmail,
-      subject: 'Transmission Received — Shrawan Karki',
+      subject: 'Thank you for getting in touch — Shrawan Karki',
       text: autoReplyText,
       html: autoReplyHtml,
     });
@@ -285,7 +249,7 @@ export const handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: true, message: 'Message and auto-reply dispatched successfully.' }),
+      body: JSON.stringify({ success: true, message: 'Message and confirmation email dispatched successfully.' }),
     };
 
   } catch (err) {
