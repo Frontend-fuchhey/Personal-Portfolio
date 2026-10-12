@@ -1,8 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -215,19 +212,6 @@
 }
 
 /* Glassmorphism utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
 
 .glass-window {
   background: rgba(255, 255, 255, 0.75);
@@ -295,26 +279,6 @@
   background: rgba(128, 128, 128, 0.5);
 }
 
-/* Mobile portfolio styles */
-.mobile-portfolio {
-  overflow-y: auto;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out forwards;
-}
 
 /* Forced Mobile Overrides - High Priority UI Fixes */
 /* Global Mobile Content Shift for Master Button */
@@ -337,11 +301,6 @@
 }
 
 /* Image rendering optimizations for high-resolution images */
-.image-render-auto {
-  image-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 .image-render-crisp {
   image-rendering: auto !important;

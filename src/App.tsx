@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { useState, useEffect, useRef, memo, useCallback, lazy, Suspense } from 'react';
 import { useIsMobile } from './hooks/use-mobile';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWindows } from './hooks/useWindows';
@@ -7,14 +7,6 @@ import { Dock } from './components/ui/Dock';
 import { TopBar } from './components/ui/TopBar';
 import { DesktopIcons } from './components/ui/DesktopIcons';
 import { BootScreen } from './components/ui/BootScreen';
-import { AboutApp } from './components/apps/AboutApp';
-import { ProjectsApp } from './components/apps/ProjectsApp';
-import { TerminalApp } from './components/apps/TerminalApp';
-import { ContactApp } from './components/apps/ContactApp';
-import { SettingsApp } from './components/apps/SettingsApp';
-import { AdminApp } from './components/apps/AdminApp';
-import { PhotosApp } from './components/apps/PhotosApp';
-import { TicTacToe } from './components/apps/TicTacToe';
 import { DesktopWidget } from './components/ui/DesktopWidget';
 import { AndroidStatusBar } from './components/android/AndroidStatusBar';
 import { AndroidDock } from './components/android/AndroidDock';
@@ -26,12 +18,20 @@ import { GlobalBackButton } from './components/ui/GlobalBackButton';
 import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
 import profilePic from './assets/shrawan.jpg';
-import { ResumeView } from './components/ResumeView';
-import { ResumeApp } from './components/apps/Resume';
 import TextPressure from './components/ui/TextPressure';
 import { preloadAllAssets } from './utils/preloadAssets';
 import { SafeImage } from './components/ui/SafeImage';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+
+const AboutApp = lazy(() => import('./components/apps/AboutApp').then(m => ({ default: m.AboutApp })));
+const ProjectsApp = lazy(() => import('./components/apps/ProjectsApp').then(m => ({ default: m.ProjectsApp })));
+const TerminalApp = lazy(() => import('./components/apps/TerminalApp').then(m => ({ default: m.TerminalApp })));
+const ContactApp = lazy(() => import('./components/apps/ContactApp').then(m => ({ default: m.ContactApp })));
+const SettingsApp = lazy(() => import('./components/apps/SettingsApp').then(m => ({ default: m.SettingsApp })));
+const AdminApp = lazy(() => import('./components/apps/AdminApp').then(m => ({ default: m.AdminApp })));
+const PhotosApp = lazy(() => import('./components/apps/PhotosApp').then(m => ({ default: m.PhotosApp })));
+const TicTacToe = lazy(() => import('./components/apps/TicTacToe').then(m => ({ default: m.TicTacToe })));
+const ResumeApp = lazy(() => import('./components/apps/Resume').then(m => ({ default: m.ResumeApp })));
 
 const initialWallpaper = WALLPAPERS[0];
 
@@ -378,18 +378,24 @@ export default function App() {
                     isRecentsView={isRecentsView}
                   >
                     <ErrorBoundary>
-                      <MemoizedAppContent
-                        appId={win.appId}
-                        wallpaper={wallpaper}
-                        onWallpaperChange={setWallpaper}
-                        onOpenApp={handleAppClick}
-                        windowId={win.id}
-                        onUpdateSize={updateSize}
-                        showClock={showClock}
-                        setShowClock={setShowClock}
-                        onResumeStateChange={setIsResumeOpen}
-                        onClose={() => handleCloseWindow(win.id)}
-                      />
+                      <Suspense fallback={
+                        <div className="w-full h-full flex items-center justify-center bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm">
+                          <div className="w-7 h-7 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                        </div>
+                      }>
+                        <MemoizedAppContent
+                          appId={win.appId}
+                          wallpaper={wallpaper}
+                          onWallpaperChange={setWallpaper}
+                          onOpenApp={handleAppClick}
+                          windowId={win.id}
+                          onUpdateSize={updateSize}
+                          showClock={showClock}
+                          setShowClock={setShowClock}
+                          onResumeStateChange={setIsResumeOpen}
+                          onClose={() => handleCloseWindow(win.id)}
+                        />
+                      </Suspense>
                     </ErrorBoundary>
                   </Window>
                 </div>
