@@ -24,23 +24,41 @@ export function ContactApp() {
     setErrorMessage(null);
 
     try {
+      // 1. Primary: Netlify serverless function (dispatches Gmail SMTP + custom HTML auto-reply)
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+      }).catch(() => null);
+
+      if (response && response.ok) {
+        setIsSuccess(true);
+        setFormData({ name: '', email: '', message: '', botField: '' });
+        return;
+      }
+
+      // 2. Resilient Fallback: If serverless endpoint fails, dispatch directly via Web3Forms
+      const fallbackResponse = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: '97d3105d-c0c0-488d-9f46-b4c76208352b',
+          from_name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `[Portfolio Contact] Message from ${formData.name}`,
+        }),
       });
 
-      const data = await response.json().catch(() => ({}));
-
-      if (response.ok) {
+      if (fallbackResponse.ok) {
         setIsSuccess(true);
         setFormData({ name: '', email: '', message: '', botField: '' });
       } else {
-        setErrorMessage(data.error || 'Failed to send message. Please try again or email directly.');
+        setErrorMessage('Failed to send message. Please email pratyushkarki6@gmail.com directly.');
       }
     } catch (error) {
-      console.error('Network Error submitting contact form:', error);
-      setErrorMessage('Network connection error. Please verify your connection or email directly.');
+      console.error('Contact submission error:', error);
+      setErrorMessage('Network error. Please email pratyushkarki6@gmail.com directly.');
     } finally {
       setIsSubmitting(false);
     }
