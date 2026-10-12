@@ -17,12 +17,12 @@ import tictactoeIcon from '../assets/tictactoe.png';
 export const CRITICAL_IMAGES: string[] = [
   '/w3.jpg',
   profilePic,
-  tictactoeIcon,
 ];
 
 // Secondary background assets loaded AFTER the session is interactive
 export const SECONDARY_IMAGES: string[] = [
   '/fluid_wave_bg.jpg',
+  tictactoeIcon,
   garmentIcon,
   resumeLogo,
   resumeIoBg,
@@ -37,7 +37,6 @@ export const SECONDARY_IMAGES: string[] = [
   imageB,
   imageC,
   imageD,
-  '/apple-touch-icon.png',
 ];
 
 /**
@@ -120,14 +119,20 @@ export async function preloadAllAssets(
     timeoutPromise
   ]);
 
-  // Silently preload secondary assets in the background during idle time
+  // Silently preload secondary assets in the background during idle time in small batches
   if (typeof window !== 'undefined') {
     const idleCallback = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1000));
     idleCallback(() => {
-      SECONDARY_IMAGES.forEach((src) => {
+      let index = 0;
+      const loadNext = () => {
+        if (index >= SECONDARY_IMAGES.length) return;
+        const src = SECONDARY_IMAGES[index++];
         const img = new Image();
+        img.onload = () => setTimeout(loadNext, 100);
+        img.onerror = () => setTimeout(loadNext, 100);
         img.src = src;
-      });
+      };
+      loadNext();
     });
   }
 }
