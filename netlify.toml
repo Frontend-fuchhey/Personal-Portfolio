@@ -25,6 +25,12 @@
     Content-Type = "application/pdf"
     Content-Disposition = "attachment; filename=\"Shrawan_karki_CV.pdf\""
 
+# Route API requests to Netlify serverless function
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/send-contact"
+  status = 200
+
 # SPA fallback: route all other paths to index.html for client-side routing
 [[redirects]]
   from = "/*"

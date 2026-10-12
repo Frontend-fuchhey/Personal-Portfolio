@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Mail, Linkedin, Github, MapPin, Send, Copy, Check } from 'lucide-react';
+import { Mail, Linkedin, Github, MapPin, Send, Copy, Check, AlertCircle } from 'lucide-react';
 import { USER_CONFIG } from '../../data/userConfig';
 import profilePic from '../../assets/shrawan.jpg';
 
 export function ContactApp() {
   const [isSuccess, setIsSuccess] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', botField: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const isFormReady = formData.name.trim() !== '' && formData.email.trim() !== '' && formData.message.trim() !== '';
@@ -20,23 +21,26 @@ export function ContactApp() {
     e.preventDefault();
     e.stopPropagation();
     setIsSubmitting(true);
+    setErrorMessage(null);
+
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: '97d3105d-c0c0-488d-9f46-b4c76208352b',
-          ...formData
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
+
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
         setIsSuccess(true);
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', message: '', botField: '' });
       } else {
-        console.error('API Error submitting contact form:', response.statusText);
+        setErrorMessage(data.error || 'Failed to send message. Please try again or email directly.');
       }
     } catch (error) {
       console.error('Network Error submitting contact form:', error);
+      setErrorMessage('Network connection error. Please verify your connection or email directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -177,6 +181,26 @@ export function ContactApp() {
           ) : (
             <form onSubmit={submissionHandler} className="w-full flex-1 flex flex-col justify-between min-h-0 overflow-visible">
               <div className="space-y-3">
+                {/* Honeypot field (hidden from genuine users) */}
+                <input
+                  type="text"
+                  name="botField"
+                  value={formData.botField}
+                  onChange={e => setFormData(p => ({ ...p, botField: e.target.value }))}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                />
+
+                {/* Error Banner */}
+                {errorMessage && (
+                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[11px] leading-tight">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 {/* Name Input */}
                 <div className="relative border border-zinc-200 rounded-lg py-1.5 px-2.5 focus-within:border-zinc-400">
                   <label className="absolute -top-2 left-2.5 bg-white px-1 text-[9px] font-bold text-zinc-500">
@@ -185,10 +209,11 @@ export function ContactApp() {
                   <input
                     type="text"
                     required
+                    disabled={isSubmitting}
                     value={formData.name}
                     onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
                     placeholder="Your name here"
-                    className="w-full bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5"
+                    className="w-full bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5 disabled:opacity-50"
                   />
                 </div>
 
@@ -200,10 +225,11 @@ export function ContactApp() {
                   <input
                     type="email"
                     required
+                    disabled={isSubmitting}
                     value={formData.email}
                     onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
                     placeholder="your.email@example.com"
-                    className="w-full bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5"
+                    className="w-full bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5 disabled:opacity-50"
                   />
                 </div>
 
@@ -214,10 +240,11 @@ export function ContactApp() {
                   </label>
                   <textarea
                     required
+                    disabled={isSubmitting}
                     value={formData.message}
                     onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
                     placeholder="Tell me about your project..."
-                    className="w-full h-16 md:h-20 bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5 resize-none"
+                    className="w-full h-16 md:h-20 bg-transparent outline-none text-xs text-zinc-800 placeholder-zinc-300 pt-0.5 resize-none disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -225,7 +252,7 @@ export function ContactApp() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isFormReady}
                 className={`w-full mt-4 active:scale-[0.98] text-white font-bold text-[10px] tracking-widest py-3 rounded-lg transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 ${isFormReady
                   ? 'bg-blue-600 hover:bg-blue-700 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
                   : 'bg-zinc-950 hover:bg-zinc-800'
