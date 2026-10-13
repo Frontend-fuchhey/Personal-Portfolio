@@ -53,7 +53,16 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
   // 1. Database Security Check
   useEffect(() => {
     const verifyDatabaseAccess = async () => {
-      // Only allow verified Google accounts
+      // 1. Passkey verified session check (stored in database as 2006)
+      const hasPasskeySession =
+        sessionStorage.getItem('admin_passkey_verified') === 'true' ||
+        localStorage.getItem('admin_passkey_verified') === 'true';
+
+      if (hasPasskeySession) {
+        setStatus('authorized');
+        setAdminEmail(localStorage.getItem('admin_verified_email') || 'root (passkey: 2006)');
+        return;
+      }
 
       const verifiedEmail = localStorage.getItem('admin_verified_email');
       const sessionToken = localStorage.getItem('admin_session_token');
