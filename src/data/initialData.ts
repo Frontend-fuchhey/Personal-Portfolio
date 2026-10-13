@@ -6,6 +6,10 @@ import mbPortfolio from '../assets/mb.png';
 import lpPortfolio from '../assets/lp.jpg';
 import resumeIoBg from '../assets/resume-io.png';
 import resumeLogo from '../assets/resume-logo.png';
+import imageA from '../assets/galleryimages/ImageA.png';
+import imageB from '../assets/galleryimages/ImageB.jpg';
+import imageC from '../assets/galleryimages/ImageC.jpg';
+import imageD from '../assets/galleryimages/ImageD.png';
 
 export const INITIAL_ABOUT_DATA = {
   experience: [
@@ -128,5 +132,55 @@ export const INITIAL_PROJECTS = [
     iconValue: resumeLogo,
     color: 'from-emerald-500 to-teal-600',
     subHeader: 'Automatic Resume Builder with live preview & instant export.'
+  }
+];
+
+export const STATIC_GALLERY_CATEGORIES = [
+  "All",
+  "Tech Team",
+  "Events & Moments",
+  "Projects & Hackathons"
+] as const;
+
+export const STATIC_GALLERY_ITEMS = [
+  {
+    id: "01",
+    category: "Tech Team",
+    subCategory: "BEHIND THE SCENES",
+    date: "February 2026",
+    title: "Rato Topi Technical Support Operations",
+    description: "Managing network infrastructure, web portals, live evaluation tools, and technical logistics during event operations.",
+    image: imageA,
+    tags: ["Network Routing", "Web Portals", "Rato Topi"]
+  },
+  {
+    id: "02",
+    category: "Events & Moments",
+    subCategory: "EVENT PHOTOGRAPH",
+    date: "January 2026",
+    title: "GPLC Intellect Award Ceremony & Champions",
+    description: "Celebrating with champions, faculty, and administration during the grand finale and awards distribution.",
+    image: imageB,
+    tags: ["GPLC Intellect", "Recognition"]
+  },
+  {
+    id: "03",
+    category: "Events & Moments",
+    subCategory: "SUMMIT HIGHLIGHT",
+    date: "December 2025",
+    title: "AI Summit Nepal — Kathmandu",
+    description: "Engaging with industry leaders and technical teams at AI Summit Nepal, discussing autonomous agent architectures and frontend systems.",
+    image: imageC,
+    tags: ["AI Summit", "Kathmandu"]
+  },
+  {
+    id: "04",
+    category: "Projects & Hackathons",
+    subCategory: "HACKATHON MOMENT",
+    date: "October 2025",
+    title: "National AI Hackathon Highlights",
+    description: "Participating and building full-stack interactive prototypes in competitive team environments.",
+    image: imageD,
+    tags: ["Hackathon", "AWS", "AI"]
   }
 ];
