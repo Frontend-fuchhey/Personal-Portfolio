@@ -413,6 +413,14 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
             { type: 'error', text: `✖ Authentication cancelled: Google popup was closed.` },
             { type: 'output', text: `Authentication cancelled.` }
           ]);
+        } else if (err?.code === 'auth/unauthorized-domain') {
+          const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your domain';
+          setHistory(h => [
+            ...h,
+            { type: 'error', text: `✖ Firebase Security Error: Domain '${currentHost}' is not authorized.` },
+            { type: 'output', text: `● Fix in Firebase Console: Authentication → Settings → Authorized domains → Add '${currentHost}'` },
+            { type: 'output', text: `● Quick bypass: Choose '2. Use Pass Key' (passkey: 'admin' or your configured root key) to enter immediately.` }
+          ]);
         } else {
           setHistory(h => [
             ...h,
@@ -454,6 +462,14 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
             ...h,
             { type: 'error', text: `✖ Authentication cancelled: Google popup was closed.` },
             { type: 'output', text: `Authentication cancelled.` }
+          ]);
+        } else if (err?.code === 'auth/unauthorized-domain') {
+          const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'your domain';
+          setHistory(h => [
+            ...h,
+            { type: 'error', text: `✖ Firebase Security Error: Domain '${currentHost}' is not authorized.` },
+            { type: 'output', text: `● Fix in Firebase Console: Authentication → Settings → Authorized domains → Add '${currentHost}'` },
+            { type: 'output', text: `● Quick bypass: Choose '2. Use Pass Key' (passkey: 'admin') to enter immediately.` }
           ]);
         } else {
           setHistory(h => [
