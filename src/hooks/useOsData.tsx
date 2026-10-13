@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_ABOUT_DATA, INITIAL_PROJECTS } from '../data/initialData';
+import { subscribeToProjects, saveProject, deleteProjectFromDb, ProjectItem } from '../lib/portfolioDataService';
 
 interface OsDataContextType {
   aboutData: typeof INITIAL_ABOUT_DATA;
-  projects: typeof INITIAL_PROJECTS;
+  projects: any[];
   updateExperience: (id: string, updated: any) => void;
   updateEducation: (id: string, updated: any) => void;
   updateProject: (id: string, updated: any) => void;
@@ -19,7 +20,17 @@ const OsDataContext = createContext<OsDataContextType | undefined>(undefined);
 
 export function OsDataProvider({ children }: { children: React.ReactNode }) {
   const [aboutData, setAboutData] = useState(INITIAL_ABOUT_DATA);
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+  const [projects, setProjects] = useState<any[]>(INITIAL_PROJECTS);
+
+  // Subscribe to live Firestore projects
+  useEffect(() => {
+    const unsubscribe = subscribeToProjects((liveProjects) => {
+      if (liveProjects && liveProjects.length > 0) {
+        setProjects(liveProjects);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const updateExperience = (id: string, updated: any) => {
     setAboutData(prev => ({
@@ -63,16 +74,24 @@ export function OsDataProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
-  const updateProject = (id: string, updated: any) => {
+  const updateProject = async (id: string, updated: any) => {
     setProjects(prev => prev.map(proj => proj.id === id ? { ...proj, ...updated } : proj));
+    const target = projects.find(p => p.id === id);
+    if (target) {
+      await saveProject({ ...target, ...updated, id } as ProjectItem).catch(console.error);
+    }
   };
 
-  const addProject = (newProj: any) => {
-    setProjects(prev => [...prev, { ...newProj, id: Math.random().toString(36).substr(2, 9) }]);
+  const addProject = async (newProj: any) => {
+    const id = newProj.id || `proj_${Date.now()}`;
+    const project = { ...newProj, id };
+    setProjects(prev => [...prev, project]);
+    await saveProject(project as ProjectItem).catch(console.error);
   };
 
-  const deleteProject = (id: string) => {
+  const deleteProject = async (id: string) => {
     setProjects(prev => prev.filter(proj => proj.id !== id));
+    await deleteProjectFromDb(id).catch(console.error);
   };
 
   return (

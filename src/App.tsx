@@ -119,7 +119,13 @@ export default function App() {
   const [showClock, setShowClock] = useState(true);
   
   const isMobile = useIsMobile();
-  
+  if (typeof window !== 'undefined') {
+    const p = window.location.pathname.toLowerCase();
+    const h = window.location.hash.toLowerCase();
+    if (p === '/admin' || p.startsWith('/admin/') || h === '#admin' || h === '#/admin') {
+      return <AdminApp isStandalone={true} />;
+    }
+  }
   const [isBooted, setIsBooted] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState(0);

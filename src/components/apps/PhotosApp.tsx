@@ -5,73 +5,41 @@ import imageA from "../../assets/galleryimages/ImageA.png";
 import imageB from "../../assets/galleryimages/ImageB.jpg";
 import imageC from "../../assets/galleryimages/ImageC.jpg";
 import imageD from "../../assets/galleryimages/ImageD.png";
-
-// MUST BE OUTSIDE THE COMPONENT FUNCTION TO PREVENT CONSTANT RE-CREATION
-export const STATIC_GALLERY_CATEGORIES = [
-  "All",
-  "Tech Team",
-  "Events & Moments",
-  "Projects & Hackathons"
-] as const;
-
-export const STATIC_GALLERY_ITEMS = [
-  {
-    id: "01",
-    category: "Tech Team",
-    subCategory: "BEHIND THE SCENES",
-    date: "February 2026",
-    title: "Rato Topi Technical Support Operations",
-    description: "Managing network infrastructure, web portals, live evaluation tools, and technical logistics during event operations.",
-    image: imageA,
-    tags: ["Network Routing", "Web Portals", "Rato Topi"]
-  },
-  {
-    id: "02",
-    category: "Events & Moments",
-    subCategory: "EVENT PHOTOGRAPH",
-    date: "January 2026",
-    title: "GPLC Intellect Award Ceremony & Champions",
-    description: "Celebrating with champions, faculty, and administration during the grand finale and awards distribution.",
-    image: imageB,
-    tags: ["GPLC Intellect", "Recognition"]
-  },
-  {
-    id: "03",
-    category: "Events & Moments",
-    subCategory: "SUMMIT HIGHLIGHT",
-    date: "December 2025",
-    title: "AI Summit Nepal — Kathmandu",
-    description: "Engaging with industry leaders and technical teams at AI Summit Nepal, discussing autonomous agent architectures and frontend systems.",
-    image: imageC,
-    tags: ["AI Summit", "Kathmandu"]
-  },
-  {
-    id: "04",
-    category: "Projects & Hackathons",
-    subCategory: "HACKATHON MOMENT",
-    date: "October 2025",
-    title: "National AI Hackathon Highlights",
-    description: "Participating and building full-stack interactive prototypes in competitive team environments.",
-    image: imageD,
-    tags: ["Hackathon", "AWS", "AI"]
-  }
-];
+import { subscribeToPhotos, PhotoItem } from "../../lib/portfolioDataService";
+import { STATIC_GALLERY_CATEGORIES, STATIC_GALLERY_ITEMS } from "../../data/initialData";
+export { STATIC_GALLERY_CATEGORIES, STATIC_GALLERY_ITEMS };
 
 // Backwards-compatible aliases
 export const galleryCategories = STATIC_GALLERY_CATEGORIES;
 export const galleryItems = STATIC_GALLERY_ITEMS;
 
 export const PhotosApp = memo(() => {
+  const [items, setItems] = useState<PhotoItem[]>(STATIC_GALLERY_ITEMS as unknown as PhotoItem[]);
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToPhotos((livePhotos) => {
+      if (livePhotos && livePhotos.length > 0) {
+        setItems(livePhotos);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
+  const categories = useMemo(() => {
+    const customCats = Array.from(new Set(items.map((i) => i.category).filter(Boolean)));
+    const merged = Array.from(new Set([...STATIC_GALLERY_CATEGORIES, ...customCats]));
+    return merged;
+  }, [items]);
+
   const filteredItems = useMemo(() => {
-    if (activeCategory === "All") return STATIC_GALLERY_ITEMS;
-    return STATIC_GALLERY_ITEMS.filter((item) => item.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "All") return items;
+    return items.filter((item) => item.category === activeCategory);
+  }, [activeCategory, items]);
 
   const handleSelectIdx = useCallback((idx: number) => {
     setSelectedIdx(idx);
@@ -147,7 +115,7 @@ export const PhotosApp = memo(() => {
               msOverflowStyle: 'none',
             }}
           >
-            {STATIC_GALLERY_CATEGORIES.map((category) => {
+            {categories.map((category) => {
               const isActive = activeCategory === category;
               return (
                 <button
