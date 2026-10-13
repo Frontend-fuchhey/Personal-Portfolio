@@ -9,6 +9,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Config & Settings collection for passkey storage (passkey: 2006)
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // Projects: Public read for portfolio visitors, write allowed for admin
     match /projects/{projectId} {
       allow read: if true;
