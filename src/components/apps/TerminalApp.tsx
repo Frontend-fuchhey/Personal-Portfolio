@@ -519,30 +519,38 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
     ]);
 
     let isValid = false;
+    let notConfigured = false;
     try {
-      // Verify against Firestore document config/auth
+      // Query Firestore database document config/auth
       const configRef = doc(db, 'config', 'auth');
       const snap = await getDoc(configRef);
       if (snap.exists() && snap.data()?.passkey) {
-        isValid = String(snap.data().passkey).trim() === entered;
+        const dbPasskey = String(snap.data().passkey).trim();
+        isValid = dbPasskey === entered;
       } else {
-        // Automatically seed passkey 2006 to Firestore
-        if (entered === '2006') {
-          try {
-            await setDoc(configRef, { passkey: '2006', updatedAt: Date.now() }, { merge: true });
-          } catch {
-            // ignore
-          }
-          isValid = true;
-        }
+        notConfigured = true;
       }
-    } catch {
-      // Offline fallback
-      if (entered === '2006') isValid = true;
+    } catch (err: any) {
+      setHistory(h => [
+        ...h,
+        { type: 'error', text: `✖ Database error while verifying passkey: ${err?.message || 'Access denied'}` },
+        { type: 'output', text: `Authentication failed.` }
+      ]);
+      setAuthMode('none');
+      setPasskeyInput('');
+      return;
     }
 
-    if (!isValid && entered === '2006') {
-      isValid = true;
+    if (notConfigured) {
+      setHistory(h => [
+        ...h,
+        { type: 'error', text: `✖ Access Denied: No passkey is configured in Firestore (collection 'config' -> document 'auth').` },
+        { type: 'output', text: `Please add document 'auth' with field 'passkey' in your Firebase Console.` },
+        { type: 'output', text: `Authentication failed.` }
+      ]);
+      setAuthMode('none');
+      setPasskeyInput('');
+      return;
     }
 
     if (isValid) {
@@ -550,7 +558,7 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
       sessionStorage.setItem('admin_session', 'true');
       localStorage.setItem('admin_passkey_verified', 'true');
       localStorage.setItem('admin_session', 'true');
-      localStorage.setItem('admin_verified_email', 'admin (passkey: 2006)');
+      localStorage.setItem('admin_verified_email', 'admin (database passkey)');
       setAuthMode('none');
       setPasskeyInput('');
 

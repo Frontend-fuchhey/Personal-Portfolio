@@ -12,7 +12,10 @@ import {
   X, 
   FolderKanban, 
   Image as ImageIcon, 
-  Search
+  Search,
+  Key,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { auth, db } from '../../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -27,7 +30,9 @@ import {
   savePhoto, 
   deletePhotoFromDb,
   seedInitialProjectsIfEmpty,
-  seedInitialPhotosIfEmpty
+  seedInitialPhotosIfEmpty,
+  getDatabasePasskey,
+  saveDatabasePasskey
 } from '../../lib/portfolioDataService';
 
 interface AdminAppProps {
@@ -39,28 +44,45 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
   // Content state
-  const [activeTab, setActiveTab] = useState<'projects' | 'photos'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'photos' | 'security'>('projects');
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  // Database Passkey Management state
+  const [currentDbPasskey, setCurrentDbPasskey] = useState<string | null>(null);
+  const [newPasskeyInput, setNewPasskeyInput] = useState('');
+  const [showPasskey, setShowPasskey] = useState(false);
+  const [isLoadingPasskey, setIsLoadingPasskey] = useState(false);
+
   // Edit / Create Modals
   const [editingProject, setEditingProject] = useState<Partial<ProjectItem> | null>(null);
   const [editingPhoto, setEditingPhoto] = useState<Partial<PhotoItem> | null>(null);
 
+  // Load passkey from Firestore when authorized
+  useEffect(() => {
+    if (status === 'authorized') {
+      setIsLoadingPasskey(true);
+      getDatabasePasskey()
+        .then((pk) => setCurrentDbPasskey(pk))
+        .catch(() => setCurrentDbPasskey(null))
+        .finally(() => setIsLoadingPasskey(false));
+    }
+  }, [status, activeTab]);
+
   // 1. Database Security Check
   useEffect(() => {
     const verifyDatabaseAccess = async () => {
-      // 1. Passkey verified session check (stored in database as 2006)
+      // 1. Database Passkey verified session check
       const hasPasskeySession =
         sessionStorage.getItem('admin_passkey_verified') === 'true' ||
         localStorage.getItem('admin_passkey_verified') === 'true';
 
       if (hasPasskeySession) {
         setStatus('authorized');
-        setAdminEmail(localStorage.getItem('admin_verified_email') || 'root (passkey: 2006)');
+        setAdminEmail(localStorage.getItem('admin_verified_email') || 'root (database passkey)');
         return;
       }
 
@@ -271,6 +293,27 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
     }
   };
 
+  // --- Passkey Database Actions ---
+  const handleUpdatePasskey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPasskeyInput.trim()) {
+      alert('Please enter a new passkey.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await saveDatabasePasskey(newPasskeyInput.trim());
+      setCurrentDbPasskey(newPasskeyInput.trim());
+      setNewPasskeyInput('');
+      showNotification('Passkey saved and updated live in Firestore (config/auth).');
+    } catch (err: any) {
+      alert(`Error updating passkey in Firestore: ${err?.message || 'Check Firestore rules for collection config'}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // ================= RENDER STATES =================
   if (status === 'checking') {
     return (
@@ -392,38 +435,52 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
               <ImageIcon className="w-4 h-4" />
               <span>Photo Gallery ({photos.length})</span>
             </button>
+
+            <button
+              onClick={() => { setActiveTab('security'); setSearchQuery(''); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'security'
+                  ? 'bg-white text-zinc-900 shadow-sm'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              <Key className="w-4 h-4" />
+              <span>Security & Passkey</span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 sm:w-64">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder={`Search ${activeTab}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-colors shadow-xs"
-              />
+          {activeTab !== 'security' && (
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-colors shadow-xs"
+                />
+              </div>
+
+              {activeTab === 'projects' ? (
+                <button
+                  onClick={() => setEditingProject({ name: '', category: 'React', description: '', tech: [], subHeader: '', url: '', demoUrl: '', coverImage: '' })}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-zinc-900 text-white hover:bg-black rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Project</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setEditingPhoto({ title: '', category: 'Tech Team', subCategory: 'GALLERY MOMENT', date: 'October 2026', image: '', description: '', tags: [] })}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-zinc-900 text-white hover:bg-black rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Photo</span>
+                </button>
+              )}
             </div>
-
-            {activeTab === 'projects' ? (
-              <button
-                onClick={() => setEditingProject({ name: '', category: 'React', description: '', tech: [], subHeader: '', url: '', demoUrl: '', coverImage: '' })}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-zinc-900 text-white hover:bg-black rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Project</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setEditingPhoto({ title: '', category: 'Tech Team', subCategory: 'GALLERY MOMENT', date: 'October 2026', image: '', description: '', tags: [] })}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-zinc-900 text-white hover:bg-black rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Photo</span>
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* TAB 1: PROJECTS MANAGEMENT */}
@@ -588,6 +645,89 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
                 <p className="text-zinc-500 text-sm">No photos found matching your search.</p>
               </div>
             )}
+          </section>
+        )}
+
+        {/* TAB 3: DATABASE SECURITY & PASSKEY MANAGEMENT */}
+        {activeTab === 'security' && (
+          <section className="flex flex-col gap-6 max-w-2xl">
+            <div className="bg-white border border-zinc-200 rounded-2xl p-6 sm:p-8 shadow-xs flex flex-col gap-6">
+              <div className="flex items-start gap-4 pb-5 border-b border-zinc-200">
+                <div className="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
+                  <Key className="w-5 h-5 text-zinc-900" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-zinc-900 tracking-tight">Database Passkey Management</h3>
+                  <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    This passkey is stored live in Cloud Firestore (<span className="font-mono text-zinc-700 bg-zinc-100 px-1.5 py-0.5 rounded">config/auth</span>) and is verified when you authenticate via <span className="font-mono text-zinc-700 bg-zinc-100 px-1.5 py-0.5 rounded">sudo admin</span> in the portfolio terminal. It is not hardcoded anywhere in the codebase.
+                  </p>
+                </div>
+              </div>
+
+              {/* Current Passkey in Database */}
+              <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Current Database Passkey</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {isLoadingPasskey ? (
+                      <span className="text-xs text-zinc-400 flex items-center gap-1.5">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Fetching from Firestore...
+                      </span>
+                    ) : currentDbPasskey ? (
+                      <span className="text-sm font-mono font-bold text-zinc-900">
+                        {showPasskey ? currentDbPasskey : '••••••••'}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                        Not configured in database yet
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {currentDbPasskey && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPasskey(!showPasskey)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-100 border border-zinc-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer self-start sm:self-auto shadow-xs"
+                  >
+                    {showPasskey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    <span>{showPasskey ? 'Hide Passkey' : 'Reveal Passkey'}</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Form to Update Passkey */}
+              <form onSubmit={handleUpdatePasskey} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-zinc-700 mb-1.5">
+                    Enter New Database Passkey
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter new passkey..."
+                    value={newPasskeyInput}
+                    onChange={(e) => setNewPasskeyInput(e.target.value)}
+                    className="w-full bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 transition-colors shadow-xs font-mono"
+                  />
+                  <p className="text-[11px] text-zinc-500 mt-1.5">
+                    Saving writes directly to Firestore document <span className="font-mono text-zinc-700">config/auth</span>. You will immediately need this new key when running <span className="font-mono text-zinc-700">sudo admin</span>.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSaving || !newPasskeyInput.trim()}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold bg-zinc-900 text-white hover:bg-black rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>Save Passkey to Live Database</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </section>
         )}
       </main>
