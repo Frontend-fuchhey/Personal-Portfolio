@@ -53,15 +53,7 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
   // 1. Database Security Check
   useEffect(() => {
     const verifyDatabaseAccess = async () => {
-      const hasPasskeySession =
-        sessionStorage.getItem('admin_passkey_verified') === 'true' ||
-        localStorage.getItem('admin_passkey_verified') === 'true';
-
-      if (hasPasskeySession) {
-        setStatus('authorized');
-        setAdminEmail('root (passkey)');
-        return;
-      }
+      // Only allow verified Google accounts
 
       const verifiedEmail = localStorage.getItem('admin_verified_email');
       const sessionToken = localStorage.getItem('admin_session_token');
@@ -190,7 +182,18 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
       setEditingProject(null);
       showNotification('Project saved successfully to live database.');
     } catch (err: any) {
-      alert(`Error saving project: ${err?.message || 'Check Firestore permissions'}`);
+      if (err?.code === 'permission-denied' || err?.message?.toLowerCase().includes('permission')) {
+        alert(
+          `Permission Denied in Firestore:\n\n` +
+          `Your Cloud Firestore Security Rules in Firebase Console are currently blocking writes.\n\n` +
+          `To fix:\n` +
+          `1. Open Firebase Console -> Firestore Database -> Rules tab.\n` +
+          `2. Allow writes to 'projects' and 'photos' collections.\n` +
+          `3. Click Publish.`
+        );
+      } else {
+        alert(`Error saving project: ${err?.message || 'Check Firestore permissions'}`);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -230,7 +233,18 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
       setEditingPhoto(null);
       showNotification('Photo saved successfully to live gallery.');
     } catch (err: any) {
-      alert(`Error saving photo: ${err?.message || 'Check Firestore permissions'}`);
+      if (err?.code === 'permission-denied' || err?.message?.toLowerCase().includes('permission')) {
+        alert(
+          `Permission Denied in Firestore:\n\n` +
+          `Your Cloud Firestore Security Rules in Firebase Console are currently blocking writes.\n\n` +
+          `To fix:\n` +
+          `1. Open Firebase Console -> Firestore Database -> Rules tab.\n` +
+          `2. Allow writes to 'projects' and 'photos' collections.\n` +
+          `3. Click Publish.`
+        );
+      } else {
+        alert(`Error saving photo: ${err?.message || 'Check Firestore permissions'}`);
+      }
     } finally {
       setIsSaving(false);
     }
