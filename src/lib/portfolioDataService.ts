@@ -206,3 +206,31 @@ export async function deletePhotoFromDb(photoId: string): Promise<void> {
   const docRef = doc(db, PHOTOS_COLLECTION, photoId);
   await deleteDoc(docRef);
 }
+
+/**
+ * Read the current administrator passkey from Firestore (collection 'config', document 'auth').
+ */
+export async function getDatabasePasskey(): Promise<string | null> {
+  try {
+    const configRef = doc(db, 'config', 'auth');
+    const snap = await getDoc(configRef);
+    if (snap.exists() && snap.data()?.passkey) {
+      return String(snap.data().passkey).trim();
+    }
+    return null;
+  } catch (err) {
+    console.error('Failed to read passkey from Firestore:', err);
+    return null;
+  }
+}
+
+/**
+ * Save or update the administrator passkey in Firestore (collection 'config', document 'auth').
+ */
+export async function saveDatabasePasskey(newPasskey: string): Promise<void> {
+  const configRef = doc(db, 'config', 'auth');
+  await setDoc(configRef, {
+    passkey: newPasskey.trim(),
+    updatedAt: Date.now()
+  }, { merge: true });
+}
