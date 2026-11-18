@@ -305,12 +305,42 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
     ]);
 
     try {
-      const userDocRef = doc(db, 'users', email);
-      const docSnap = await getDoc(userDocRef);
+      // 1. Try exact lowercase email
+      let userDocRef = doc(db, 'users', email);
+      let docSnap = await getDoc(userDocRef);
+      let matchedEmail = email;
 
-      if (docSnap.exists() && docSnap.data()?.admin === true) {
+      // 2. Fallback: try raw email casing if different
+      if (!docSnap.exists() && emailToVerify.trim() !== email) {
+        const rawRef = doc(db, 'users', emailToVerify.trim());
+        const rawSnap = await getDoc(rawRef);
+        if (rawSnap.exists()) {
+          docSnap = rawSnap;
+          matchedEmail = emailToVerify.trim();
+        }
+      }
+
+      // 3. Fallback: check with trailing whitespace if accidental space in Firestore Doc ID
+      if (!docSnap.exists()) {
+        const spaceRef = doc(db, 'users', `${email} `);
+        const spaceSnap = await getDoc(spaceRef);
+        if (spaceSnap.exists()) {
+          docSnap = spaceSnap;
+          matchedEmail = `${email} `;
+        }
+      }
+
+      const adminVal = docSnap.exists() ? docSnap.data()?.admin : undefined;
+      const isVerified =
+        adminVal === true ||
+        adminVal === 'true' ||
+        adminVal === 'TRUE' ||
+        adminVal === 1 ||
+        adminVal === '1';
+
+      if (isVerified) {
         const sessionToken = `admin_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        localStorage.setItem('admin_verified_email', email);
+        localStorage.setItem('admin_verified_email', matchedEmail.trim());
         localStorage.setItem('admin_session_token', sessionToken);
         localStorage.setItem('admin_session', 'true');
         sessionStorage.setItem('admin_session', 'true');
@@ -350,7 +380,8 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
           }
         ]);
         setAuthMode('none');
-      } else {
+      } else if (docSnap.exists()) {
+        // Document exists, but admin field is not truthy
         try {
           await signOut(auth);
         } catch {
@@ -358,22 +389,62 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
         }
         setHistory(h => [
           ...h,
-          { type: 'error', text: `✖ Access Denied: ${email} is not configured as an Admin in Firestore.` },
+          {
+            type: 'error',
+            text: `✖ Access Denied: Document 'users/${matchedEmail}' exists in Firestore, but field 'admin' is set to ${JSON.stringify(adminVal)} instead of true.`
+          },
+          { type: 'output', text: `Authentication failed.` }
+        ]);
+        setAuthMode('none');
+      } else {
+        // Document does not exist
+        try {
+          await signOut(auth);
+        } catch {
+          // ignore
+        }
+        setHistory(h => [
+          ...h,
+          {
+            type: 'error',
+            text: `✖ Access Denied: No document found at 'users/${email}' in Firestore.`
+          },
+          {
+            type: 'output',
+            text: `Please check your Firestore Console under collection 'users' to ensure document ID matches '${email}'.`
+          },
           { type: 'output', text: `Authentication failed.` }
         ]);
         setAuthMode('none');
       }
-    } catch {
+    } catch (err: any) {
+      console.error('Firestore admin check error:', err);
       try {
         await signOut(auth);
       } catch {
         // ignore
       }
-      setHistory(h => [
-        ...h,
-        { type: 'error', text: `✖ Access Denied: ${email} is not configured as an Admin in Firestore.` },
-        { type: 'output', text: `Authentication failed.` }
-      ]);
+      if (err?.code === 'permission-denied' || err?.message?.toLowerCase().includes('permission')) {
+        setHistory(h => [
+          ...h,
+          {
+            type: 'error',
+            text: `✖ Firestore Permission Denied: Cloud Firestore Security Rules in Firebase Console are blocking reads on the 'users' collection.`
+          },
+          { type: 'output', text: `● Fix in Firebase Console: Go to Firestore Database → Rules tab.` },
+          { type: 'output', text: `● Ensure rules allow read on users/{email}: allow read: if true;` },
+          { type: 'output', text: `● Click 'Publish' in Firebase Console.` }
+        ]);
+      } else {
+        setHistory(h => [
+          ...h,
+          {
+            type: 'error',
+            text: `✖ Database error (${err?.code || 'query_failed'}): ${err?.message || 'Access Denied'}`
+          },
+          { type: 'output', text: `Authentication failed.` }
+        ]);
+      }
       setAuthMode('none');
     }
   };

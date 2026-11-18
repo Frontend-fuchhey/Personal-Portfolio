@@ -40,11 +40,26 @@ export async function authenticateAdmin(
     onProgress?.({ step: 'verifying_firestore', email: user.email });
 
     // c) Query Firestore document doc(db, 'users', user.email)
-    const userDocRef = doc(db, "users", user.email);
-    const docSnap = await getDoc(userDocRef);
+    let userDocRef = doc(db, "users", user.email.toLowerCase());
+    let docSnap = await getDoc(userDocRef);
 
-    // d) If docSnap.exists() AND docSnap.data().admin === true
-    if (docSnap.exists() && docSnap.data()?.admin === true) {
+    if (!docSnap.exists()) {
+      docSnap = await getDoc(doc(db, "users", user.email));
+    }
+    if (!docSnap.exists()) {
+      docSnap = await getDoc(doc(db, "users", `${user.email.toLowerCase()} `));
+    }
+
+    const adminVal = docSnap.exists() ? docSnap.data()?.admin : undefined;
+    const isVerified =
+      adminVal === true ||
+      adminVal === 'true' ||
+      adminVal === 'TRUE' ||
+      adminVal === 1 ||
+      adminVal === '1';
+
+    // d) If docSnap.exists() AND docSnap.data().admin is true
+    if (isVerified) {
       return {
         success: true,
         user,

@@ -89,12 +89,22 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
       const verifiedEmail = localStorage.getItem('admin_verified_email');
       const sessionToken = localStorage.getItem('admin_session_token');
 
+      const isTruthfulAdmin = (val: any) =>
+        val === true || val === 'true' || val === 'TRUE' || val === 1 || val === '1';
+
       if (verifiedEmail && sessionToken) {
         try {
-          const userDocRef = doc(db, 'users', verifiedEmail);
-          const docSnap = await getDoc(userDocRef);
+          let userDocRef = doc(db, 'users', verifiedEmail.toLowerCase());
+          let docSnap = await getDoc(userDocRef);
 
-          if (docSnap.exists() && docSnap.data()?.admin === true) {
+          if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, 'users', verifiedEmail));
+          }
+          if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, 'users', `${verifiedEmail.toLowerCase()} `));
+          }
+
+          if (docSnap.exists() && isTruthfulAdmin(docSnap.data()?.admin)) {
             setStatus('authorized');
             setAdminEmail(verifiedEmail);
             return;
@@ -118,10 +128,17 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
         }
 
         try {
-          const userDocRef = doc(db, 'users', user.email);
-          const docSnap = await getDoc(userDocRef);
+          let userDocRef = doc(db, 'users', user.email.toLowerCase());
+          let docSnap = await getDoc(userDocRef);
 
-          if (docSnap.exists() && docSnap.data()?.admin === true) {
+          if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, 'users', user.email));
+          }
+          if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, 'users', `${user.email.toLowerCase()} `));
+          }
+
+          if (docSnap.exists() && isTruthfulAdmin(docSnap.data()?.admin)) {
             localStorage.setItem('admin_session', 'true');
             sessionStorage.setItem('admin_session', 'true');
             setStatus('authorized');
