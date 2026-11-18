@@ -4,7 +4,7 @@ import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X, Smartphon
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOsData } from '../../hooks/useOsData';
 import { INITIAL_PROJECTS } from '../../data/initialData';
-import resumeIoBg from '../assets/resume-io.png';
+import resumeIoBg from '../../assets/resume-io.png';
 import { MobileDownloadModal } from './MobileDownloadModal';
 import { SafeImage } from '../ui/SafeImage';
 

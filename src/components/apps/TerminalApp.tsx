@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, KeyboardEvent, ReactNode } from 'react';
 import { AppId } from "../../types/os";
 import { useIsMobile } from '../../hooks/use-mobile';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../lib/firebase';
+import { verifyAdminEmailInFirestore } from '../../lib/adminAuth';
 
 interface HistoryEntry {
   type: 'input' | 'output' | 'error' | 'success' | 'ai' | 'action';
@@ -304,149 +305,103 @@ export function TerminalApp({ onOpenApp }: { onOpenApp?: (appId: AppId) => void 
       { type: 'output', text: `● Verifying database administrator clearance for ${email}...` }
     ]);
 
-    try {
-      // 1. Try exact lowercase email
-      let userDocRef = doc(db, 'users', email);
-      let docSnap = await getDoc(userDocRef);
-      let matchedEmail = email;
+    const result = await verifyAdminEmailInFirestore(emailToVerify);
 
-      // 2. Fallback: try raw email casing if different
-      if (!docSnap.exists() && emailToVerify.trim() !== email) {
-        const rawRef = doc(db, 'users', emailToVerify.trim());
-        const rawSnap = await getDoc(rawRef);
-        if (rawSnap.exists()) {
-          docSnap = rawSnap;
-          matchedEmail = emailToVerify.trim();
-        }
-      }
+    if (result.isAdmin) {
+      const sessionToken = `admin_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem('admin_verified_email', result.matchedEmail || email);
+      localStorage.setItem('admin_session_token', sessionToken);
+      localStorage.setItem('admin_session', 'true');
+      sessionStorage.setItem('admin_session', 'true');
 
-      // 3. Fallback: check with trailing whitespace if accidental space in Firestore Doc ID
-      if (!docSnap.exists()) {
-        const spaceRef = doc(db, 'users', `${email} `);
-        const spaceSnap = await getDoc(spaceRef);
-        if (spaceSnap.exists()) {
-          docSnap = spaceSnap;
-          matchedEmail = `${email} `;
-        }
-      }
-
-      const adminVal = docSnap.exists() ? docSnap.data()?.admin : undefined;
-      const isVerified =
-        adminVal === true ||
-        adminVal === 'true' ||
-        adminVal === 'TRUE' ||
-        adminVal === 1 ||
-        adminVal === '1';
-
-      if (isVerified) {
-        const sessionToken = `admin_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        localStorage.setItem('admin_verified_email', matchedEmail.trim());
-        localStorage.setItem('admin_session_token', sessionToken);
-        localStorage.setItem('admin_session', 'true');
-        sessionStorage.setItem('admin_session', 'true');
-
-        let openedTab = false;
-        try {
-          const newTab = window.open('/admin', '_blank');
-          if (newTab && !newTab.closed && typeof newTab.closed !== 'undefined') {
-            openedTab = true;
-          }
-        } catch {
-          openedTab = false;
-        }
-
-        if (!openedTab) {
-          try {
-            const anchor = document.createElement('a');
-            anchor.href = '/admin';
-            anchor.target = '_blank';
-            anchor.rel = 'noopener noreferrer';
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
-          } catch {
-            // ignore
-          }
-        }
-
-        setHistory(h => [
-          ...h,
-          { type: 'success', text: `✔ Administrator privileges verified for ${email}` },
-          {
-            type: 'action',
-            text: `✔ Launching Admin Panel in a new browser tab. Click the button below if your browser blocked popups:`,
-            actionUrl: '/admin',
-            actionLabel: 'Open Admin Panel in New Tab ↗'
-          }
-        ]);
-        setAuthMode('none');
-      } else if (docSnap.exists()) {
-        // Document exists, but admin field is not truthy
-        try {
-          await signOut(auth);
-        } catch {
-          // ignore
-        }
-        setHistory(h => [
-          ...h,
-          {
-            type: 'error',
-            text: `✖ Access Denied: Document 'users/${matchedEmail}' exists in Firestore, but field 'admin' is set to ${JSON.stringify(adminVal)} instead of true.`
-          },
-          { type: 'output', text: `Authentication failed.` }
-        ]);
-        setAuthMode('none');
-      } else {
-        // Document does not exist
-        try {
-          await signOut(auth);
-        } catch {
-          // ignore
-        }
-        setHistory(h => [
-          ...h,
-          {
-            type: 'error',
-            text: `✖ Access Denied: No document found at 'users/${email}' in Firestore.`
-          },
-          {
-            type: 'output',
-            text: `Please check your Firestore Console under collection 'users' to ensure document ID matches '${email}'.`
-          },
-          { type: 'output', text: `Authentication failed.` }
-        ]);
-        setAuthMode('none');
-      }
-    } catch (err: any) {
-      console.error('Firestore admin check error:', err);
+      let openedTab = false;
       try {
-        await signOut(auth);
+        const newTab = window.open('/admin', '_blank');
+        if (newTab && !newTab.closed && typeof newTab.closed !== 'undefined') {
+          openedTab = true;
+        }
       } catch {
-        // ignore
+        openedTab = false;
       }
-      if (err?.code === 'permission-denied' || err?.message?.toLowerCase().includes('permission')) {
-        setHistory(h => [
-          ...h,
-          {
-            type: 'error',
-            text: `✖ Firestore Permission Denied: Cloud Firestore Security Rules in Firebase Console are blocking reads on the 'users' collection.`
-          },
-          { type: 'output', text: `● Fix in Firebase Console: Go to Firestore Database → Rules tab.` },
-          { type: 'output', text: `● Ensure rules allow read on users/{email}: allow read: if true;` },
-          { type: 'output', text: `● Click 'Publish' in Firebase Console.` }
-        ]);
-      } else {
-        setHistory(h => [
-          ...h,
-          {
-            type: 'error',
-            text: `✖ Database error (${err?.code || 'query_failed'}): ${err?.message || 'Access Denied'}`
-          },
-          { type: 'output', text: `Authentication failed.` }
-        ]);
+
+      if (!openedTab) {
+        try {
+          const anchor = document.createElement('a');
+          anchor.href = '/admin';
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+          document.body.appendChild(anchor);
+          anchor.click();
+          document.body.removeChild(anchor);
+        } catch {
+          // ignore
+        }
       }
+
+      setHistory(h => [
+        ...h,
+        { type: 'success', text: `✔ Administrator privileges verified for ${email}` },
+        {
+          type: 'action',
+          text: `✔ Launching Admin Panel in a new browser tab. Click the button below if your browser blocked popups:`,
+          actionUrl: '/admin',
+          actionLabel: 'Open Admin Panel in New Tab ↗'
+        }
+      ]);
       setAuthMode('none');
+      return;
     }
+
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore
+    }
+
+    if (result.errorCode === 'permission-denied' || result.errorMessage?.toLowerCase().includes('permission')) {
+      setHistory(h => [
+        ...h,
+        {
+          type: 'error',
+          text: `✖ Firestore Permission Denied: Cloud Firestore Security Rules in Firebase Console are blocking reads on the 'users' collection.`
+        },
+        { type: 'output', text: `● Fix in Firebase Console: Go to Firestore Database → Rules tab.` },
+        { type: 'output', text: `● Ensure rules allow read on users/{email}: allow read: if true;` },
+        { type: 'output', text: `● Click 'Publish' in Firebase Console.` }
+      ]);
+    } else if (result.errorCode) {
+      setHistory(h => [
+        ...h,
+        {
+          type: 'error',
+          text: `✖ Database error (${result.errorCode}): ${result.errorMessage || 'Access Denied'}`
+        },
+        { type: 'output', text: `Authentication failed.` }
+      ]);
+    } else if (result.foundDoc) {
+      setHistory(h => [
+        ...h,
+        {
+          type: 'error',
+          text: `✖ Access Denied: Document 'users/${result.matchedEmail}' exists in Firestore, but field 'admin' is set to ${JSON.stringify(result.actualAdminValue)} instead of true.`
+        },
+        { type: 'output', text: `Authentication failed.` }
+      ]);
+    } else {
+      setHistory(h => [
+        ...h,
+        {
+          type: 'error',
+          text: `✖ Access Denied: No document found at 'users/${email}' in Firestore.`
+        },
+        {
+          type: 'output',
+          text: `Please check your Firestore Console under collection 'users' to ensure document ID matches '${email}'.`
+        },
+        { type: 'output', text: `Authentication failed.` }
+      ]);
+    }
+    setAuthMode('none');
   };
 
   const handleSelectGoogleAccount = async (index: number) => {

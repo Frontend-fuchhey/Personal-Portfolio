@@ -2,7 +2,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import "./firebase";
+import "./lib/firebase";
 
 const AdminApp = lazy(() => import("./components/apps/AdminApp").then(m => ({ default: m.AdminApp })));
 

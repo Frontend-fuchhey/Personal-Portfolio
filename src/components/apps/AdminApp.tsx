@@ -17,9 +17,9 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { auth, db } from '../../lib/firebase';
+import { auth } from '../../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { verifyAdminEmailInFirestore } from '../../lib/adminAuth';
 import { 
   ProjectItem, 
   PhotoItem, 
@@ -89,33 +89,16 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
       const verifiedEmail = localStorage.getItem('admin_verified_email');
       const sessionToken = localStorage.getItem('admin_session_token');
 
-      const isTruthfulAdmin = (val: any) =>
-        val === true || val === 'true' || val === 'TRUE' || val === 1 || val === '1';
-
       if (verifiedEmail && sessionToken) {
-        try {
-          let userDocRef = doc(db, 'users', verifiedEmail.toLowerCase());
-          let docSnap = await getDoc(userDocRef);
-
-          if (!docSnap.exists()) {
-            docSnap = await getDoc(doc(db, 'users', verifiedEmail));
-          }
-          if (!docSnap.exists()) {
-            docSnap = await getDoc(doc(db, 'users', `${verifiedEmail.toLowerCase()} `));
-          }
-
-          if (docSnap.exists() && isTruthfulAdmin(docSnap.data()?.admin)) {
-            setStatus('authorized');
-            setAdminEmail(verifiedEmail);
-            return;
-          } else {
-            localStorage.removeItem('admin_verified_email');
-            localStorage.removeItem('admin_session_token');
-            localStorage.removeItem('admin_session');
-            setStatus('unauthorized');
-            return;
-          }
-        } catch {
+        const result = await verifyAdminEmailInFirestore(verifiedEmail);
+        if (result.isAdmin) {
+          setStatus('authorized');
+          setAdminEmail(result.matchedEmail || verifiedEmail);
+          return;
+        } else {
+          localStorage.removeItem('admin_verified_email');
+          localStorage.removeItem('admin_session_token');
+          localStorage.removeItem('admin_session');
           setStatus('unauthorized');
           return;
         }
@@ -127,31 +110,22 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
           return;
         }
 
-        try {
-          let userDocRef = doc(db, 'users', user.email.toLowerCase());
-          let docSnap = await getDoc(userDocRef);
-
-          if (!docSnap.exists()) {
-            docSnap = await getDoc(doc(db, 'users', user.email));
-          }
-          if (!docSnap.exists()) {
-            docSnap = await getDoc(doc(db, 'users', `${user.email.toLowerCase()} `));
-          }
-
-          if (docSnap.exists() && isTruthfulAdmin(docSnap.data()?.admin)) {
-            localStorage.setItem('admin_session', 'true');
-            sessionStorage.setItem('admin_session', 'true');
-            setStatus('authorized');
-            setAdminEmail(user.email);
-          } else {
+        const result = await verifyAdminEmailInFirestore(user.email);
+        if (result.isAdmin) {
+          localStorage.setItem('admin_session', 'true');
+          sessionStorage.setItem('admin_session', 'true');
+          setStatus('authorized');
+          setAdminEmail(result.matchedEmail || user.email);
+        } else {
+          try {
             await signOut(auth);
-            localStorage.removeItem('admin_session');
-            localStorage.removeItem('admin_verified_email');
-            localStorage.removeItem('admin_session_token');
-            sessionStorage.removeItem('admin_session');
-            setStatus('unauthorized');
+          } catch {
+            // ignore
           }
-        } catch {
+          localStorage.removeItem('admin_session');
+          localStorage.removeItem('admin_verified_email');
+          localStorage.removeItem('admin_session_token');
+          sessionStorage.removeItem('admin_session');
           setStatus('unauthorized');
         }
       });
@@ -353,11 +327,8 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
         <h1 className="text-3xl font-extrabold text-zinc-900 mb-2 tracking-tight">
           smart hunu khojeyko babu !!!
         </h1>
-        <p className="text-zinc-600 text-base font-normal mb-8">
+        <p className="text-zinc-600 text-base font-normal">
           trying to be smart huh 😏
-        </p>
-        <p className="text-zinc-500 text-xs max-w-sm border-t border-zinc-200 pt-4">
-          Direct URL access is restricted. Only accounts with verified admin privileges in the Firestore database are authorized.
         </p>
       </div>
     );

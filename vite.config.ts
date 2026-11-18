@@ -10,6 +10,7 @@ const port = Number(process.env.PORT) || 5173;
 
 export default defineConfig({
   base: "/",
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   plugins: [
     react(),
     tailwindcss(),
@@ -32,7 +33,7 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom'],
           'vendor-motion': ['framer-motion'],
           'vendor-icons': ['lucide-react'],
-          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage', 'firebase/analytics'],
+          'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
         }
       }
     }

@@ -1,123 +1,156 @@
-import { signInWithPopup, signOut, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, googleProvider, db } from "./firebase";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { auth, db } from "./firebase";
 
-export interface AdminAuthResult {
-  success: boolean;
-  user?: User;
-  error?: string;
+export interface AdminVerifyResult {
+  isAdmin: boolean;
+  matchedEmail: string;
+  foundDoc: boolean;
+  actualAdminValue?: unknown;
+  errorCode?: string;
+  errorMessage?: string;
 }
 
-export type AdminAuthProgressCallback = (status: {
-  step: 'popup_opened' | 'user_signed_in' | 'verifying_firestore';
-  email?: string;
-}) => void;
+export function isTruthyAdminValue(val: unknown): boolean {
+  if (val === true || val === 1) return true;
+  if (typeof val === "string") {
+    const norm = val.trim().toLowerCase();
+    return norm === "true" || norm === "1" || norm === "yes";
+  }
+  return false;
+}
 
-/**
- * Initiates Google Auth popup and verifies if the authenticated user
- * has an admin document in Firestore (`users/{email}`) with `admin === true`.
- */
-export async function authenticateAdmin(
-  onProgress?: AdminAuthProgressCallback
-): Promise<AdminAuthResult> {
+export function extractAdminFlagFromData(data: Record<string, unknown> | undefined): {
+  foundField: boolean;
+  isAdmin: boolean;
+  rawValue: unknown;
+} {
+  if (!data || typeof data !== "object") {
+    return { foundField: false, isAdmin: false, rawValue: undefined };
+  }
+
+  for (const [key, value] of Object.entries(data)) {
+    const normKey = key.trim().toLowerCase();
+    if (normKey === "admin" || normKey === "isadmin" || normKey === "is_admin") {
+      return {
+        foundField: true,
+        isAdmin: isTruthyAdminValue(value),
+        rawValue: value,
+      };
+    }
+    if (normKey === "role" && typeof value === "string" && value.trim().toLowerCase() === "admin") {
+      return {
+        foundField: true,
+        isAdmin: true,
+        rawValue: value,
+      };
+    }
+  }
+
+  return { foundField: false, isAdmin: false, rawValue: undefined };
+}
+
+async function waitForAuthReady(timeoutMs = 2500): Promise<void> {
   try {
-    onProgress?.({ step: 'popup_opened' });
-
-    // a) Call signInWithPopup with Google provider
-    const userCredential = await signInWithPopup(auth, googleProvider);
-    const user = userCredential.user;
-
-    // b) Read the signed-in user's email
-    if (!user || !user.email) {
-      await signOut(auth);
-      return {
-        success: false,
-        error: "Access Denied: Account is not configured as an Admin.",
-      };
+    if (typeof auth.authStateReady === "function") {
+      await Promise.race([
+        auth.authStateReady(),
+        new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+      ]);
     }
-
-    onProgress?.({ step: 'user_signed_in', email: user.email });
-    onProgress?.({ step: 'verifying_firestore', email: user.email });
-
-    // c) Query Firestore document doc(db, 'users', user.email)
-    let userDocRef = doc(db, "users", user.email.toLowerCase());
-    let docSnap = await getDoc(userDocRef);
-
-    if (!docSnap.exists()) {
-      docSnap = await getDoc(doc(db, "users", user.email));
-    }
-    if (!docSnap.exists()) {
-      docSnap = await getDoc(doc(db, "users", `${user.email.toLowerCase()} `));
-    }
-
-    const adminVal = docSnap.exists() ? docSnap.data()?.admin : undefined;
-    const isVerified =
-      adminVal === true ||
-      adminVal === 'true' ||
-      adminVal === 'TRUE' ||
-      adminVal === 1 ||
-      adminVal === '1';
-
-    // d) If docSnap.exists() AND docSnap.data().admin is true
-    if (isVerified) {
-      return {
-        success: true,
-        user,
-      };
-    }
-
-    // e) Otherwise: call signOut(auth) immediately
-    await signOut(auth);
-    return {
-      success: false,
-      error: `Access Denied: Account (${user.email}) is not configured as an Admin in Firestore.`,
-    };
-  } catch (error: any) {
-    try {
-      await signOut(auth);
-    } catch {
-      // Ignored
-    }
-
-    if (error?.code === "auth/popup-closed-by-user") {
-      return {
-        success: false,
-        error: "Authentication popup closed by user.",
-      };
-    }
-
-    if (error?.code === "permission-denied" || error?.message?.toLowerCase().includes("permission")) {
-      return {
-        success: false,
-        error: "Firestore permission denied: Your Firestore Security Rules do not allow reading the 'users' collection. Please update your rules in Firebase Console.",
-      };
-    }
-
-    return {
-      success: false,
-      error: error?.message || "Access Denied: Account is not configured as an Admin.",
-    };
+  } catch {
+    // Ignore
   }
 }
 
 /**
- * Verifies if an email has an admin document in Firestore (`users/{email}`) with `admin === true`.
+ * Verifies whether the given email has admin clearance in the Firestore `users` collection.
+ * Handles exact document IDs, casing variations, accidental whitespace in document IDs or field names,
+ * string/boolean admin flags, and documents storing `email` as a field.
  */
-export async function verifyAdminEmail(email: string): Promise<{ success: boolean; error?: string }> {
+export async function verifyAdminEmailInFirestore(emailInput: string): Promise<AdminVerifyResult> {
+  const rawTrimmed = emailInput.trim();
+  const cleanEmail = rawTrimmed.toLowerCase();
+
+  if (!cleanEmail) {
+    return { isAdmin: false, matchedEmail: "", foundDoc: false };
+  }
+
+  await waitForAuthReady();
+
   try {
-    const userDocRef = doc(db, "users", email);
-    const docSnap = await getDoc(userDocRef);
-    if (docSnap.exists() && docSnap.data()?.admin === true) {
-      return { success: true };
+    const candidates = Array.from(
+      new Set([
+        cleanEmail,
+        rawTrimmed,
+        `${cleanEmail} `,
+        ` ${cleanEmail}`,
+        `${rawTrimmed} `,
+      ])
+    );
+
+    let foundDoc = false;
+    let lastAdminVal: unknown = undefined;
+    let matchedId = cleanEmail;
+
+    // 1. Direct document ID lookups
+    for (const candidateId of candidates) {
+      const snap = await getDoc(doc(db, "users", candidateId));
+      if (snap.exists()) {
+        foundDoc = true;
+        matchedId = candidateId.trim();
+        const extracted = extractAdminFlagFromData(snap.data() as Record<string, unknown>);
+        lastAdminVal = extracted.rawValue;
+        if (extracted.isAdmin) {
+          return {
+            isAdmin: true,
+            matchedEmail: matchedId,
+            foundDoc: true,
+            actualAdminValue: extracted.rawValue,
+          };
+        }
+      }
     }
+
+    // 2. Fallback: scan the `users` collection in case doc ID has unexpected whitespace/casing or auto-ID with `email` field
+    try {
+      const allUsersSnap = await getDocs(collection(db, "users"));
+      for (const userDoc of allUsersSnap.docs) {
+        const docIdNorm = userDoc.id.trim().toLowerCase();
+        const data = userDoc.data() as Record<string, unknown>;
+        const fieldEmailNorm = typeof data?.email === "string" ? data.email.trim().toLowerCase() : "";
+
+        if (docIdNorm === cleanEmail || fieldEmailNorm === cleanEmail) {
+          foundDoc = true;
+          matchedId = cleanEmail;
+          const extracted = extractAdminFlagFromData(data);
+          lastAdminVal = extracted.rawValue;
+          if (extracted.isAdmin) {
+            return {
+              isAdmin: true,
+              matchedEmail: cleanEmail,
+              foundDoc: true,
+              actualAdminValue: extracted.rawValue,
+            };
+          }
+        }
+      }
+    } catch {
+      // Collection list might be restricted even if individual doc get is allowed; ignore fallback error
+    }
+
     return {
-      success: false,
-      error: `Access Denied: ${email} is not configured as an Admin in Firestore.`,
+      isAdmin: false,
+      matchedEmail: matchedId,
+      foundDoc,
+      actualAdminValue: lastAdminVal,
     };
-  } catch (error: any) {
+  } catch (err: any) {
     return {
-      success: false,
-      error: error?.message || `Access Denied: ${email} is not configured as an Admin in Firestore.`,
+      isAdmin: false,
+      matchedEmail: cleanEmail,
+      foundDoc: false,
+      errorCode: err?.code || "query_failed",
+      errorMessage: err?.message || "Failed to query Firestore",
     };
   }
 }

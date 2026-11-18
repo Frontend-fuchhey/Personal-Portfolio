@@ -1,42 +1,66 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, Firestore } from "firebase/firestore";
 
-const getApiKey = (): string => {
-  const envKey =
-    (import.meta.env.VITE_FIREBASE_API_KEY as string) ||
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_API_KEY as string);
-  if (envKey) return envKey;
-  try {
-    return atob("QUl6YVN5Q3ZXa0tYbUxfMW00TU5qd3BvQjMxUkQ1OS02VGhtZGJj");
-  } catch {
-    return "";
-  }
+const sanitizeEnvValue = (
+  val: unknown,
+  fallback: string,
+  options?: { mustInclude?: string; mustNotInclude?: string; minLength?: number }
+): string => {
+  if (typeof val !== "string") return fallback;
+  const cleaned = val.trim().replace(/^['"`]+|['"`]+$/g, "").trim();
+  if (!cleaned || cleaned.toLowerCase().startsWith("your_")) return fallback;
+  if (options?.minLength && cleaned.length < options.minLength) return fallback;
+  if (options?.mustInclude && !cleaned.includes(options.mustInclude)) return fallback;
+  if (options?.mustNotInclude && cleaned.includes(options.mustNotInclude)) return fallback;
+  return cleaned;
 };
 
-// Read environment variables (supports NEXT_PUBLIC_FIREBASE_* as well as VITE_FIREBASE_*)
+const getApiKey = (): string => {
+  let fallbackKey = "";
+  try {
+    fallbackKey = atob("QUl6YVN5Q3ZXa0tYbUxfMW00TU5qd3BvQjMxUkQ1OS02VGhtZGJj");
+  } catch {
+    fallbackKey = "";
+  }
+  const rawEnvKey =
+    (import.meta.env.VITE_FIREBASE_API_KEY as string) ||
+    (import.meta.env.NEXT_PUBLIC_FIREBASE_API_KEY as string);
+
+  return sanitizeEnvValue(rawEnvKey, fallbackKey, { minLength: 30 });
+};
+
 const firebaseConfig = {
   apiKey: getApiKey(),
-  authDomain:
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string) ||
+  authDomain: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string),
     "shrawan-portfolio.firebaseapp.com",
-  projectId:
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string) ||
+    { mustInclude: "." }
+  ),
+  projectId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string),
     "shrawan-portfolio",
-  storageBucket:
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string) ||
+    { mustNotInclude: "." }
+  ),
+  storageBucket: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string),
     "shrawan-portfolio.firebasestorage.app",
-  messagingSenderId:
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string) ||
+    { mustInclude: "." }
+  ),
+  messagingSenderId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) ||
-    "674306342708",
-  appId:
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_APP_ID as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string),
+    "674306342708"
+  ),
+  appId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_APP_ID as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_APP_ID as string),
     "1:674306342708:web:fc834664f508060062ef61",
+    { mustInclude: ":" }
+  ),
 };
 
 // Initialize Firebase App (singleton pattern safe for hot-module reloading)
@@ -46,7 +70,17 @@ export const app: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp(
 export const auth: Auth = getAuth(app);
 export const googleProvider: GoogleAuthProvider = new GoogleAuthProvider();
 
-// Initialize Firestore
-export const db: Firestore = getFirestore(app);
+// Initialize Firestore with automatic long-polling detection for live HTTPS reliability
+const createFirestoreInstance = (): Firestore => {
+  try {
+    return initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true,
+    });
+  } catch {
+    return getFirestore(app);
+  }
+};
+
+export const db: Firestore = createFirestoreInstance();
 
 export default app;
