@@ -102,16 +102,26 @@ const STABLE_IMAGES: Record<string, string> = {
   'imaged': '/images/gallery/ImageD.png'
 };
 
-// Matches old Vite-hashed bundle URLs such as /assets/garmentflow-BxY12_ab.png
-const HASHED_ASSET_RE = /^(?:https?:\/\/[^/]+)?\/assets\/(.+)-[A-Za-z0-9_-]{8}\.(?:png|jpe?g|webp|gif|svg)(?:\?.*)?$/i;
+// Matches legacy dev (/src/assets/...) or Vite-hashed (/assets/name-Hash.ext) bundle URLs
+const LEGACY_ASSET_RE = /^(?:https?:\/\/[^/]+)?\/(?:src\/)?assets\/(?:[^/]+\/)*([A-Za-z0-9_.-]+?)\.(?:png|jpe?g|webp|gif|svg|avif)(?:\?.*)?$/i;
 
-/** Map an old hashed asset URL back to its stable /images path. Returns the same value if not applicable. */
+/** Map a legacy /src/assets/... or hashed /assets/... URL back to its stable /images path. */
 export function normalizeImageUrl<T>(value: T): T {
   if (typeof value !== 'string' || value.startsWith('data:')) return value;
-  const m = HASHED_ASSET_RE.exec(value);
+  const m = LEGACY_ASSET_RE.exec(value.trim());
   if (!m) return value;
-  const stable = STABLE_IMAGES[m[1].toLowerCase()];
-  return (stable ?? value) as unknown as T;
+  const rawName = m[1].toLowerCase();
+  // Direct match (e.g. garmentflow, resume-io, resume-logo, imagea)
+  if (STABLE_IMAGES[rawName]) {
+    return STABLE_IMAGES[rawName] as unknown as T;
+  }
+  // Strip trailing Vite hash suffix (e.g. garmentflow-bvxiirqr, resume-io-jd7qyw4e, mb-nb7-e94x)
+  for (const [key, stableUrl] of Object.entries(STABLE_IMAGES)) {
+    if (rawName.startsWith(`${key}-`)) {
+      return stableUrl as unknown as T;
+    }
+  }
+  return value;
 }
 
 const IMAGE_FIELDS = ['image', 'coverImage', 'icon', 'iconValue', 'logo'] as const;

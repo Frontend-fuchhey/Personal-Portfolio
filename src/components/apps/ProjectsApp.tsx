@@ -145,7 +145,7 @@ export function ProjectsApp() {
         <div className="w-full border-b border-slate-200/60 bg-white/70 backdrop-blur-md flex flex-wrap items-center gap-y-2 px-4 py-2 select-none shrink-0 z-10">
           {/* Row 1: Title + Filter Tabs */}
           <div className="flex items-center gap-4 w-full md:w-auto">
-            {/* Left Section â€” Project Directory Brand Label */}
+            {/* Left Section — Project Directory Brand Label */}
             <div className="flex items-center gap-2 text-slate-700 font-sans font-bold text-xs tracking-wide uppercase shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -153,7 +153,7 @@ export function ProjectsApp() {
               <span>PROJECTS ({projectsData.length})</span>
             </div>
 
-            {/* Center Section â€” Filter Tab Navigation */}
+            {/* Center Section — Filter Tab Navigation */}
             <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400 font-sans">
               {filterTabs.map(({ key: cat, label }, idx, arr) => (
                 <span key={cat} className="flex items-center gap-3">
@@ -208,8 +208,15 @@ export function ProjectsApp() {
             ) : (
               projectsData.map(project => {
                 const projectName = project.name || project.title || 'Project';
-                const isEmoji = project.iconType === 'emoji' || (typeof project.icon === 'string' && !project.icon.includes('/') && !project.icon.includes('.'));
-                const iconDisplay = project.iconType === 'emoji' ? (project.iconValue || 'ðŸ“„') : (project.iconValue || project.icon || 'ðŸ“„');
+                const candidateImg =
+                  project.iconType !== 'emoji'
+                    ? (project.iconValue || project.icon || project.coverImage || project.image || (Array.isArray(project.images) ? project.images[0] : ''))
+                    : '';
+                const hasImageIcon =
+                  typeof candidateImg === 'string' &&
+                  (candidateImg.startsWith('/') || candidateImg.startsWith('http://') || candidateImg.startsWith('https://') || candidateImg.startsWith('data:image/'));
+                const isEmoji = !hasImageIcon;
+                const emojiDisplay = (project.iconType === 'emoji' && project.iconValue) ? project.iconValue : '📄';
                 const projectColor = project.color || 'from-emerald-500 to-teal-600';
 
                 return (
@@ -219,7 +226,7 @@ export function ProjectsApp() {
                     className="flex flex-col items-center gap-2 p-4 w-32 rounded-xl hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors group text-center"
                   >
                     <div className={`w-16 h-16 relative flex items-center justify-center transition-transform group-hover:scale-105 ${isEmoji ? 'rounded-2xl bg-gradient-to-br shadow-md group-hover:shadow-lg ' + projectColor : ''}`}>
-                      {isEmoji ? <span className="text-3xl">{iconDisplay}</span> : <SafeImage src={iconDisplay} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
+                      {isEmoji ? <span className="text-3xl">{emojiDisplay}</span> : <SafeImage src={candidateImg} alt={projectName} className="w-full h-full object-contain drop-shadow-md rounded-2xl border-2 border-gray-100 dark:border-gray-700 shadow-md bg-white dark:bg-white/10 p-1" />}
                       {(project.downloads || project.id === 'portfolio') && (
                         <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900" title="Mobile Download Available">
                           <Download className="w-2.5 h-2.5" />
@@ -258,29 +265,37 @@ export function ProjectsApp() {
 
               <div className="relative mb-16 shadow-2xl rounded-2xl animate-in zoom-in-95 duration-500">
                 {(() => {
-                  const bgImage = selected.coverImage || selected.image;
-                  return bgImage ? (
-                    <div 
-                      className="w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-cover bg-center bg-no-repeat border border-slate-200/40 dark:border-slate-700/50 shadow-inner"
-                      style={{ backgroundImage: `url("${String(bgImage).replace(/"/g, '%22')}")` }}
-                    />
-                  ) : (
-                    <div className={`w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-gradient-to-br ${selected.color || 'from-emerald-500 to-teal-600'} flex items-center justify-center`}>
-                      <div className="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <Code className="w-64 h-64 text-white transform -rotate-12 scale-150" />
+                  const bgImage = selected.coverImage || selected.image || (Array.isArray(selected.images) ? selected.images[0] : '');
+                  const rawBadgeIcon = selected.iconType !== 'emoji' ? (selected.icon || selected.iconValue || bgImage) : '';
+                  const hasBadgeImg = typeof rawBadgeIcon === 'string' && (rawBadgeIcon.startsWith('/') || rawBadgeIcon.startsWith('http://') || rawBadgeIcon.startsWith('https://') || rawBadgeIcon.startsWith('data:image/'));
+                  const badgeEmoji = (selected.iconType === 'emoji' && selected.iconValue) ? selected.iconValue : '📄';
+
+                  return (
+                    <>
+                      {bgImage ? (
+                        <div 
+                          className="w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-cover bg-center bg-no-repeat border border-slate-200/40 dark:border-slate-700/50 shadow-inner"
+                          style={{ backgroundImage: `url("${String(bgImage).replace(/"/g, '%22')}")` }}
+                        />
+                      ) : (
+                        <div className={`w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-gradient-to-br ${selected.color || 'from-emerald-500 to-teal-600'} flex items-center justify-center`}>
+                          <div className="absolute inset-0 opacity-10 flex items-center justify-center">
+                            <Code className="w-64 h-64 text-white transform -rotate-12 scale-150" />
+                          </div>
+                          <div className="text-8xl transform scale-125 opacity-30 drop-shadow-2xl saturate-150 mix-blend-overlay">
+                            {hasBadgeImg ? <SafeImage src={rawBadgeIcon} alt="" className="w-48 h-48 object-contain opacity-50" /> : badgeEmoji}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="absolute -bottom-8 left-6 sm:left-10 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2 shadow-2xl border border-white/20 dark:border-gray-700/60 ring-4 ring-white/50 dark:ring-gray-900/50 z-10">
+                        <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl shadow-inner ${!hasBadgeImg ? 'bg-gradient-to-br ' + (selected.color || 'from-emerald-500 to-teal-600') : 'bg-transparent'}`}>
+                          {hasBadgeImg ? <SafeImage src={rawBadgeIcon} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" /> : badgeEmoji}
+                        </div>
                       </div>
-                      <div className="text-8xl transform scale-125 opacity-30 drop-shadow-2xl saturate-150 mix-blend-overlay">
-                        {selected.iconType === 'emoji' ? (selected.iconValue || 'ðŸ“„') : <SafeImage src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
-                      </div>
-                    </div>
+                    </>
                   );
                 })()}
-
-                <div className="absolute -bottom-8 left-6 sm:left-10 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2 shadow-2xl border border-white/20 dark:border-gray-700/60 ring-4 ring-white/50 dark:ring-gray-900/50 z-10">
-                  <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl shadow-inner ${selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? 'bg-gradient-to-br ' + (selected.color || 'from-emerald-500 to-teal-600') : 'bg-transparent'}`}>
-                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || 'ðŸ“„') : <SafeImage src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
-                  </div>
-                </div>
               </div>
 
               <div className="px-2 sm:px-4 space-y-8">
@@ -295,7 +310,7 @@ export function ProjectsApp() {
                   )}
                   <div className="space-y-4 text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                     {String(selected.longDesc || selected.longDescription || selected.description || '').split('||').map((paragraph: string, index: number) => {
-                      const isHeader = paragraph.startsWith('ðŸš€') || paragraph.startsWith('ðŸ’¡') || paragraph.startsWith('ðŸ“ˆ');
+                      const isHeader = paragraph.startsWith('🚀') || paragraph.startsWith('💡') || paragraph.startsWith('📈');
                       return (
                         <p 
                           key={index} 
@@ -316,7 +331,7 @@ export function ProjectsApp() {
                         <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all items-start group">
                           <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selected.color || 'from-indigo-500 to-blue-600'} shadow-inner shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform`}>
                             {typeof feature.icon === 'string' || !feature.icon
-                              ? <span className="text-lg text-white">{feature.icon || 'Ã¢Å“Â¨'}</span>
+                              ? <span className="text-lg text-white">{feature.icon || '✨'}</span>
                               : <feature.icon className="w-5 h-5 text-white drop-shadow-sm" />}
                           </div>
                           <div className="pt-0.5">
