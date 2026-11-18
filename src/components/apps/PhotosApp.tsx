@@ -1,10 +1,6 @@
 import { useState, useEffect, memo, useMemo, useCallback } from "react";
 import { Camera, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import imageA from "../../assets/galleryimages/ImageA.png";
-import imageB from "../../assets/galleryimages/ImageB.jpg";
-import imageC from "../../assets/galleryimages/ImageC.jpg";
-import imageD from "../../assets/galleryimages/ImageD.png";
 import { subscribeToPhotos, PhotoItem } from "../../lib/portfolioDataService";
 import { STATIC_GALLERY_CATEGORIES, STATIC_GALLERY_ITEMS } from "../../data/initialData";
 export { STATIC_GALLERY_CATEGORIES, STATIC_GALLERY_ITEMS };
@@ -20,8 +16,9 @@ export const PhotosApp = memo(() => {
 
   useEffect(() => {
     const unsubscribe = subscribeToPhotos((livePhotos) => {
-      if (livePhotos && livePhotos.length > 0) {
-        setItems(livePhotos);
+      // Live Firestore data is the source of truth (empty = admin removed everything)
+      if (Array.isArray(livePhotos)) {
+        setItems(livePhotos.filter((p) => p && p.id).map((p) => ({ ...p, tags: Array.isArray(p.tags) ? p.tags : [] })));
       }
     });
     return () => unsubscribe();
@@ -31,9 +28,10 @@ export const PhotosApp = memo(() => {
     typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
   const categories = useMemo(() => {
-    const customCats = Array.from(new Set(items.map((i) => i.category).filter(Boolean)));
-    const merged = Array.from(new Set([...STATIC_GALLERY_CATEGORIES, ...customCats]));
-    return merged;
+    const customCats = Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[];
+    // "All" first, then static categories that still have photos (or are built-in), then admin-defined ones
+    const staticCats = [...STATIC_GALLERY_CATEGORIES] as string[];
+    return Array.from(new Set(["All", ...staticCats, ...customCats]));
   }, [items]);
 
   const filteredItems = useMemo(() => {
@@ -60,6 +58,11 @@ export const PhotosApp = memo(() => {
       return (prev - 1 + filteredItems.length) % filteredItems.length;
     });
   }, [filteredItems.length]);
+
+  // If the active category vanished (e.g. admin deleted last photo of it), go back to All
+  useEffect(() => {
+    if (!categories.includes(activeCategory)) setActiveCategory("All");
+  }, [categories, activeCategory]);
 
   // Reset selected image index when category changes to avoid overflow index issues
   useEffect(() => {
@@ -217,7 +220,7 @@ export const PhotosApp = memo(() => {
                   {/* Category, Date & Close */}
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                      {filteredItems[selectedIdx].id} / {filteredItems[selectedIdx].subCategory}
+                      {filteredItems[selectedIdx].subCategory || filteredItems[selectedIdx].category}
                     </span>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-zinc-400 font-medium">
@@ -250,7 +253,7 @@ export const PhotosApp = memo(() => {
                     Tags
                   </span>
                   <div className="flex flex-wrap gap-1.5">
-                    {filteredItems[selectedIdx].tags.map((tag) => (
+                    {(filteredItems[selectedIdx].tags || []).map((tag) => (
                       <span
                         key={tag}
                         className="text-[10px] bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded-md font-medium border border-zinc-200/80"
@@ -275,7 +278,7 @@ export const PhotosApp = memo(() => {
 });
 
 interface PhotoCardProps {
-  item: typeof STATIC_GALLERY_ITEMS[0];
+  item: PhotoItem;
   index: number;
   onSelect: (index: number) => void;
 }
@@ -325,7 +328,7 @@ const PhotoCard = memo(({ item, index, onSelect }: PhotoCardProps) => {
       {/* Metadata Row */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-          {item.id} / {item.subCategory}
+          {item.subCategory || item.category}
         </span>
         <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
           {item.date}
@@ -342,7 +345,7 @@ const PhotoCard = memo(({ item, index, onSelect }: PhotoCardProps) => {
 
       {/* Tags Footer */}
       <div className="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-        {item.tags.map((tag) => (
+        {(item.tags || []).map((tag) => (
           <span
             key={tag}
             className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-md font-medium border border-zinc-200/50 dark:border-zinc-700/20"

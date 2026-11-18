@@ -25,9 +25,7 @@ export function OsDataProvider({ children }: { children: React.ReactNode }) {
   // Subscribe to live Firestore projects
   useEffect(() => {
     const unsubscribe = subscribeToProjects((liveProjects) => {
-      if (liveProjects && liveProjects.length > 0) {
-        setProjects(liveProjects);
-      }
+      if (Array.isArray(liveProjects)) setProjects(liveProjects);
     });
     return () => unsubscribe();
   }, []);
@@ -77,9 +75,7 @@ export function OsDataProvider({ children }: { children: React.ReactNode }) {
   const updateProject = async (id: string, updated: any) => {
     setProjects(prev => prev.map(proj => proj.id === id ? { ...proj, ...updated } : proj));
     const target = projects.find(p => p.id === id);
-    if (target) {
-      await saveProject({ ...target, ...updated, id } as ProjectItem).catch(console.error);
-    }
+    await saveProject({ ...(target || {}), ...updated, id } as ProjectItem).catch(console.error);
   };
 
   const addProject = async (newProj: any) => {

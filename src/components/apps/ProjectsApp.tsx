@@ -1,10 +1,8 @@
-import { useState } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
-import { FolderOpen, ArrowLeft, ExternalLink, Code, Github, Camera, X, Smartphone, Download } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Code, Github, Camera, X, Smartphone, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOsData } from '../../hooks/useOsData';
-import { INITIAL_PROJECTS } from '../../data/initialData';
-import resumeIoBg from '../../assets/resume-io.png';
 import { MobileDownloadModal } from './MobileDownloadModal';
 import { SafeImage } from '../ui/SafeImage';
 
@@ -66,12 +64,23 @@ interface Project {
 }
 
 export function ProjectsApp() {
-  const { projects } = useOsData() as { projects: Project[] };
-  const [selected, setSelected] = useState<Project | null>(null);
+  // Live projects from Firestore (static seed data only until Firestore responds / when offline)
+  const { projects: liveProjects } = useOsData() as { projects: Project[] };
+  const projects = useMemo<Project[]>(
+    () => (Array.isArray(liveProjects) ? liveProjects.filter((p) => p && p.id) : []),
+    [liveProjects]
+  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Resolve the selected project from the live list so admin edits show immediately
+  const selected = useMemo<Project | null>(
+    () => (selectedId ? projects.find((p) => p.id === selectedId) || null : null),
+    [projects, selectedId]
+  );
+  const setSelected = (p: Project | null) => setSelectedId(p ? p.id : null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
-  const [activeFilter, setActiveFilter] = useState<'all' | 'react' | 'web applications' | 'web design'>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleProjectClick = (e: React.MouseEvent, project: Project) => {
@@ -87,13 +96,32 @@ export function ProjectsApp() {
     setIsDownloadModalOpen(false);
   };
 
-  const filteredProjects = INITIAL_PROJECTS.filter((project) => {
-    // Always read from INITIAL_PROJECTS (source of truth) — never stale context state
+  // Filter tabs: built-in ones plus any category used by live projects
+  const filterTabs = useMemo(() => {
+    const base: { key: string; label: string }[] = [
+      { key: 'all', label: 'All' },
+      { key: 'react', label: 'React' },
+      { key: 'web applications', label: 'Web Applications' },
+      { key: 'web design', label: 'Web Design' },
+    ];
+    const seen = new Set(base.map((b) => b.key));
+    projects.forEach((p) => {
+      const label = String(p.category || '').trim();
+      const key = label.toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        base.push({ key, label });
+      }
+    });
+    return base;
+  }, [projects]);
+
+  const filteredProjects = projects.filter((project) => {
     if (activeFilter.toLowerCase() === 'all') return true;
-    const cat = (project.category || '').toLowerCase().trim();
+    const cat = String(project.category || '').toLowerCase().trim();
     const filter = activeFilter.toLowerCase().trim();
     if (cat === filter) return true;
-    const techList = ((project as any).tech || (project as any).tags || []).map((t: string) => t.toLowerCase().trim());
+    const techList = (((project as any).tech || (project as any).tags || []) as any[]).map((t) => String(t).toLowerCase().trim());
     return techList.includes(filter);
   });
 
@@ -101,12 +129,12 @@ export function ProjectsApp() {
   const projectsData = (filteredProjects as Project[]).filter(project => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    const name = (project.name || project.title || '').toLowerCase();
-    const desc = (project.description || '').toLowerCase();
-    const tech = (project.tech || project.tags || []);
+    const name = String(project.name || project.title || '').toLowerCase();
+    const desc = String(project.description || '').toLowerCase();
+    const tech = (Array.isArray(project.tech || project.tags) ? (project.tech || project.tags) : []) as string[];
     return name.includes(q) ||
       desc.includes(q) ||
-      tech.some(t => t.toLowerCase().includes(q));
+      tech.some(t => String(t).toLowerCase().includes(q));
   });
 
   const isMobile = useIsMobile();
@@ -117,7 +145,7 @@ export function ProjectsApp() {
         <div className="w-full border-b border-slate-200/60 bg-white/70 backdrop-blur-md flex flex-wrap items-center gap-y-2 px-4 py-2 select-none shrink-0 z-10">
           {/* Row 1: Title + Filter Tabs */}
           <div className="flex items-center gap-4 w-full md:w-auto">
-            {/* Left Section — Project Directory Brand Label */}
+            {/* Left Section â€” Project Directory Brand Label */}
             <div className="flex items-center gap-2 text-slate-700 font-sans font-bold text-xs tracking-wide uppercase shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -125,9 +153,9 @@ export function ProjectsApp() {
               <span>PROJECTS ({projectsData.length})</span>
             </div>
 
-            {/* Center Section — Filter Tab Navigation */}
+            {/* Center Section â€” Filter Tab Navigation */}
             <div className="flex items-center gap-3 text-[11px] font-medium text-slate-400 font-sans">
-              {(['all', 'react', 'web applications', 'web design'] as const).map((cat, idx, arr) => (
+              {filterTabs.map(({ key: cat, label }, idx, arr) => (
                 <span key={cat} className="flex items-center gap-3">
                   <button
                     onClick={() => setActiveFilter(cat)}
@@ -136,7 +164,7 @@ export function ProjectsApp() {
                       : 'hover:text-slate-600 cursor-pointer transition-colors duration-150'
                     }
                   >
-                    {cat === 'all' ? 'All' : cat === 'react' ? 'React' : cat === 'web applications' ? 'Web Applications' : 'Web Design'}
+                    {label}
                   </button>
                   {idx < arr.length - 1 && (
                     <span className="text-slate-200 pointer-events-none px-0.5">|</span>
@@ -181,7 +209,7 @@ export function ProjectsApp() {
               projectsData.map(project => {
                 const projectName = project.name || project.title || 'Project';
                 const isEmoji = project.iconType === 'emoji' || (typeof project.icon === 'string' && !project.icon.includes('/') && !project.icon.includes('.'));
-                const iconDisplay = project.iconType === 'emoji' ? (project.iconValue || '📄') : (project.iconValue || project.icon || '📄');
+                const iconDisplay = project.iconType === 'emoji' ? (project.iconValue || 'ðŸ“„') : (project.iconValue || project.icon || 'ðŸ“„');
                 const projectColor = project.color || 'from-emerald-500 to-teal-600';
 
                 return (
@@ -230,11 +258,11 @@ export function ProjectsApp() {
 
               <div className="relative mb-16 shadow-2xl rounded-2xl animate-in zoom-in-95 duration-500">
                 {(() => {
-                  const bgImage = selected.id === 'resume-io' ? resumeIoBg : (selected.coverImage || selected.image);
+                  const bgImage = selected.coverImage || selected.image;
                   return bgImage ? (
                     <div 
                       className="w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-cover bg-center bg-no-repeat border border-slate-200/40 dark:border-slate-700/50 shadow-inner"
-                      style={{ backgroundImage: `url(${bgImage})` }}
+                      style={{ backgroundImage: `url("${String(bgImage).replace(/"/g, '%22')}")` }}
                     />
                   ) : (
                     <div className={`w-full h-52 sm:h-64 rounded-2xl relative overflow-hidden bg-gradient-to-br ${selected.color || 'from-emerald-500 to-teal-600'} flex items-center justify-center`}>
@@ -242,7 +270,7 @@ export function ProjectsApp() {
                         <Code className="w-64 h-64 text-white transform -rotate-12 scale-150" />
                       </div>
                       <div className="text-8xl transform scale-125 opacity-30 drop-shadow-2xl saturate-150 mix-blend-overlay">
-                        {selected.iconType === 'emoji' ? (selected.iconValue || '📄') : <SafeImage src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
+                        {selected.iconType === 'emoji' ? (selected.iconValue || 'ðŸ“„') : <SafeImage src={selected.iconValue || selected.icon} alt="" className="w-48 h-48 object-contain opacity-50" />}
                       </div>
                     </div>
                   );
@@ -250,7 +278,7 @@ export function ProjectsApp() {
 
                 <div className="absolute -bottom-8 left-6 sm:left-10 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2 shadow-2xl border border-white/20 dark:border-gray-700/60 ring-4 ring-white/50 dark:ring-gray-900/50 z-10">
                   <div className={`w-full h-full rounded-xl flex items-center justify-center text-4xl shadow-inner ${selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? 'bg-gradient-to-br ' + (selected.color || 'from-emerald-500 to-teal-600') : 'bg-transparent'}`}>
-                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || '📄') : <SafeImage src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
+                    {selected.iconType === 'emoji' || (!selected.icon && !selected.iconValue) ? (selected.iconValue || 'ðŸ“„') : <SafeImage src={selected.icon || selected.iconValue} alt={selected.name || selected.title} className="w-full h-full object-contain drop-shadow-md rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-white/10 p-1" />}
                   </div>
                 </div>
               </div>
@@ -266,8 +294,8 @@ export function ProjectsApp() {
                     </div>
                   )}
                   <div className="space-y-4 text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                    {(selected.longDesc || selected.longDescription || selected.description).split('||').map((paragraph: string, index: number) => {
-                      const isHeader = paragraph.startsWith('🚀') || paragraph.startsWith('💡') || paragraph.startsWith('📈');
+                    {String(selected.longDesc || selected.longDescription || selected.description || '').split('||').map((paragraph: string, index: number) => {
+                      const isHeader = paragraph.startsWith('ðŸš€') || paragraph.startsWith('ðŸ’¡') || paragraph.startsWith('ðŸ“ˆ');
                       return (
                         <p 
                           key={index} 
@@ -280,14 +308,16 @@ export function ProjectsApp() {
                   </div>
                 </div>
 
-                {selected.features && selected.features.length > 0 && (
+                {Array.isArray(selected.features) && selected.features.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">High-Impact Features</h3>
                     <div className="flex flex-col gap-4">
                       {selected.features.map((feature, idx) => (
                         <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/80 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all items-start group">
                           <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selected.color || 'from-indigo-500 to-blue-600'} shadow-inner shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform`}>
-                            <feature.icon className="w-5 h-5 text-white drop-shadow-sm" />
+                            {typeof feature.icon === 'string' || !feature.icon
+                              ? <span className="text-lg text-white">{feature.icon || 'Ã¢Å“Â¨'}</span>
+                              : <feature.icon className="w-5 h-5 text-white drop-shadow-sm" />}
                           </div>
                           <div className="pt-0.5">
                             <h4 className="font-bold text-gray-900 dark:text-white text-[16px] mb-1">{feature.title}</h4>
@@ -299,12 +329,12 @@ export function ProjectsApp() {
                   </div>
                 )}
 
-                {(selected.tech || selected.tags) && (selected.tech || selected.tags)!.length > 0 && (
+                {Array.isArray(selected.tech || selected.tags) && (selected.tech || selected.tags)!.length > 0 && (
                   <div className="space-y-4 lg:pt-2">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">Technical Highlights</h3>
                     <div className="flex flex-wrap gap-2.5">
-                      {(selected.tech || selected.tags)!.map(t => (
-                        <span key={t} className="px-4 py-2 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 text-indigo-900 dark:text-blue-100 text-sm font-black tracking-wide rounded-xl border border-indigo-100/50 dark:border-indigo-800/50 shadow-sm hover:-translate-y-1 hover:shadow-md hover:from-indigo-100 hover:to-blue-100 dark:hover:from-indigo-800/60 dark:hover:to-blue-800/60 transition-all duration-300 cursor-default">
+                      {(selected.tech || selected.tags)!.map((t, ti) => (
+                        <span key={`${t}-${ti}`} className="px-4 py-2 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 text-indigo-900 dark:text-blue-100 text-sm font-black tracking-wide rounded-xl border border-indigo-100/50 dark:border-indigo-800/50 shadow-sm hover:-translate-y-1 hover:shadow-md hover:from-indigo-100 hover:to-blue-100 dark:hover:from-indigo-800/60 dark:hover:to-blue-800/60 transition-all duration-300 cursor-default">
                           {t}
                         </span>
                       ))}
@@ -347,7 +377,7 @@ export function ProjectsApp() {
                   )}
                 </div>
 
-                {((selected.images && selected.images.length > 0) || selected.image || selected.coverImage) && (
+                {((Array.isArray(selected.images) && selected.images.length > 0) || selected.image || selected.coverImage) && (
                   <div className="pt-10">
                     <div className="flex items-center gap-3 mb-6">
                       <Camera className="w-6 h-6 text-gray-700 dark:text-gray-300" />
@@ -356,7 +386,7 @@ export function ProjectsApp() {
                     <div className="h-px w-full bg-gradient-to-r from-gray-200 via-gray-200 to-transparent dark:from-gray-700 dark:via-gray-700 dark:to-transparent mb-8"></div>
 
                     <div className="flex flex-col sm:grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-                      {(selected.images && selected.images.length > 0 ? selected.images : [selected.coverImage || selected.image].filter(Boolean) as string[]).map((img, idx) => (
+                      {(Array.isArray(selected.images) && selected.images.length > 0 ? selected.images : [selected.coverImage || selected.image].filter(Boolean) as string[]).map((img, idx) => (
                         <motion.div
                           key={`${selected.id}-img-${idx}`}
                           layoutId={`image-${img}`}

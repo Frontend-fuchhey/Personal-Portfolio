@@ -19,6 +19,10 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // NOTE: the admin panel may be unlocked via Google sign-in OR a passkey (passkey sessions have no
+    // Firebase Auth identity), so request.auth cannot gate these writes. The admin gate is enforced in the UI.
+    // Tighten (e.g. App Check / Cloud Function) if you move to Auth-only admin.
+
     // Projects: Public read for portfolio visitors, write allowed for admin
     match /projects/{projectId} {
       allow read: if true;

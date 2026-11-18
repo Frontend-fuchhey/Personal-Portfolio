@@ -1,15 +1,3 @@
-import itahariLogo from '../assets/itahari-logo.png';
-import arnikoLogo from '../assets/arniko-logo.png';
-import garmentIcon from '../assets/garmentflow.png';
-import gallery2 from '../assets/maingarment.jpg';
-import mbPortfolio from '../assets/mb.png';
-import lpPortfolio from '../assets/lp.jpg';
-import resumeIoBg from '../assets/resume-io.png';
-import resumeLogo from '../assets/resume-logo.png';
-import imageA from '../assets/galleryimages/ImageA.png';
-import imageB from '../assets/galleryimages/ImageB.jpg';
-import imageC from '../assets/galleryimages/ImageC.jpg';
-import imageD from '../assets/galleryimages/ImageD.png';
 
 export const INITIAL_ABOUT_DATA = {
   experience: [
@@ -36,7 +24,7 @@ export const INITIAL_ABOUT_DATA = {
       detail: "BSc (Hons) Computing",
       year: "2081 - Present",
       status: "ongoing",
-      logo: itahariLogo,
+      logo: '/images/itahari-logo.png',
       link: "https://iic.edu.np/"
     },
     {
@@ -46,7 +34,7 @@ export const INITIAL_ABOUT_DATA = {
       detail: "Computer Science",
       year: "2079 - 2081",
       status: "completed",
-      logo: arnikoLogo,
+      logo: '/images/arniko-logo.png',
       certId: "cert-class12",
       link: "https://arnikofoundation.edu.np/"
     },
@@ -56,7 +44,7 @@ export const INITIAL_ABOUT_DATA = {
       institution: "Arniko Secondary School, Biratnagar",
       year: "Completed 2079",
       status: "completed",
-      logo: arnikoLogo,
+      logo: '/images/arniko-logo.png',
       certId: "cert-class10",
       link: "https://arnikofoundation.edu.np/"
     }
@@ -72,13 +60,13 @@ export const INITIAL_PROJECTS = [
     tech: ['React.js', 'TypeScript', 'Tailwind CSS', 'Next.js'],
     url: 'https://github.com/Frontend-fuchhey/Garment-flow',
     demoUrl: 'https://garment-flow.app',
-    icon: garmentIcon,
+    icon: '/images/garmentflow.png',
     iconType: 'image',
-    iconValue: garmentIcon,
+    iconValue: '/images/garmentflow.png',
     color: 'from-blue-500 to-cyan-500',
     subHeader: 'A specialized ERP system for Garment Store management.',
-    images: [gallery2],
-    coverImage: gallery2
+    images: ['/images/maingarment.jpg'],
+    coverImage: '/images/maingarment.jpg'
   },
   {
     id: 'portfolio',
@@ -91,8 +79,8 @@ export const INITIAL_PROJECTS = [
     iconValue: '💻',
     color: 'from-indigo-500 to-blue-600',
     subHeader: 'A macOS-inspired portfolio experience.',
-    images: [lpPortfolio, mbPortfolio],
-    coverImage: lpPortfolio,
+    images: ['/images/lp.jpg', '/images/mb.png'],
+    coverImage: '/images/lp.jpg',
     downloads: {
       android: {
         url: '/downloads/ShrawanOS.apk',
@@ -124,12 +112,12 @@ export const INITIAL_PROJECTS = [
     githubUrl: "https://github.com/Frontend-fuchhey/resume.io",
     url: "https://github.com/Frontend-fuchhey/resume.io",
     featured: true,
-    image: resumeIoBg,
-    coverImage: resumeIoBg,
-    images: [resumeIoBg],
-    icon: resumeLogo,
+    image: '/images/resume-io.png',
+    coverImage: '/images/resume-io.png',
+    images: ['/images/resume-io.png'],
+    icon: '/images/resume-logo.png',
     iconType: 'image',
-    iconValue: resumeLogo,
+    iconValue: '/images/resume-logo.png',
     color: 'from-emerald-500 to-teal-600',
     subHeader: 'Automatic Resume Builder with live preview & instant export.'
   }
@@ -150,7 +138,7 @@ export const STATIC_GALLERY_ITEMS = [
     date: "February 2026",
     title: "Rato Topi Technical Support Operations",
     description: "Managing network infrastructure, web portals, live evaluation tools, and technical logistics during event operations.",
-    image: imageA,
+    image: '/images/gallery/ImageA.png',
     tags: ["Network Routing", "Web Portals", "Rato Topi"]
   },
   {
@@ -160,7 +148,7 @@ export const STATIC_GALLERY_ITEMS = [
     date: "January 2026",
     title: "GPLC Intellect Award Ceremony & Champions",
     description: "Celebrating with champions, faculty, and administration during the grand finale and awards distribution.",
-    image: imageB,
+    image: '/images/gallery/ImageB.jpg',
     tags: ["GPLC Intellect", "Recognition"]
   },
   {
@@ -170,7 +158,7 @@ export const STATIC_GALLERY_ITEMS = [
     date: "December 2025",
     title: "AI Summit Nepal — Kathmandu",
     description: "Engaging with industry leaders and technical teams at AI Summit Nepal, discussing autonomous agent architectures and frontend systems.",
-    image: imageC,
+    image: '/images/gallery/ImageC.jpg',
     tags: ["AI Summit", "Kathmandu"]
   },
   {
@@ -180,7 +168,7 @@ export const STATIC_GALLERY_ITEMS = [
     date: "October 2025",
     title: "National AI Hackathon Highlights",
     description: "Participating and building full-stack interactive prototypes in competitive team environments.",
-    image: imageD,
+    image: '/images/gallery/ImageD.png',
     tags: ["Hackathon", "AWS", "AI"]
   }
 ];

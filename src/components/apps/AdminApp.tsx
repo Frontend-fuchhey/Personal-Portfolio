@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldCheck, 
   ShieldAlert, 
@@ -29,17 +29,106 @@ import {
   deleteProjectFromDb, 
   savePhoto, 
   deletePhotoFromDb,
-  seedInitialProjectsIfEmpty,
-  seedInitialPhotosIfEmpty,
   getDatabasePasskey,
   saveDatabasePasskey
 } from '../../lib/portfolioDataService';
+import { fileToCompressedDataUrl } from '../../lib/imageUpload';
+
+const looksLikeImage = (s: unknown): s is string =>
+  typeof s === 'string' && s.trim() !== '' && /^(data:image\/|https?:\/\/|\/|\.\/|[\w-]+\/)|\.(png|jpe?g|gif|webp|svg|avif)(\?|$)/i.test(s.trim());
+
+export function getProjectImage(project: Partial<ProjectItem> | null | undefined): string {
+  if (!project) return '';
+  const p = project as any;
+  const candidates = [
+    p.coverImage,
+    p.image,
+    Array.isArray(p.images) ? p.images[0] : undefined,
+    p.iconType === 'image' ? p.iconValue : undefined,
+    p.icon,
+  ];
+  for (const c of candidates) if (looksLikeImage(c)) return c.trim();
+  return '';
+}
+
+function ProjectThumb({ project }: { project: Partial<ProjectItem> }) {
+  const src = getProjectImage(project);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
+  return (
+    <div className="w-full h-36 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200 flex items-center justify-center">
+      {src && !failed ? (
+        <img src={src} alt={project.name || ''} className="w-full h-full object-cover" onError={() => setFailed(true)} />
+      ) : (
+        <ImageIcon className="w-8 h-8 text-zinc-300" />
+      )}
+    </div>
+  );
+}
+
+function ImageUploadField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [broken, setBroken] = useState(false);
+  useEffect(() => setBroken(false), [value]);
+
+  const handleFile = async (file?: File | null) => {
+    if (!file) return;
+    setError(null);
+    setBusy(true);
+    try {
+      onChange(await fileToCompressedDataUrl(file));
+    } catch (err: any) {
+      setError(err?.message || 'Failed to process image.');
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-zinc-700 mb-1">{label}</label>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+      {value && !broken ? (
+        <div className="relative w-full h-44 bg-zinc-100 border border-zinc-200 rounded-lg overflow-hidden">
+          <img src={value} alt="Preview" className="w-full h-full object-cover" onError={() => setBroken(true)} />
+          <div className="absolute bottom-2 right-2 flex gap-2">
+            <button type="button" disabled={busy} onClick={() => inputRef.current?.click()} className="px-2.5 py-1 text-xs font-semibold bg-white border border-zinc-300 rounded-md text-zinc-800 hover:bg-zinc-50 cursor-pointer shadow-xs">
+              {busy ? 'Processing...' : 'Replace'}
+            </button>
+            <button type="button" disabled={busy} onClick={() => { setError(null); onChange(''); }} className="px-2.5 py-1 text-xs font-semibold bg-white border border-red-200 rounded-md text-red-600 hover:bg-red-50 cursor-pointer shadow-xs">
+              Remove
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files?.[0]); }}
+          className={`w-full h-32 flex flex-col items-center justify-center gap-1.5 border border-dashed rounded-lg text-xs text-zinc-600 transition-colors cursor-pointer ${dragOver ? 'border-zinc-900 bg-zinc-100' : 'border-zinc-300 bg-zinc-50 hover:bg-zinc-100'}`}
+        >
+          {busy ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-5 h-5 text-zinc-400" />}
+          <span className="font-semibold">{busy ? 'Compressing image...' : 'Click to upload or drag & drop an image'}</span>
+          {!busy && <span className="text-zinc-400">{broken ? 'Current image could not be loaded' : 'JPG, PNG or WebP'}</span>}
+        </button>
+      )}
+      {error && <p className="text-xs text-red-600 mt-1.5">{error}</p>}
+    </div>
+  );
+}
 
 interface AdminAppProps {
   isStandalone?: boolean;
 }
 
-export function AdminApp({ isStandalone = false }: AdminAppProps) {
+export function AdminApp(_props: AdminAppProps) {
   const [status, setStatus] = useState<'checking' | 'authorized' | 'unauthorized'>('checking');
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
@@ -198,7 +287,7 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
         tech: Array.isArray(editingProject.tech) ? editingProject.tech : (editingProject.tech as any || '').split(',').map((s: string) => s.trim()).filter(Boolean),
         url: editingProject.url || '',
         demoUrl: editingProject.demoUrl || '',
-        coverImage: editingProject.coverImage || '',
+        coverImage: editingProject.coverImage || getProjectImage(editingProject),
         order: editingProject.order ?? projects.length,
       } as ProjectItem);
       setEditingProject(null);
@@ -236,7 +325,11 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
   // --- Photo Actions ---
   const handleSavePhoto = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingPhoto || !editingPhoto.title || !editingPhoto.image) return;
+    if (!editingPhoto || !editingPhoto.title) return;
+    if (!editingPhoto.image) {
+      alert('Please upload an image for this photo.');
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -347,7 +440,7 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
   );
 
   return (
-    <div className="min-h-screen w-full bg-[#f8fafc] text-zinc-900 font-sans flex flex-col selection:bg-zinc-200">
+    <div className="fixed inset-0 z-30 overflow-y-auto overflow-x-hidden bg-[#f8fafc] text-zinc-900 font-sans flex flex-col selection:bg-zinc-200" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Top Navbar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
@@ -481,16 +574,7 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
                   className="bg-white border border-zinc-200 rounded-xl p-5 flex flex-col justify-between hover:border-zinc-300 hover:shadow-md transition-all shadow-xs"
                 >
                   <div className="space-y-3">
-                    {project.coverImage && (
-                      <div className="w-full h-36 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
-                        <img 
-                          src={project.coverImage} 
-                          alt={project.name} 
-                          className="w-full h-full object-cover" 
-                          onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
-                        />
-                      </div>
-                    )}
+                    <ProjectThumb project={project} />
 
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -722,8 +806,9 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
 
       {/* EDIT / CREATE PROJECT MODAL */}
       {editingProject && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-zinc-200 rounded-2xl max-w-xl w-full p-6 text-zinc-900 my-8 shadow-2xl animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/40 overflow-y-auto overscroll-contain">
+          <div className="flex min-h-full items-start sm:items-center justify-center p-4">
+          <div className="bg-white border border-zinc-200 rounded-2xl max-w-xl w-full p-6 text-zinc-900 my-4 shadow-2xl animate-in fade-in duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-5">
               <h3 className="text-base font-bold text-zinc-900">
                 {editingProject.id ? 'Edit Project' : 'Add New Project'}
@@ -806,16 +891,13 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">Cover Image URL</label>
-                <input
-                  type="text"
-                  value={editingProject.coverImage || ''}
-                  onChange={(e) => setEditingProject({ ...editingProject, coverImage: e.target.value })}
-                  placeholder="Direct image URL or /assets/..."
-                  className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
-                />
-              </div>
+              <ImageUploadField
+                label="Cover Image"
+                value={getProjectImage(editingProject)}
+                onChange={(v) => setEditingProject(v
+                  ? { ...editingProject, coverImage: v }
+                  : { ...editingProject, coverImage: '', image: '', images: [], iconValue: '', icon: '' } as Partial<ProjectItem>)}
+              />
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">Full Description</label>
@@ -847,13 +929,15 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
               </div>
             </form>
           </div>
+          </div>
         </div>
       )}
 
       {/* EDIT / CREATE PHOTO MODAL */}
       {editingPhoto && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-zinc-200 rounded-2xl max-w-lg w-full p-6 text-zinc-900 my-8 shadow-2xl animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/40 overflow-y-auto overscroll-contain">
+          <div className="flex min-h-full items-start sm:items-center justify-center p-4">
+          <div className="bg-white border border-zinc-200 rounded-2xl max-w-lg w-full p-6 text-zinc-900 my-4 shadow-2xl animate-in fade-in duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-zinc-200 mb-5">
               <h3 className="text-base font-bold text-zinc-900">
                 {editingPhoto.id ? 'Edit Gallery Photo' : 'Add New Gallery Photo'}
@@ -879,17 +963,11 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">Image URL *</label>
-                <input
-                  type="text"
-                  required
-                  value={editingPhoto.image || ''}
-                  onChange={(e) => setEditingPhoto({ ...editingPhoto, image: e.target.value })}
-                  placeholder="https://... or direct image link"
-                  className="w-full bg-white border border-zinc-300 rounded-lg px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900"
-                />
-              </div>
+              <ImageUploadField
+                label="Photo Image *"
+                value={editingPhoto.image || ''}
+                onChange={(v) => setEditingPhoto({ ...editingPhoto, image: v })}
+              />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -966,6 +1044,7 @@ export function AdminApp({ isStandalone = false }: AdminAppProps) {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}
