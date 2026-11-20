@@ -5,7 +5,6 @@ import {
   Terminal,
   Mail,
   Settings as SettingsIcon,
-  Image as ImageIcon,
 } from 'lucide-react';
 import { AppId, WindowState } from "../../types/os";
 

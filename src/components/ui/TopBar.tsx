@@ -3,6 +3,7 @@ import { Wifi, Battery, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppId } from '../../types/os';
 import { USER_CONFIG } from '../../data/userConfig';
+import { useOsData } from '../../hooks/useOsData';
 
 const Clock = memo(() => {
   const [time, setTime] = useState(new Date());
@@ -38,6 +39,8 @@ interface TopBarProps {
 }
 
 export function TopBar({ onOpenApp, showClock = true }: TopBarProps) {
+  const { profile } = useOsData();
+  const displayName = profile?.name?.trim() || USER_CONFIG.name;
 
   return (
     <motion.div
@@ -56,7 +59,7 @@ export function TopBar({ onOpenApp, showClock = true }: TopBarProps) {
           onClick={() => onOpenApp?.('about')}
           className="text-white text-[13px] font-bold tracking-tight cursor-pointer hover:opacity-75 transition-opacity px-2"
         >
-          {USER_CONFIG.name.split(' ')[0]} OS
+          {displayName.split(' ')[0]} OS
         </span>
       </div>
 
