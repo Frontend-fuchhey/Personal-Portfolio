@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { motion, useDragControls } from 'framer-motion';
 import { X, Minus, Square, Maximize2 } from 'lucide-react';
@@ -143,7 +143,7 @@ export function Window({
       dragMomentum={false}
       dragTransition={{ bounceStiffness: 1000, bounceDamping: 100 }}
       onDragEnd={handleDragEnd}
-      onMouseDown={(e) => {
+      onMouseDown={() => {
         // Only focus the window; do NOT intercept events from inside the content
         onFocus(win.id);
       }}

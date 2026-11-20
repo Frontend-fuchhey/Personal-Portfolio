@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useOsData } from '../../hooks/useOsData';
 
 interface DesktopWidgetProps {
   onOpenCv?: () => void;
@@ -7,7 +8,15 @@ interface DesktopWidgetProps {
 }
 
 export function DesktopWidget({ onOpenCv, onOpenResume, onOpenAbout }: DesktopWidgetProps) {
+  const { profile } = useOsData();
   const handleOpen = onOpenCv || onOpenResume || onOpenAbout || (() => {});
+  const displayName = profile?.name?.trim() || 'Shrawan Karki';
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .map(p => p[0]?.toUpperCase())
+    .slice(0, 2)
+    .join('') || 'SK';
 
   return (
     <motion.div
@@ -18,14 +27,20 @@ export function DesktopWidget({ onOpenCv, onOpenResume, onOpenAbout }: DesktopWi
       whileHover={{ y: -5 }}
       onClick={handleOpen}
     >
-      {/* Vector Initials Badge - Option 2 */}
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-base shadow-inner">
-        SK
-      </div>
+      {/* Profile Pic or Initials Badge */}
+      {profile?.profilePic ? (
+        <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shadow-inner">
+          <img src={profile.profilePic} alt={displayName} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-base shadow-inner">
+          {initials}
+        </div>
+      )}
 
       {/* Profile Links Text */}
       <div className="flex flex-col pr-2">
-        <span className="text-white font-semibold text-sm">Shrawan Karki</span> 
+        <span className="text-white font-semibold text-sm">{displayName}</span> 
         <a 
           href="/resume" 
           onClick={(e) => { e.preventDefault(); handleOpen(); }}
