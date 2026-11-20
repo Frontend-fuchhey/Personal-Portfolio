@@ -365,7 +365,7 @@ export function ProjectsApp() {
                       className="group flex flex-1 items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-[length:200%_auto] hover:bg-right text-white font-black tracking-wider transition-all duration-300 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 hover:-translate-y-0.5 cursor-pointer"
                     >
                       <Smartphone className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      DOWNLOAD MOBILE APP
+                      DOWNLOAD APP
                     </button>
                   )}
                   {(selected.demoUrl || selected.liveUrl) && (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Smartphone, Check, Copy, QrCode, ShieldCheck, Share, ArrowRight, Settings, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
+import { X, Download, Check, Copy, QrCode, ShieldCheck, Share, CheckCircle2, ChevronRight } from 'lucide-react';
 import QRCode from 'qrcode';
 
 interface DownloadInfo {
