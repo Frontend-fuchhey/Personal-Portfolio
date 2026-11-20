@@ -36,7 +36,6 @@ export function useWindows() {
 
       if (appId.startsWith('cert-')) {
         const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
-        const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
         
         width = 900;
         height = Math.round(viewportHeight * 0.85);
