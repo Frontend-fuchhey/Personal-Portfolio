@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User, FolderOpen, Terminal, Mail, Image as ImageIcon } from 'lucide-react';
+import { User, FolderOpen, Terminal, Mail } from 'lucide-react';
 import { AppId } from '../../types/os';
 
 interface AndroidDockProps {
