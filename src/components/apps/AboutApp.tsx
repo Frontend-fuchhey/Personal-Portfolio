@@ -12,21 +12,12 @@ import {
   Monitor,
   School,
   Code2,
-  Cloud,
-  Palette,
-  Globe,
-  Zap,
-  MonitorSmartphone,
-  Cpu,
-  Braces,
-  Maximize2,
-  Compass,
-  TrendingUp,
 } from "lucide-react";
 import { AppId } from "../../types/os";
 import { ResumeView } from "../ResumeView";
 import { useOsData } from "../../hooks/useOsData";
 import { USER_CONFIG } from "../../data/userConfig";
+import { SkillIcon } from "../icons/SkillIcon";
 
 export function AboutApp({
   windowId,
@@ -43,7 +34,7 @@ export function AboutApp({
 }) {
   const [isResumeVisible, setIsResumeVisible] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-  const { aboutData } = useOsData();
+  const { profile, aboutData, skills } = useOsData();
   const isMobile = useIsMobile();
 
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
@@ -112,8 +103,8 @@ export function AboutApp({
               <div className="relative w-64 h-64 rounded-full border-4 border-white/80 dark:border-white/20 shadow-2xl overflow-hidden bg-white/10 antialiased">
                 <img
                   ref={profileImgRef}
-                  src={profilePic}
-                  alt={USER_CONFIG.name}
+                  src={profile.profilePic?.trim() || profilePic}
+                  alt={profile.name || USER_CONFIG.name}
                   loading="eager"
                   decoding="async"
                   onLoad={() => setIsProfileLoaded(true)}
@@ -132,10 +123,10 @@ export function AboutApp({
 
             <div className="mb-6 text-center mt-6">
               <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-                {USER_CONFIG.name}
+                {profile.name || USER_CONFIG.name}
               </h1>
               <p className="text-xs font-bold uppercase tracking-[0.4em] text-blue-600 dark:text-blue-400">
-                {USER_CONFIG.title}
+                {profile.title || USER_CONFIG.title}
               </p>
             </div>
 
@@ -143,25 +134,25 @@ export function AboutApp({
               {[
                 {
                   icon: <Github className="w-5 h-5" />,
-                  href: "https://github.com/frontend-fuchhey",
+                  href: profile.socials?.github || USER_CONFIG.socials.github,
                   label: "GitHub",
                   rel: "me noopener noreferrer",
                 },
                 {
                   icon: <Linkedin className="w-5 h-5" />,
-                  href: "https://www.linkedin.com/in/shrawan-karki-187706428/",
+                  href: profile.socials?.linkedin || USER_CONFIG.socials.linkedin,
                   label: "LinkedIn",
                   rel: "me noopener noreferrer",
                 },
                 {
                   icon: <Twitter className="w-5 h-5" />,
-                  href: "https://x.com/pratyushkarki6",
+                  href: profile.socials?.twitter || USER_CONFIG.socials.twitter,
                   label: "Twitter",
                   rel: "noopener noreferrer",
                 },
                 {
                   icon: <Instagram className="w-5 h-5" />,
-                  href: "https://www.instagram.com/prasar_7/",
+                  href: profile.socials?.instagram || USER_CONFIG.socials.instagram,
                   label: "Instagram",
                   rel: "me noopener noreferrer",
                 },
@@ -179,11 +170,8 @@ export function AboutApp({
               ))}
             </div>
 
-            <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-[1.6] font-medium max-w-lg mb-2">
-              I build immersive digital experiences that live at the
-              intersection of design and technology. Passionate about crafting
-              clean, performant, and accessible user interfaces that tell a
-              story.
+            <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-[1.6] font-medium max-w-lg mb-2 whitespace-pre-line">
+              {profile.bio || "I build immersive digital experiences that live at the intersection of design and technology. Passionate about crafting clean, performant, and accessible user interfaces that tell a story."}
             </p>
           </div>
 
@@ -200,196 +188,14 @@ export function AboutApp({
               <div className="w-16 h-1 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 mx-auto mt-3 shadow-xs" />
             </div>
 
-            {/* Stacked Categories: Full-width rows with responsive grid items */}
+            {/* Stacked Categories: Dynamic live skills from admin panel */}
             <div className="flex flex-col gap-6 w-full">
-              {[
-                {
-                  category: "Frontend & Frameworks",
-                  icon: <Code2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
-                  gridClass: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3",
-                  items: [
-                    {
-                      title: "Next.js",
-                      descriptor: "React Framework",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-zinc-900 dark:text-white fill-current" viewBox="0 0 24 24">
-                          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.83 17.89l-6.8-9.43v9.43H9.41V6.11h1.62l6.8 9.43V6.11h1.62v11.78h-1.62z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "React",
-                      descriptor: "UI Library",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-[#00D8FF]" viewBox="-11.5 -10.23174 23 20.46348" fill="none" stroke="currentColor" strokeWidth="1.2">
-                          <ellipse rx="11" ry="4.2" />
-                          <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-                          <ellipse rx="11" ry="4.2" transform="rotate(120)" />
-                          <circle r="2" fill="currentColor" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "TypeScript",
-                      descriptor: "Type Safety",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 rounded" viewBox="0 0 24 24" fill="none">
-                          <rect width="24" height="24" rx="4" fill="#3178C6" />
-                          <text x="4.5" y="17" fill="white" fontSize="13" fontWeight="bold" fontFamily="system-ui, -apple-system, sans-serif">TS</text>
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "JavaScript (ES6+)",
-                      descriptor: "Programming Language",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 rounded" viewBox="0 0 24 24" fill="none">
-                          <rect width="24" height="24" rx="4" fill="#F7DF1E" />
-                          <text x="5" y="17" fill="#000000" fontSize="13" fontWeight="bold" fontFamily="system-ui, -apple-system, sans-serif">JS</text>
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "Tailwind CSS",
-                      descriptor: "Utility-first CSS",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-[#38BDF8] fill-current" viewBox="0 0 24 24">
-                          <path d="M12 6.5c-2.8 0-4.9 1.4-6.3 4.2 2.1-2.1 4.2-2.8 6.3-2.1 1.2.4 2 1.3 3 2.3 1.5 1.5 3.3 3.3 6.6 3.3 2.8 0 4.9-1.4 6.3-4.2-2.1 2.1-4.2 2.8-6.3 2.1-1.2-.4-2-1.3-3-2.3-1.5-1.5-3.3-3.3-6.6-3.3zM5.4 13c-2.8 0-4.9 1.4-6.3 4.2 2.1-2.1 4.2-2.8 6.3-2.1 1.2.4 2 1.3 3 2.3 1.5 1.5 3.3 3.3 6.6 3.3 2.8 0 4.9-1.4 6.3-4.2-2.1 2.1-4.2 2.8-6.3 2.1-1.2-.4-2-1.3-3-2.3-1.5-1.5-3.3-3.3-6.6-3.3z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "Variable Fonts",
-                      descriptor: "Custom Typography",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path d="M3.5 19L8 5L12.5 19M5 14.5H11" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M13.5 19L17 9L20.5 19M14.5 15.5H19.5" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "HTML5",
-                      descriptor: "Markup Language",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-[#E34F26] fill-current" viewBox="0 0 24 24">
-                          <path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.433 4.41l.707 7.962h10.457l-.372 4.156-4.225 1.15-4.225-1.15-.27-3.028H5.111l.465 5.568 6.424 1.781 6.425-1.781.859-9.338H8.531z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "CSS3",
-                      descriptor: "Styling Language",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-[#1572B6] fill-current" viewBox="0 0 24 24">
-                          <path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm17.09 4.413L5.41 4.41l.245 2.625 10.635.003-.277 3.03H6.012l.245 2.625h9.873l-.48 5.253-3.65 1.01-3.65-1.01-.233-2.625H5.72l.417 4.838 5.863 1.625 5.863-1.625 1.144-12.89z" />
-                        </svg>
-                      ),
-                    },
-                  ],
-                },
-                {
-                  category: "Edge & Cloud Infrastructure",
-                  icon: <Cloud className="w-4 h-4 text-sky-500 dark:text-sky-400" />,
-                  gridClass: "grid grid-cols-1 sm:grid-cols-3 gap-3",
-                  items: [
-                    {
-                      title: "Cloudflare Workers",
-                      descriptor: "Edge Runtime",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-[#F38020] fill-current" viewBox="0 0 24 24">
-                          <path d="M18.3 12.3c-.2-2.3-2.1-4.1-4.5-4.1-1.7 0-3.2.9-4 2.3-.4-.1-.8-.2-1.3-.2-2.2 0-4 1.8-4 4 0 .3 0 .5.1.8C2.9 15.6 1.5 17.2 1.5 19.1c0 2.2 1.8 3.9 4 3.9h12.8c2.6 0 4.7-2.1 4.7-4.7 0-2.3-1.6-4.2-3.7-4.6-.2-.7-.5-1-1-1.4z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "Vercel / Cloudflare Pages",
-                      descriptor: "Hosting & Deployment",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-zinc-900 dark:text-white fill-current" viewBox="0 0 24 24">
-                          <path d="M12 1L24 22H0L12 1Z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "Git / GitHub",
-                      descriptor: "Version Control",
-                      icon: (
-                        <svg className="w-4.5 h-4.5 text-zinc-900 dark:text-white fill-current" viewBox="0 0 24 24">
-                          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                        </svg>
-                      ),
-                    },
-                  ],
-                },
-                {
-                  category: "UI/UX Design & Craftsmanship",
-                  icon: <Palette className="w-4 h-4 text-purple-600 dark:text-purple-400" />,
-                  gridClass: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3",
-                  items: [
-                    {
-                      title: "Figma",
-                      descriptor: "UI/UX Design",
-                      icon: (
-                        <svg className="w-4.5 h-4.5" viewBox="0 0 38 57" fill="none">
-                          <path d="M19 0a9.5 9.5 0 0 0-9.5 9.5 9.5 9.5 0 0 0 9.5 9.5 9.5 9.5 0 0 0 9.5-9.5A9.5 9.5 0 0 0 19 0z" fill="#F24E1E" />
-                          <path d="M9.5 19a9.5 9.5 0 0 0 0 19h9.5V19H9.5z" fill="#A259FF" />
-                          <path d="M19 19h9.5a9.5 9.5 0 0 0 0-19H19v19z" fill="#FF7262" />
-                          <path d="M19 38h9.5a9.5 9.5 0 0 0 0-19H19v19z" fill="#1ABC9C" />
-                          <path d="M9.5 38a9.5 9.5 0 0 0 9.5 9.5V38H9.5z" fill="#18A0FB" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      title: "Micro-interactions",
-                      descriptor: "Delightful Animations",
-                      icon: <Zap className="w-4.5 h-4.5 text-amber-500 fill-amber-500/20" />,
-                    },
-                    {
-                      title: "CSS-first Responsive",
-                      descriptor: "Mobile WebView Optimized",
-                      icon: <MonitorSmartphone className="w-4.5 h-4.5 text-indigo-500" />,
-                    },
-                    {
-                      title: "GPU Acceleration",
-                      descriptor: "Performance Tweaks",
-                      icon: <Cpu className="w-4.5 h-4.5 text-emerald-500" />,
-                    },
-                  ],
-                },
-                {
-                  category: "Web Standards & SEO",
-                  icon: <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
-                  gridClass: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3",
-                  items: [
-                    {
-                      title: "Schema.org JSON-LD",
-                      descriptor: "Structured Data",
-                      icon: <Braces className="w-4.5 h-4.5 text-blue-500" />,
-                    },
-                    {
-                      title: "Responsive Design",
-                      descriptor: "All Screen Sizes",
-                      icon: <Maximize2 className="w-4.5 h-4.5 text-violet-500" />,
-                    },
-                    {
-                      title: "Cross-browser",
-                      descriptor: "Consistent Experience",
-                      icon: <Compass className="w-4.5 h-4.5 text-rose-500" />,
-                    },
-                    {
-                      title: "SEO Best Practices",
-                      descriptor: "Visibility & Performance",
-                      icon: <TrendingUp className="w-4.5 h-4.5 text-teal-500" />,
-                    },
-                  ],
-                },
-              ].map((cat) => (
-                <div key={cat.category} className="flex flex-col w-full">
-                  {/* Category Header - Full-width Row */}
+              {skills.map((cat) => (
+                <div key={cat.id || cat.category} className="flex flex-col w-full">
+                  {/* Category Header */}
                   <div className="flex items-center gap-2.5 mb-3">
                     <div className="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200/70 dark:border-zinc-700/60 flex items-center justify-center shrink-0 shadow-2xs">
-                      {cat.icon}
+                      <Code2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <h3 className="font-bold text-xs tracking-wider text-zinc-700 dark:text-zinc-200 uppercase">
                       {cat.category}
@@ -397,14 +203,14 @@ export function AboutApp({
                   </div>
 
                   {/* Responsive Grid for Category Items */}
-                  <div className={cat.gridClass}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     {cat.items.map((item) => (
                       <div
-                        key={item.title}
+                        key={item.id || item.title}
                         className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition"
                       >
                         <div className="w-9 h-9 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-700/50 flex items-center justify-center shrink-0">
-                          {item.icon}
+                          <SkillIcon skill={item} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap overflow-hidden text-ellipsis">
@@ -427,7 +233,7 @@ export function AboutApp({
                 <Code2 className="w-5 h-5 stroke-[2.2]" />
               </div>
               <p className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed italic">
-                &ldquo;I combine modern technologies with clean design and web standards to build products that are fast, accessible, and built to scale.&rdquo;
+                &ldquo;{profile.quote || "I combine modern technologies with clean design and web standards to build products that are fast, accessible, and built to scale."}&rdquo;
               </p>
             </div>
           </section>
@@ -592,10 +398,10 @@ export function AboutApp({
                 </h2>
               </div>
               <div className="flex flex-col h-auto">
-                {systemSpecs.map((spec, i) => (
+                {(profile.systemSpecs && profile.systemSpecs.length > 0 ? profile.systemSpecs : systemSpecs).map((spec, i, arr) => (
                   <div
                     key={i}
-                    className={`flex justify-between items-center py-2 ${i !== systemSpecs.length - 1 ? "border-b border-gray-100/30 dark:border-white/[0.04]" : ""}`}
+                    className={`flex justify-between items-center py-2 ${i !== arr.length - 1 ? "border-b border-gray-100/30 dark:border-white/[0.04]" : ""}`}
                   >
                     <span className="text-[12px] font-normal text-gray-400 dark:text-gray-500">
                       {spec.label}
