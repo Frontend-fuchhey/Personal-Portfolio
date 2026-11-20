@@ -13,11 +13,10 @@ import { AndroidDock } from './components/android/AndroidDock';
 import { ClockWidget } from './components/android/ClockWidget';
 import { WALLPAPERS } from './data/wallpapers';
 import { AppId, Wallpaper } from './types/os';
-import { OsDataProvider } from './hooks/useOsData';
+import { OsDataProvider, useOsData } from './hooks/useOsData';
 import { GlobalBackButton } from './components/ui/GlobalBackButton';
 import { DesktopBackground } from './components/ui/DesktopBackground';
 import { USER_CONFIG } from './data/userConfig';
-import profilePic from './assets/shrawan.jpg';
 import TextPressure from './components/ui/TextPressure';
 import { preloadAllAssets } from './utils/preloadAssets';
 import { SafeImage } from './components/ui/SafeImage';
@@ -90,7 +89,51 @@ const MemoizedAppContent = memo(({
   }
 });
 
+function DesktopBrandHero() {
+  const { profile } = useOsData();
+  const name = profile?.name?.trim() || 'Shrawan Karki';
+  const title = profile?.title?.trim() || 'Frontend Developer & UI/UX Designer';
+
+  return (
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 z-10 pointer-events-auto">
+      <div className="w-full relative min-h-[120px] md:min-h-[160px] flex items-center justify-center">
+        <TextPressure minFontSize={52} text={name} textColor="#FFFFFF" />
+      </div>
+      <p className="text-zinc-200 dark:text-zinc-200 font-medium text-lg md:text-2xl tracking-wide mt-2 drop-shadow-md text-center">
+        {title}
+      </p>
+    </div>
+  );
+}
+
+function StandaloneAdminView() {
+  return (
+    <ErrorBoundary>
+      <OsDataProvider>
+        <Suspense fallback={
+          <div className="fixed inset-0 flex flex-col items-center justify-center bg-zinc-50 text-zinc-800">
+            <div className="w-8 h-8 rounded-full border-2 border-zinc-900 border-t-transparent animate-spin mb-3" />
+            <p className="text-xs font-semibold text-zinc-500">Loading Admin Control Center...</p>
+          </div>
+        }>
+          <AdminApp isStandalone={true} />
+        </Suspense>
+      </OsDataProvider>
+    </ErrorBoundary>
+  );
+}
+
 export default function App() {
+  const isAdminRoute = typeof window !== 'undefined' && (
+    window.location.pathname.toLowerCase() === '/admin' ||
+    window.location.pathname.toLowerCase().startsWith('/admin/') ||
+    window.location.hash.toLowerCase() === '#admin' ||
+    window.location.hash.toLowerCase() === '#/admin'
+  );
+
+  if (isAdminRoute) {
+    return <StandaloneAdminView />;
+  }
   const [wallpaper, setWallpaperState] = useState<Wallpaper>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('shrawan_os_wallpaper');
@@ -119,13 +162,6 @@ export default function App() {
   const [showClock, setShowClock] = useState(true);
   
   const isMobile = useIsMobile();
-  if (typeof window !== 'undefined') {
-    const p = window.location.pathname.toLowerCase();
-    const h = window.location.hash.toLowerCase();
-    if (p === '/admin' || p.startsWith('/admin/') || h === '#admin' || h === '#/admin') {
-      return <AdminApp isStandalone={true} />;
-    }
-  }
   const [isBooted, setIsBooted] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [preloadProgress, setPreloadProgress] = useState(0);
@@ -353,14 +389,7 @@ export default function App() {
           >
             <div className="absolute w-[600px] h-[600px] rounded-full bg-white opacity-[0.03] blur-[100px] pointer-events-none" />
 
-            <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 z-10 pointer-events-auto">
-              <div className="w-full relative min-h-[120px] md:min-h-[160px] flex items-center justify-center">
-                <TextPressure alpha={false} flex={false} italic={true} minFontSize={52} stroke={false} text="Shrawan Karki" textColor="#FFFFFF" weight={true} width={true}/>
-              </div>
-              <p className="text-zinc-200 dark:text-zinc-200 font-medium text-lg md:text-2xl tracking-wide mt-2 drop-shadow-md text-center">
-                Frontend Developer & UI/UX Designer
-              </p>
-            </div>
+            <DesktopBrandHero />
           </motion.div>
         </div>
 

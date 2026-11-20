@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import "./lib/firebase";
+import { OsDataProvider } from "./hooks/useOsData";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 const AdminApp = lazy(() => import("./components/apps/AdminApp").then(m => ({ default: m.AdminApp })));
 
@@ -38,13 +40,18 @@ function Root() {
 
   if (isAdmin) {
     return (
-      <Suspense fallback={
-        <div className="fixed inset-0 min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center font-mono">
-          <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-        </div>
-      }>
-        <AdminApp isStandalone={true} />
-      </Suspense>
+      <ErrorBoundary>
+        <OsDataProvider>
+          <Suspense fallback={
+            <div className="fixed inset-0 bg-[#0a0a0f] text-white flex flex-col items-center justify-center font-mono p-4">
+              <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-3" />
+              <p className="text-xs text-zinc-400">Loading Admin Control Center...</p>
+            </div>
+          }>
+            <AdminApp isStandalone={true} />
+          </Suspense>
+        </OsDataProvider>
+      </ErrorBoundary>
     );
   }
 
