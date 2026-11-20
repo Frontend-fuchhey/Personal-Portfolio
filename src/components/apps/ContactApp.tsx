@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Mail, Linkedin, Github, MapPin, Send, Copy, Check, AlertCircle } from 'lucide-react';
 import { USER_CONFIG } from '../../data/userConfig';
+import { useOsData } from '../../hooks/useOsData';
 import profilePic from '../../assets/shrawan.jpg';
 
 export function ContactApp() {
+  const { profile } = useOsData();
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '', botField: '' });
@@ -24,25 +26,17 @@ export function ContactApp() {
     setErrorMessage(null);
 
     try {
-      // 1. Primary: Netlify serverless function (dispatches Gmail SMTP + custom HTML auto-reply)
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      }).catch(() => null);
-
-      if (response && response.ok) {
-        setIsSuccess(true);
-        setFormData({ name: '', email: '', message: '', botField: '' });
+      const web3FormsKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as string | undefined;
+      if (!web3FormsKey) {
+        setErrorMessage('Failed to send message. Please email pratyushkarki6@gmail.com directly.');
         return;
       }
 
-      // 2. Resilient Fallback: If serverless endpoint fails, dispatch directly via Web3Forms
-      const fallbackResponse = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          access_key: '97d3105d-c0c0-488d-9f46-b4c76208352b',
+          access_key: web3FormsKey,
           from_name: formData.name,
           email: formData.email,
           message: formData.message,
@@ -50,7 +44,7 @@ export function ContactApp() {
         }),
       });
 
-      if (fallbackResponse.ok) {
+      if (response.ok) {
         setIsSuccess(true);
         setFormData({ name: '', email: '', message: '', botField: '' });
       } else {
@@ -64,10 +58,11 @@ export function ContactApp() {
     }
   };
 
+  const activeEmail = profile.email || 'pratyushkarki6@gmail.com';
   const contactNodes = [
-    { id: 'email', title: 'EMAIL', label: 'pratyushkarki6@gmail.com', icon: Mail, color: '#EA4335', link: 'mailto:pratyushkarki6@gmail.com' },
-    { id: 'github', title: 'GITHUB', label: 'GitHub', icon: Github, color: '#181717', link: 'https://github.com/frontend-fuchhey' },
-    { id: 'linkedin', title: 'LINKEDIN', label: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: 'https://www.linkedin.com/in/shrawan-karki-187706428/' },
+    { id: 'email', title: 'EMAIL', label: activeEmail, icon: Mail, color: '#EA4335', link: `mailto:${activeEmail}` },
+    { id: 'github', title: 'GITHUB', label: 'GitHub', icon: Github, color: '#181717', link: profile.socials?.github || 'https://github.com/frontend-fuchhey' },
+    { id: 'linkedin', title: 'LINKEDIN', label: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: profile.socials?.linkedin || 'https://www.linkedin.com/in/shrawan-karki-187706428/' },
     { id: 'location', title: 'LOCATION', label: 'Morang, Nepal', icon: MapPin, color: '#EA4335', link: '#' },
   ];
 
@@ -85,7 +80,7 @@ export function ContactApp() {
           <div className="relative shrink-0">
             <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-[3px] border-white shadow-sm overflow-hidden antialiased">
               <img
-                src={profilePic}
+                src={profile.profilePic?.trim() || profilePic}
                 className="w-full h-full object-cover object-center image-render-crisp"
                 style={{
                   // @ts-ignore
@@ -94,7 +89,7 @@ export function ContactApp() {
                   transform: 'translateZ(0)',
                   backfaceVisibility: 'hidden'
                 }}
-                alt={USER_CONFIG.name}
+                alt={profile.name || USER_CONFIG.name}
               />
             </div>
             <div className="absolute bottom-0 right-1 w-[12px] h-[12px] bg-[#34C759] border-2 border-white rounded-full" />
