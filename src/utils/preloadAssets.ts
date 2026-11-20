@@ -1,16 +1,4 @@
 import profilePic from '../assets/shrawan.jpg';
-import garmentIcon from '../assets/garmentflow.png';
-import gallery2 from '../assets/maingarment.jpg';
-import mbPortfolio from '../assets/mb.png';
-import lpPortfolio from '../assets/lp.jpg';
-import resumeIoBg from '../assets/resume-io.png';
-import resumeLogo from '../assets/resume-logo.png';
-import itahariLogo from '../assets/itahari-logo.png';
-import arnikoLogo from '../assets/arniko-logo.png';
-import imageA from '../assets/galleryimages/ImageA.png';
-import imageB from '../assets/galleryimages/ImageB.jpg';
-import imageC from '../assets/galleryimages/ImageC.jpg';
-import imageD from '../assets/galleryimages/ImageD.png';
 import tictactoeIcon from '../assets/tictactoe.png';
 
 // Critical assets required strictly for the initial desktop / mobile home screen
@@ -23,20 +11,20 @@ export const CRITICAL_IMAGES: string[] = [
 export const SECONDARY_IMAGES: string[] = [
   '/fluid_wave_bg.jpg',
   tictactoeIcon,
-  garmentIcon,
-  resumeLogo,
-  resumeIoBg,
-  gallery2,
-  lpPortfolio,
-  mbPortfolio,
-  itahariLogo,
-  arnikoLogo,
+  '/images/garmentflow.png',
+  '/images/resume-logo.png',
+  '/images/resume-io.png',
+  '/images/maingarment.jpg',
+  '/images/lp.jpg',
+  '/images/mb.png',
+  '/images/itahari-logo.png',
+  '/images/arniko-logo.png',
   '/certificates/class10.jpg',
   '/certificates/class12.jpg',
-  imageA,
-  imageB,
-  imageC,
-  imageD,
+  '/images/gallery/ImageA.png',
+  '/images/gallery/ImageB.jpg',
+  '/images/gallery/ImageC.jpg',
+  '/images/gallery/ImageD.png',
 ];
 
 /**
