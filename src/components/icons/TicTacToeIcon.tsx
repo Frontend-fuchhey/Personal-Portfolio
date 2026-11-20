@@ -1,6 +1,5 @@
 import React from 'react';
 import localTicTacToeIcon from '../../assets/tictactoe.png';
-import { SafeImage } from '../ui/SafeImage';
 
 export const TIC_TAC_TOE_ICON_URL = localTicTacToeIcon;
 
