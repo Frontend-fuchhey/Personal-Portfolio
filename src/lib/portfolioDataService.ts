@@ -9,7 +9,16 @@ import {
   query
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { INITIAL_PROJECTS, STATIC_GALLERY_ITEMS } from '../data/initialData';
+import { 
+  INITIAL_PROJECTS, 
+  STATIC_GALLERY_ITEMS,
+  ProfileData,
+  INITIAL_PROFILE_DATA,
+  AboutData,
+  INITIAL_ABOUT_DATA,
+  SkillCategory,
+  INITIAL_SKILLS_DATA
+} from '../data/initialData';
 
 export interface ProjectItem {
   id: string;
@@ -386,5 +395,139 @@ export async function saveDatabasePasskey(newPasskey: string): Promise<void> {
     }, { merge: true });
   } catch (err) {
     throw describeError('save passkey', err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Profile & Branding
+// ---------------------------------------------------------------------------
+
+export function subscribeToProfile(callback: (profile: ProfileData) => void): () => void {
+  try {
+    return onSnapshot(
+      doc(db, CONFIG_COLLECTION, 'profile'),
+      (snap) => {
+        if (!snap.exists()) {
+          callback(INITIAL_PROFILE_DATA);
+          return;
+        }
+        const data = snap.data() as Partial<ProfileData>;
+        callback({
+          ...INITIAL_PROFILE_DATA,
+          ...data,
+          socials: {
+            ...INITIAL_PROFILE_DATA.socials,
+            ...(data.socials || {})
+          },
+          systemSpecs: Array.isArray(data.systemSpecs) && data.systemSpecs.length > 0 
+            ? data.systemSpecs 
+            : INITIAL_PROFILE_DATA.systemSpecs
+        });
+      },
+      (err) => {
+        console.warn('Firestore profile read error, using fallback:', err);
+        callback(INITIAL_PROFILE_DATA);
+      }
+    );
+  } catch (err) {
+    console.warn('Firestore profile subscribe failed:', err);
+    callback(INITIAL_PROFILE_DATA);
+    return () => {};
+  }
+}
+
+export async function saveProfileData(profile: ProfileData): Promise<void> {
+  try {
+    await setDoc(doc(db, CONFIG_COLLECTION, 'profile'), stripUndefined({
+      ...profile,
+      updatedAt: Date.now()
+    }), { merge: true });
+  } catch (err) {
+    throw describeError('save profile', err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// About Content (Experience & Education)
+// ---------------------------------------------------------------------------
+
+export function subscribeToAbout(callback: (about: AboutData) => void): () => void {
+  try {
+    return onSnapshot(
+      doc(db, CONFIG_COLLECTION, 'about'),
+      (snap) => {
+        if (!snap.exists()) {
+          callback(INITIAL_ABOUT_DATA);
+          return;
+        }
+        const data = snap.data() as Partial<AboutData>;
+        callback({
+          experience: Array.isArray(data.experience) ? data.experience : INITIAL_ABOUT_DATA.experience,
+          education: Array.isArray(data.education) ? data.education : INITIAL_ABOUT_DATA.education,
+        });
+      },
+      (err) => {
+        console.warn('Firestore about read error, using fallback:', err);
+        callback(INITIAL_ABOUT_DATA);
+      }
+    );
+  } catch (err) {
+    console.warn('Firestore about subscribe failed:', err);
+    callback(INITIAL_ABOUT_DATA);
+    return () => {};
+  }
+}
+
+export async function saveAboutData(about: AboutData): Promise<void> {
+  try {
+    await setDoc(doc(db, CONFIG_COLLECTION, 'about'), stripUndefined({
+      ...about,
+      updatedAt: Date.now()
+    }), { merge: true });
+  } catch (err) {
+    throw describeError('save about data', err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Skills & Tech Stack
+// ---------------------------------------------------------------------------
+
+export function subscribeToSkills(callback: (skills: SkillCategory[]) => void): () => void {
+  try {
+    return onSnapshot(
+      doc(db, CONFIG_COLLECTION, 'skills'),
+      (snap) => {
+        if (!snap.exists()) {
+          callback(INITIAL_SKILLS_DATA);
+          return;
+        }
+        const data = snap.data();
+        if (Array.isArray(data?.categories) && data.categories.length > 0) {
+          callback(data.categories as SkillCategory[]);
+        } else {
+          callback(INITIAL_SKILLS_DATA);
+        }
+      },
+      (err) => {
+        console.warn('Firestore skills read error, using fallback:', err);
+        callback(INITIAL_SKILLS_DATA);
+      }
+    );
+  } catch (err) {
+    console.warn('Firestore skills subscribe failed:', err);
+    callback(INITIAL_SKILLS_DATA);
+    return () => {};
+  }
+}
+
+export async function saveSkillsData(categories: SkillCategory[]): Promise<void> {
+  try {
+    await setDoc(doc(db, CONFIG_COLLECTION, 'skills'), stripUndefined({
+      categories,
+      updatedAt: Date.now()
+    }), { merge: true });
+  } catch (err) {
+    throw describeError('save skills', err);
   }
 }

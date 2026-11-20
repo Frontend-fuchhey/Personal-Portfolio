@@ -1,5 +1,130 @@
 
-export const INITIAL_ABOUT_DATA = {
+export interface ExperienceItem {
+  id: string;
+  title: string;
+  company: string;
+  range: string;
+  achievement: string;
+}
+
+export interface EducationItem {
+  id: string;
+  degree: string;
+  institution: string;
+  detail?: string;
+  year: string;
+  status: 'ongoing' | 'completed';
+  logo?: string;
+  link?: string;
+  certId?: string;
+}
+
+export interface AboutData {
+  experience: ExperienceItem[];
+  education: EducationItem[];
+}
+
+export interface SkillItem {
+  id: string;
+  title: string;
+  descriptor: string;
+  icon?: string;
+  iconType?: 'preset' | 'emoji' | 'image';
+}
+
+export interface SkillCategory {
+  id: string;
+  category: string;
+  items: SkillItem[];
+}
+
+export interface ProfileData {
+  name: string;
+  title: string;
+  bio: string;
+  quote?: string;
+  profilePic?: string;
+  favicon?: string;
+  email: string;
+  socials: {
+    github: string;
+    linkedin: string;
+    twitter: string;
+    instagram: string;
+  };
+  systemSpecs: Array<{ label: string; value: string }>;
+}
+
+export const INITIAL_PROFILE_DATA: ProfileData = {
+  name: "Shrawan Karki",
+  title: "Frontend Developer & UI/UX Designer",
+  bio: "I build immersive digital experiences that live at the intersection of design and technology. Passionate about crafting clean, performant, and accessible user interfaces that tell a story.",
+  quote: "I combine modern technologies with clean design and web standards to build products that are fast, accessible, and built to scale.",
+  profilePic: "",
+  favicon: "",
+  email: "pratyushkarki6@gmail.com",
+  socials: {
+    github: "https://github.com/frontend-fuchhey",
+    linkedin: "https://www.linkedin.com/in/shrawan-karki-187706428/",
+    twitter: "https://x.com/pratyushkarki6",
+    instagram: "https://www.instagram.com/prasar_7/",
+  },
+  systemSpecs: [
+    { label: "Processor", value: "16GB Passion" },
+    { label: "Graphics", value: "4GB Creativity" },
+    { label: "Memory", value: "1TB Overflowing Ideas" },
+    { label: "OS", value: "Premium Human Edition" },
+    { label: "Developer", value: "Shrawan Karki" },
+  ]
+};
+
+export const INITIAL_SKILLS_DATA: SkillCategory[] = [
+  {
+    id: "frontend",
+    category: "Frontend & Frameworks",
+    items: [
+      { id: "nextjs", title: "Next.js", descriptor: "React Framework", icon: "nextjs", iconType: "preset" },
+      { id: "react", title: "React", descriptor: "UI Library", icon: "react", iconType: "preset" },
+      { id: "ts", title: "TypeScript", descriptor: "Type Safety", icon: "ts", iconType: "preset" },
+      { id: "js", title: "JavaScript (ES6+)", descriptor: "Programming Language", icon: "js", iconType: "preset" },
+      { id: "tailwind", title: "Tailwind CSS", descriptor: "Utility-first CSS", icon: "tailwind", iconType: "preset" },
+      { id: "varfonts", title: "Variable Fonts", descriptor: "Custom Typography", icon: "varfonts", iconType: "preset" },
+      { id: "html5", title: "HTML5", descriptor: "Markup Language", icon: "html5", iconType: "preset" },
+      { id: "css3", title: "CSS3", descriptor: "Styling Language", icon: "css3", iconType: "preset" },
+    ],
+  },
+  {
+    id: "cloud",
+    category: "Edge & Cloud Infrastructure",
+    items: [
+      { id: "cloudflare", title: "Cloudflare Workers", descriptor: "Edge Runtime", icon: "cloudflare", iconType: "preset" },
+      { id: "vercel", title: "Vercel / Cloudflare Pages", descriptor: "Hosting & Deployment", icon: "vercel", iconType: "preset" },
+      { id: "github", title: "Git / GitHub", descriptor: "Version Control", icon: "github", iconType: "preset" },
+    ],
+  },
+  {
+    id: "uiux",
+    category: "UI/UX Design & Craftsmanship",
+    items: [
+      { id: "figma", title: "Figma", descriptor: "UI/UX Design", icon: "figma", iconType: "preset" },
+      { id: "micro", title: "Micro-interactions", descriptor: "Delightful Animations", icon: "zap", iconType: "preset" },
+      { id: "responsive", title: "CSS-first Responsive", descriptor: "Mobile WebView Optimized", icon: "responsive", iconType: "preset" },
+      { id: "gpu", title: "GPU Acceleration", descriptor: "Performance Tweaks", icon: "gpu", iconType: "preset" },
+    ],
+  },
+  {
+    id: "standards",
+    category: "Web Standards & SEO",
+    items: [
+      { id: "schema", title: "Schema.org JSON-LD", descriptor: "Structured Data", icon: "schema", iconType: "preset" },
+      { id: "screen", title: "Responsive Design", descriptor: "All Screen Sizes", icon: "screen", iconType: "preset" },
+      { id: "browser", title: "Cross-browser", descriptor: "Consistent Experience", icon: "browser", iconType: "preset" },
+      { id: "seo", title: "SEO Best Practices", descriptor: "Visibility & Performance", icon: "seo", iconType: "preset" },
+    ],
+  },
+];
+
+export const INITIAL_ABOUT_DATA: AboutData = {
   experience: [
     {
       id: 'exp1',
