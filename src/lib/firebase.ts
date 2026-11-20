@@ -4,61 +4,45 @@ import { getFirestore, initializeFirestore, Firestore } from "firebase/firestore
 
 const sanitizeEnvValue = (
   val: unknown,
-  fallback: string,
   options?: { mustInclude?: string; mustNotInclude?: string; minLength?: number }
 ): string => {
-  if (typeof val !== "string") return fallback;
+  if (typeof val !== "string") return "";
   const cleaned = val.trim().replace(/^['"`]+|['"`]+$/g, "").trim();
-  if (!cleaned || cleaned.toLowerCase().startsWith("your_")) return fallback;
-  if (options?.minLength && cleaned.length < options.minLength) return fallback;
-  if (options?.mustInclude && !cleaned.includes(options.mustInclude)) return fallback;
-  if (options?.mustNotInclude && cleaned.includes(options.mustNotInclude)) return fallback;
+  if (!cleaned || cleaned.toLowerCase().startsWith("your_")) return "";
+  if (options?.minLength && cleaned.length < options.minLength) return "";
+  if (options?.mustInclude && !cleaned.includes(options.mustInclude)) return "";
+  if (options?.mustNotInclude && cleaned.includes(options.mustNotInclude)) return "";
   return cleaned;
 };
 
-const getApiKey = (): string => {
-  let fallbackKey = "";
-  try {
-    fallbackKey = atob("QUl6YVN5Q3ZXa0tYbUxfMW00TU5qd3BvQjMxUkQ1OS02VGhtZGJj");
-  } catch {
-    fallbackKey = "";
-  }
-  const rawEnvKey =
-    (import.meta.env.VITE_FIREBASE_API_KEY as string) ||
-    (import.meta.env.NEXT_PUBLIC_FIREBASE_API_KEY as string);
-
-  return sanitizeEnvValue(rawEnvKey, fallbackKey, { minLength: 30 });
-};
-
 const firebaseConfig = {
-  apiKey: getApiKey(),
+  apiKey: sanitizeEnvValue(
+    (import.meta.env.VITE_FIREBASE_API_KEY as string) ||
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_API_KEY as string),
+    { minLength: 30 }
+  ),
   authDomain: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) ||
       (import.meta.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string),
-    "shrawan-portfolio.firebaseapp.com",
     { mustInclude: "." }
   ),
   projectId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) ||
       (import.meta.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string),
-    "shrawan-portfolio",
     { mustNotInclude: "." }
   ),
   storageBucket: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) ||
       (import.meta.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string),
-    "shrawan-portfolio.firebasestorage.app",
     { mustInclude: "." }
   ),
   messagingSenderId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) ||
-      (import.meta.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string),
-    "674306342708"
+      (import.meta.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string)
   ),
   appId: sanitizeEnvValue(
     (import.meta.env.VITE_FIREBASE_APP_ID as string) ||
       (import.meta.env.NEXT_PUBLIC_FIREBASE_APP_ID as string),
-    "1:674306342708:web:fc834664f508060062ef61",
     { mustInclude: ":" }
   ),
 };
