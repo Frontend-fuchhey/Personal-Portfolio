@@ -16,17 +16,7 @@ An OS-style interactive portfolio of Shrawan Karki, built as a desktop/mobile "o
 
 ## Tech Stack
 
-React 19, TypeScript, Vite, Tailwind CSS, Framer Motion, Firebase, Netlify Functions.
-
-## Run Locally
-
-```bash
-npm install
-cp .env.example .env
-npm run dev
-```
-
-Build for production with `npm run build`.
+React 19, TypeScript, Vite, Tailwind CSS, Framer Motion, Firebase.
 
 ## License
 

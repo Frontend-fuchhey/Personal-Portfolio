@@ -44,16 +44,6 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-    proxy: {
-      '/api/contact': {
-        target: 'https://shrawankarki.com.np',
-        changeOrigin: true,
-      },
-      '/.netlify/functions': {
-        target: 'https://shrawankarki.com.np',
-        changeOrigin: true,
-      },
-    },
   },
   preview: {
     port,
